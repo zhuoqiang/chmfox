@@ -38,7 +38,7 @@
 #include "ICHMUnitInfo.h"
 #include "chm_lib.h"
 
-#define MOZ_CHMUNITINFO_CONTRACTID "@coralsoft.com/chmreader/CHMUnitInfo;1"
+#define MOZ_CHMUNITINFO_CONTRACTID "@zhuoqiang.me/chmfox/CHMUnitInfo;1"
 #define MOZ_CHMUNITINFO_CLASSNAME "A XPCOM component used to store chmUnitInfo"
 #define MOZ_CHMUNITINFO_CID \
   {0xeef77fe6, 0xd4f2, 0x4ead, \

@@ -16,11 +16,11 @@
 #endif
 
 /* starting interface:    ICHMUnitInfo */
-#define ICHMUNITINFO_IID_STR "c00c787a-3911-49e4-8b54-7b3c935548f3"
+#define ICHMUNITINFO_IID_STR "d360fd27-c486-4e60-844a-1075270f98ac"
 
 #define ICHMUNITINFO_IID \
-  {0xc00c787a, 0x3911, 0x49e4, \
-    { 0x8b, 0x54, 0x7b, 0x3c, 0x93, 0x55, 0x48, 0xf3 }}
+  {0xd360fd27, 0xc486, 0x4e60, \
+    { 0x84, 0x4a, 0x10, 0x75, 0x27, 0x0f, 0x98, 0xac }}
 
 class NS_NO_VTABLE NS_SCRIPTABLE ICHMUnitInfo : public nsISupports {
  public: 

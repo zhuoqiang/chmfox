@@ -28,11 +28,11 @@
 #endif
 
 /* starting interface:    ICHMFile */
-#define ICHMFILE_IID_STR "ca627f57-99b7-4ebc-9483-9a216eb99439"
+#define ICHMFILE_IID_STR "0689a604-7420-4b90-92c5-343c89ddddc6"
 
 #define ICHMFILE_IID \
-  {0xca627f57, 0x99b7, 0x4ebc, \
-    { 0x94, 0x83, 0x9a, 0x21, 0x6e, 0xb9, 0x94, 0x39 }}
+  {0x0689a604, 0x7420, 0x4b90, \
+    { 0x92, 0xc5, 0x34, 0x3c, 0x89, 0xdd, 0xdd, 0xc6 }}
 
 class NS_NO_VTABLE NS_SCRIPTABLE ICHMFile : public nsISupports {
  public: 

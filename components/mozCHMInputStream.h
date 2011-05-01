@@ -48,7 +48,7 @@
 #define MOZ_CHMINPUTSTREAM_CID \
   {0x1e6f568a, 0x2f2f, 0x4bf9, \
     { 0x97, 0x01, 0x94, 0x00, 0xa9, 0xfa, 0x62, 0x05 }}
-#define MOZ_CHMINPUTSTREAM_CONTRACTID "@coralsoft.com/chmreader/CHMInputStream;1"
+#define MOZ_CHMINPUTSTREAM_CONTRACTID "@zhuoqiang.me/chmfox/CHMInputStream;1"
 
 class mozCHMInputStream : public nsIInputStream
 {

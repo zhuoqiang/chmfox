@@ -7,7 +7,7 @@ content = 'overlay.js overlay.xul sidebar.js sidebar.xul'
 for c in content.split(' '):
     contents.append(os.path.join('chrome', 'content', c))
 
-skin = 'chmreader_16.png chmreader_24.png overlay.css'
+skin = 'chmfox_16.png chmfox_24.png overlay.css'
 for s in skin.split(' '):
     contents.append(os.path.join('chrome', 'skin', s))
 

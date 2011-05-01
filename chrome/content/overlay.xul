@@ -35,41 +35,41 @@
    - 
 ***** END LICENSE BLOCK ***** -->
 
-<?xml-stylesheet href="chrome://chmreader/skin/overlay.css" type="text/css"?>
+<?xml-stylesheet href="chrome://chmfox/skin/overlay.css" type="text/css"?>
 
-<overlay id="chmReaderOverlay" 
+<overlay id="chmfoxOverlay" 
   xmlns="http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul">
 
     <script type="application/x-javascript" src="overlay.js"/>
 
     <!-- Tools menu -->
     <menupopup id="menu_FilePopup">
-        <menuitem insertbefore="menu_closeWindow" label="Open CHM Files" id="CHMReaderOpenFilesItem" accesskey="h" oncommand="on_open_chm(event)" />
+        <menuitem insertbefore="menu_closeWindow" label="Open CHM Files" id="ChmfoxOpenFilesItem" accesskey="h" oncommand="on_open_chm(event)" />
     </menupopup>
 
     <menupopup id="viewSidebarMenu">
-        <menuitem key="key_openCHMReaderSidebar" observes="viewCHMReaderSidebar" />
+        <menuitem key="key_openChmfoxSidebar" observes="viewChmfoxSidebar" />
     </menupopup>
   
     <keyset id="mainKeyset">
-        <key id="key_openCHMReaderSidebar" command="viewCHMReaderSidebar"
+        <key id="key_openChmfoxSidebar" command="viewChmfoxSidebar"
              key="E" 
              modifiers="control" />
     </keyset>
   
     <broadcasterset id="mainBroadcasterSet"> 
-        <broadcaster id="viewCHMReaderSidebar" 
+        <broadcaster id="viewChmfoxSidebar" 
                      label="CHM Reader"
                      autoCheck="false"
                      type="checkbox"
                      group="sidebar"
-                     sidebarurl="chrome://chmreader/content/sidebar.xul"
+                     sidebarurl="chrome://chmfox/content/sidebar.xul"
                      sidebartitle="CHM Reader"
-                     oncommand="toggleSidebar('viewCHMReaderSidebar');" />
+                     oncommand="toggleSidebar('viewChmfoxSidebar');" />
     </broadcasterset>
 
     <toolbarpalette id="BrowserToolbarPalette">
-        <toolbarbutton id="tb-chmreader-open" class="toolbarbutton-1"
+        <toolbarbutton id="tb-chmfox-open" class="toolbarbutton-1"
             label="Open CHM" tooltiptext="Open CHM File"
             oncommand="on_open_chm(event);"/>
     </toolbarpalette>

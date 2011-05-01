@@ -14,7 +14,7 @@
    - The Original Code is "CHM Reader".
    -
    - The Initial Developer of the Original Code is Denis Remondini.
-   - Portions created by the Initial Developer are Copyright (C) 2005-2006 Denis Remondini.  
+   - Portions created by the Initial Developer are Copyright (C) 2005-2006 Denis Remondini.
    - All Rights Reserved.
    -
    - Contributor(s): Ling Li <lilingv AT gmail DOT com>
@@ -31,7 +31,7 @@
    - the provisions above, a recipient may use your version of this file under
    - the terms of any one of the MPL, the GPL or the LGPL.
    -
-   - 
+   -
 ***** END LICENSE BLOCK *****/
 
 function on_open_chm(e)
@@ -44,8 +44,8 @@ function on_open_chm(e)
     var prefs = Components.classes["@mozilla.org/preferences-service;1"]
                           .getService(Components.interfaces.nsIPrefBranch);
     var dir;
-    if (prefs.getPrefType("chmreader.opendir") == prefs.PREF_STRING){
-        dir = prefs.getCharPref("chmreader.opendir");
+    if (prefs.getPrefType("chmfox.opendir") == prefs.PREF_STRING){
+        dir = prefs.getCharPref("chmfox.opendir");
         var path = Components.classes["@mozilla.org/file/local;1"]
                              .createInstance(Components.interfaces.nsILocalFile);
         path.initWithPath(unescape(dir));
@@ -57,13 +57,13 @@ function on_open_chm(e)
     var res = fp.show();
     if (res == nsIFilePicker.returnOK) {
         // Save path
-        prefs.setCharPref("chmreader.opendir", escape(fp.file.parent.path));
+        prefs.setCharPref("chmfox.opendir", escape(fp.file.parent.path));
 
         var path = encodeURI(fp.file.path);
 
         var b;
-        if (e.target.id == 'CHMReaderOpenFilesItem' ||
-            e.target.id == 'tb-chmreader-open') {
+        if (e.target.id == 'ChmfoxOpenFilesItem' ||
+            e.target.id == 'tb-chmfox-open') {
             // Call from main window
             b = getBrowser();
         } else {
@@ -93,9 +93,9 @@ function chm_fetch_and_load_remote_file(url,fname,intab) {
 
     var dir;
     if (tmpdir.path == "/tmp" && userinfo.username) {
-        tmpdir.append("mozchmreader-" + userinfo.username).path;
+        tmpdir.append("mozchmfox-" + userinfo.username).path;
     } else {
-        tmpdir.append("mozchmreader");
+        tmpdir.append("mozchmfox");
     }
     dir = tmpdir.path;
 
@@ -147,7 +147,7 @@ function chm_fetch_and_load_remote_file(url,fname,intab) {
         uri: null,
         intab: null,
 
-        init: function(tr_i, uri_i, intab_i) { this.tr = tr_i; 
+        init: function(tr_i, uri_i, intab_i) { this.tr = tr_i;
                                       this.uri = uri_i;
                                       this.intab = intab_i; },
 
@@ -170,7 +170,7 @@ function chm_fetch_and_load_remote_file(url,fname,intab) {
         onStateChange: function(progress, request, flags, stat) {
             if (flags & Components.interfaces.nsIWebProgressListener.STATE_STOP)
                 chm_load_local_uri_in_browser(this.uri, this.intab);
-            return tr.onStateChange(progress, request, flags, stat); 
+            return tr.onStateChange(progress, request, flags, stat);
         }
     };
 
@@ -187,7 +187,7 @@ function chm_fetch_and_load_remote_file(url,fname,intab) {
 }
 
 //------------------------------------------------------------------------------
-// 
+//
 
 function chm_load_local_uri_in_browser(uri,intab) {
     var fph = Components.classes['@mozilla.org/network/protocol;1?name=file']
@@ -197,7 +197,7 @@ function chm_load_local_uri_in_browser(uri,intab) {
 
     if (intab) {
         var tab = getBrowser().addTab(uri);
-        if (chm_should_new_tab_get_focus()) 
+        if (chm_should_new_tab_get_focus())
             getBrowser().selectedTab = tab;
     } else {
         getBrowser().loadURI(uri);
@@ -208,7 +208,7 @@ function chm_load_local_uri_in_browser(uri,intab) {
 //
 
 function chm_handle_url(url,intab) {
-    if (chm_is_link_type("file:",url)) {  
+    if (chm_is_link_type("file:",url)) {
         chm_load_local_uri_in_browser (url, intab);
     } else {
         var fname = decodeURIComponent(url.substring(url.lastIndexOf('/') + 1));
@@ -229,7 +229,7 @@ function chm_mouse_click_handler(aEvent) {
         return;
 
     // if Shift key and Ctrl key were pressed, it means that the user wants to open the PDF file without "PDF Download"
-    if (aEvent.shiftKey && aEvent.ctrlKey) 
+    if (aEvent.shiftKey && aEvent.ctrlKey)
         return;
 
     if (aEvent.target)
@@ -249,19 +249,19 @@ function chm_mouse_click_handler(aEvent) {
             return;
     }
     // END of the code taken by an extension written by Ben Basson (Cusser)
-    
+
 
     // Middle click for new tab
     var intab = 0;
     if (aEvent.button == 1)
         intab = 1;
 
-    var url = targ.getAttribute("href");  
+    var url = targ.getAttribute("href");
     if (url == null) return;
 
     // remove heading spaces
     url = url.replace(/^\s+/, '');
-     
+
     // we check if the link is absolute or not
     if ( (!chm_is_link_type("http", url)) && (!chm_is_link_type("file:",url)) && (!chm_is_link_type("ftp",url)) ) {
         // the link is not absolute, hence we need to build the absolute link
@@ -276,7 +276,7 @@ function chm_mouse_click_handler(aEvent) {
         } else {
             url = dir + url;
         }
-    } 
+    }
 
     // if it is a javascript link, we do not do anything
     if (url.toLowerCase().indexOf('javascript:') != -1)
@@ -290,17 +290,17 @@ function chm_mouse_click_handler(aEvent) {
     if (url.match(/^http:\/\/[a-z.]+yahoo.[a-z.]+\//i) && (url.match(/\/\*\*([^&#]+)/i))) {
         url = decodeURIComponent(RegExp.$1);
     }
-      
+
     var originalUrl = url;
-    // we remove eventual parameters in the url    
-    var firstSharpPosition = url.indexOf('#');  
+    // we remove eventual parameters in the url
+    var firstSharpPosition = url.indexOf('#');
     if (firstSharpPosition != -1) {
         url = url.substring(0,firstSharpPosition);
-    } 
-    var firstQuestionMarkPosition = url.indexOf('?');  
+    }
+    var firstQuestionMarkPosition = url.indexOf('?');
     if (firstQuestionMarkPosition != -1) {
         url = url.substring(0,firstQuestionMarkPosition);
-    } 
+    }
 
     // we check if the link points to a chm file
     var lastDotPosition = url.lastIndexOf('.');
@@ -308,7 +308,7 @@ function chm_mouse_click_handler(aEvent) {
 
     // we check if the extension is part of a directory name or if it is a real filename extension
     var lastSlashPosition = url.lastIndexOf('/');
-    if (lastSlashPosition > lastDotPosition) {  
+    if (lastSlashPosition > lastDotPosition) {
         // the extension we found is not the filename extension but it is part of a directory name
         // ex: http://groups.google.com/group/comp.text.pdf/browse_thread/thread/a7e39729ab3bc5d/9d9408322b2a77ff
         return;
@@ -317,12 +317,12 @@ function chm_mouse_click_handler(aEvent) {
     if (ext.toLowerCase() == "chm") {
         chm_handle_url(url, intab);
         aEvent.preventDefault();
-        aEvent.stopPropagation();  
+        aEvent.stopPropagation();
     }
 }
 
 //------------------------------------------------------------------------------
-// 
+//
 
 function chm_should_new_tab_get_focus() {
     var focusNewTab;
@@ -347,7 +347,7 @@ function chm_is_link_type (linktype, link) {
 }
 
 //------------------------------------------------------------------------------
-// Display message on javascript console 
+// Display message on javascript console
 
 function chm_log(msg) {
     var consoleService = Components.classes["@mozilla.org/consoleservice;1"].getService(Components.interfaces.nsIConsoleService);
@@ -367,7 +367,7 @@ function chm_uninit() {
 
 function getCurrentLocation() {
     return document.commandDispatcher.focusedWindow.location.href;
-}       
+}
 
 //find the base URL for the document
 function getBaseUrl() {

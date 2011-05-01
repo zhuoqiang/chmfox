@@ -42,7 +42,7 @@
 
 // interface nsIDictionary;
 
-[scriptable, uuid(ca627f57-99b7-4ebc-9483-9a216eb99439)]
+[scriptable, uuid(0689a604-7420-4b90-92c5-343c89ddddc6)]
 interface ICHMFile : nsISupports
 {
     long LoadCHM(in nsIFile chmfile);

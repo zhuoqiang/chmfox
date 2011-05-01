@@ -42,7 +42,7 @@
 #include "chm_lib.h"
 #include <nsEmbedString.h>
 
-#define MOZ_CHMFILE_CONTRACTID "@coralsoft.com/chmreader/CHMFile;1"
+#define MOZ_CHMFILE_CONTRACTID "@zhuoqiang.me/chmfox/CHMFile;1"
 #define MOZ_CHMFILE_CLASSNAME "A XPCOM component used to open chm files"
 #define MOZ_CHMFILE_CID \
   {0x9990b02d, 0xbd1a, 0x4a13, \

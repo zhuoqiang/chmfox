@@ -37,7 +37,7 @@
 
 [ptr] native npChmUnitInfo(struct chmUnitInfo);
 
-[scriptable, uuid(c00c787a-3911-49e4-8b54-7b3c935548f3)]
+[scriptable, uuid(d360fd27-c486-4e60-844a-1075270f98ac)]
 interface ICHMUnitInfo : nsISupports
 {
     readonly attribute unsigned long long start;

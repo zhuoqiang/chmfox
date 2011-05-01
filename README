@@ -13,6 +13,6 @@ There's no prebuild xulrunner sdk for FreeBSD and XULRunner 1.9.0.x is still
 not included in FreeBSD ports too. We can build a SDK from source code, but
 that's waste lots of time.
 
-We can use headers and libiaries in firefox3 package to build chmreader.
+We can use headers and libiaries in firefox3 package to build chmfox.
 Since no xpidl provided with firefox3 package, the header and xpt file
 generation is disabled by default on FreeBSD.

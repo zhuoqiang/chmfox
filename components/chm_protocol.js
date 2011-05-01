@@ -83,7 +83,7 @@ Protocol.prototype = {
                               .createInstance(Ci.nsILocalFile);
     var path = thefile.substring(thefile.indexOf("://") + 3);
     localfile.initWithPath(path);
-    var chmfile = Cc["@coralsoft.com/chmreader/CHMFile;1"].createInstance(Ci.ICHMFile);
+    var chmfile = Cc["@zhuoqiang.me/chmfox/CHMFile;1"].createInstance(Ci.ICHMFile);
     if (chmfile.LoadCHM(localfile) != 0) {
         this.log("file not found: " + localfile.path + "\n");
         // File not found
