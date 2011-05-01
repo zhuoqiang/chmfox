@@ -76,7 +76,7 @@ class NS_NO_VTABLE NS_SCRIPTABLE ICHMFile : public nsISupports {
   NS_SCRIPTABLE NS_IMETHOD RetrieveObject(ICHMUnitInfo *ui, PRInt32 start, PRInt32 length, nsACString & _retval NS_OUTPARAM) = 0;
 
   /* [noscript] unsigned long retrieveObjectToBuffer (in ICHMUnitInfo ui, in long start, in long length, in charPtr buf); */
-  NS_IMETHOD RetrieveObjectToBuffer(ICHMUnitInfo *ui, PRInt32 start, PRInt32 length, char * buf, PRUint32 *_retval NS_OUTPARAM) = 0;
+  NS_IMETHOD RetrieveObjectToBuffer(ICHMUnitInfo *ui, PRInt32 start, PRInt32 length, char *buf, PRUint32 *_retval NS_OUTPARAM) = 0;
 
   /* nsIInputStream getInputStream (in ICHMUnitInfo ui); */
   NS_SCRIPTABLE NS_IMETHOD GetInputStream(ICHMUnitInfo *ui, nsIInputStream **_retval NS_OUTPARAM) = 0;
@@ -99,7 +99,7 @@ class NS_NO_VTABLE NS_SCRIPTABLE ICHMFile : public nsISupports {
   NS_SCRIPTABLE NS_IMETHOD GetLCID(PRInt32 *aLCID); \
   NS_SCRIPTABLE NS_IMETHOD ResolveObject(const nsACString & path, ICHMUnitInfo **_retval NS_OUTPARAM); \
   NS_SCRIPTABLE NS_IMETHOD RetrieveObject(ICHMUnitInfo *ui, PRInt32 start, PRInt32 length, nsACString & _retval NS_OUTPARAM); \
-  NS_IMETHOD RetrieveObjectToBuffer(ICHMUnitInfo *ui, PRInt32 start, PRInt32 length, char * buf, PRUint32 *_retval NS_OUTPARAM); \
+  NS_IMETHOD RetrieveObjectToBuffer(ICHMUnitInfo *ui, PRInt32 start, PRInt32 length, char *buf, PRUint32 *_retval NS_OUTPARAM); \
   NS_SCRIPTABLE NS_IMETHOD GetInputStream(ICHMUnitInfo *ui, nsIInputStream **_retval NS_OUTPARAM); 
 
 /* Use this macro to declare functions that forward the behavior of this interface to another object. */
@@ -116,7 +116,7 @@ class NS_NO_VTABLE NS_SCRIPTABLE ICHMFile : public nsISupports {
   NS_SCRIPTABLE NS_IMETHOD GetLCID(PRInt32 *aLCID) { return _to GetLCID(aLCID); } \
   NS_SCRIPTABLE NS_IMETHOD ResolveObject(const nsACString & path, ICHMUnitInfo **_retval NS_OUTPARAM) { return _to ResolveObject(path, _retval); } \
   NS_SCRIPTABLE NS_IMETHOD RetrieveObject(ICHMUnitInfo *ui, PRInt32 start, PRInt32 length, nsACString & _retval NS_OUTPARAM) { return _to RetrieveObject(ui, start, length, _retval); } \
-  NS_IMETHOD RetrieveObjectToBuffer(ICHMUnitInfo *ui, PRInt32 start, PRInt32 length, char * buf, PRUint32 *_retval NS_OUTPARAM) { return _to RetrieveObjectToBuffer(ui, start, length, buf, _retval); } \
+  NS_IMETHOD RetrieveObjectToBuffer(ICHMUnitInfo *ui, PRInt32 start, PRInt32 length, char *buf, PRUint32 *_retval NS_OUTPARAM) { return _to RetrieveObjectToBuffer(ui, start, length, buf, _retval); } \
   NS_SCRIPTABLE NS_IMETHOD GetInputStream(ICHMUnitInfo *ui, nsIInputStream **_retval NS_OUTPARAM) { return _to GetInputStream(ui, _retval); } 
 
 /* Use this macro to declare functions that forward the behavior of this interface to another object in a safe way. */
@@ -133,7 +133,7 @@ class NS_NO_VTABLE NS_SCRIPTABLE ICHMFile : public nsISupports {
   NS_SCRIPTABLE NS_IMETHOD GetLCID(PRInt32 *aLCID) { return !_to ? NS_ERROR_NULL_POINTER : _to->GetLCID(aLCID); } \
   NS_SCRIPTABLE NS_IMETHOD ResolveObject(const nsACString & path, ICHMUnitInfo **_retval NS_OUTPARAM) { return !_to ? NS_ERROR_NULL_POINTER : _to->ResolveObject(path, _retval); } \
   NS_SCRIPTABLE NS_IMETHOD RetrieveObject(ICHMUnitInfo *ui, PRInt32 start, PRInt32 length, nsACString & _retval NS_OUTPARAM) { return !_to ? NS_ERROR_NULL_POINTER : _to->RetrieveObject(ui, start, length, _retval); } \
-  NS_IMETHOD RetrieveObjectToBuffer(ICHMUnitInfo *ui, PRInt32 start, PRInt32 length, char * buf, PRUint32 *_retval NS_OUTPARAM) { return !_to ? NS_ERROR_NULL_POINTER : _to->RetrieveObjectToBuffer(ui, start, length, buf, _retval); } \
+  NS_IMETHOD RetrieveObjectToBuffer(ICHMUnitInfo *ui, PRInt32 start, PRInt32 length, char *buf, PRUint32 *_retval NS_OUTPARAM) { return !_to ? NS_ERROR_NULL_POINTER : _to->RetrieveObjectToBuffer(ui, start, length, buf, _retval); } \
   NS_SCRIPTABLE NS_IMETHOD GetInputStream(ICHMUnitInfo *ui, nsIInputStream **_retval NS_OUTPARAM) { return !_to ? NS_ERROR_NULL_POINTER : _to->GetInputStream(ui, _retval); } 
 
 #if 0
@@ -241,7 +241,7 @@ NS_IMETHODIMP _MYCLASS_::RetrieveObject(ICHMUnitInfo *ui, PRInt32 start, PRInt32
 }
 
 /* [noscript] unsigned long retrieveObjectToBuffer (in ICHMUnitInfo ui, in long start, in long length, in charPtr buf); */
-NS_IMETHODIMP _MYCLASS_::RetrieveObjectToBuffer(ICHMUnitInfo *ui, PRInt32 start, PRInt32 length, char * buf, PRUint32 *_retval NS_OUTPARAM)
+NS_IMETHODIMP _MYCLASS_::RetrieveObjectToBuffer(ICHMUnitInfo *ui, PRInt32 start, PRInt32 length, char *buf, PRUint32 *_retval NS_OUTPARAM)
 {
     return NS_ERROR_NOT_IMPLEMENTED;
 }

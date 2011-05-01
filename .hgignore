@@ -1,0 +1,5 @@
+\.dblite$
+\.os$
+\.xpi$
+^install\.rdf$
+\.orig$

@@ -43,7 +43,7 @@ class NS_NO_VTABLE NS_SCRIPTABLE ICHMUnitInfo : public nsISupports {
   NS_SCRIPTABLE NS_IMETHOD GetPath(nsACString & aPath) = 0;
 
   /* [noscript] npChmUnitInfo getNativeChmUnitInfo (); */
-  NS_IMETHOD GetNativeChmUnitInfo(struct chmUnitInfo * *_retval NS_OUTPARAM) = 0;
+  NS_IMETHOD GetNativeChmUnitInfo(struct chmUnitInfo **_retval NS_OUTPARAM) = 0;
 
 };
 
@@ -56,7 +56,7 @@ class NS_NO_VTABLE NS_SCRIPTABLE ICHMUnitInfo : public nsISupports {
   NS_SCRIPTABLE NS_IMETHOD GetSpace(PRInt32 *aSpace); \
   NS_SCRIPTABLE NS_IMETHOD GetFlags(PRInt32 *aFlags); \
   NS_SCRIPTABLE NS_IMETHOD GetPath(nsACString & aPath); \
-  NS_IMETHOD GetNativeChmUnitInfo(struct chmUnitInfo * *_retval NS_OUTPARAM); 
+  NS_IMETHOD GetNativeChmUnitInfo(struct chmUnitInfo **_retval NS_OUTPARAM); 
 
 /* Use this macro to declare functions that forward the behavior of this interface to another object. */
 #define NS_FORWARD_ICHMUNITINFO(_to) \
@@ -65,7 +65,7 @@ class NS_NO_VTABLE NS_SCRIPTABLE ICHMUnitInfo : public nsISupports {
   NS_SCRIPTABLE NS_IMETHOD GetSpace(PRInt32 *aSpace) { return _to GetSpace(aSpace); } \
   NS_SCRIPTABLE NS_IMETHOD GetFlags(PRInt32 *aFlags) { return _to GetFlags(aFlags); } \
   NS_SCRIPTABLE NS_IMETHOD GetPath(nsACString & aPath) { return _to GetPath(aPath); } \
-  NS_IMETHOD GetNativeChmUnitInfo(struct chmUnitInfo * *_retval NS_OUTPARAM) { return _to GetNativeChmUnitInfo(_retval); } 
+  NS_IMETHOD GetNativeChmUnitInfo(struct chmUnitInfo **_retval NS_OUTPARAM) { return _to GetNativeChmUnitInfo(_retval); } 
 
 /* Use this macro to declare functions that forward the behavior of this interface to another object in a safe way. */
 #define NS_FORWARD_SAFE_ICHMUNITINFO(_to) \
@@ -74,7 +74,7 @@ class NS_NO_VTABLE NS_SCRIPTABLE ICHMUnitInfo : public nsISupports {
   NS_SCRIPTABLE NS_IMETHOD GetSpace(PRInt32 *aSpace) { return !_to ? NS_ERROR_NULL_POINTER : _to->GetSpace(aSpace); } \
   NS_SCRIPTABLE NS_IMETHOD GetFlags(PRInt32 *aFlags) { return !_to ? NS_ERROR_NULL_POINTER : _to->GetFlags(aFlags); } \
   NS_SCRIPTABLE NS_IMETHOD GetPath(nsACString & aPath) { return !_to ? NS_ERROR_NULL_POINTER : _to->GetPath(aPath); } \
-  NS_IMETHOD GetNativeChmUnitInfo(struct chmUnitInfo * *_retval NS_OUTPARAM) { return !_to ? NS_ERROR_NULL_POINTER : _to->GetNativeChmUnitInfo(_retval); } 
+  NS_IMETHOD GetNativeChmUnitInfo(struct chmUnitInfo **_retval NS_OUTPARAM) { return !_to ? NS_ERROR_NULL_POINTER : _to->GetNativeChmUnitInfo(_retval); } 
 
 #if 0
 /* Use the code below as a template for the implementation class for this interface. */
@@ -139,7 +139,7 @@ NS_IMETHODIMP _MYCLASS_::GetPath(nsACString & aPath)
 }
 
 /* [noscript] npChmUnitInfo getNativeChmUnitInfo (); */
-NS_IMETHODIMP _MYCLASS_::GetNativeChmUnitInfo(struct chmUnitInfo * *_retval NS_OUTPARAM)
+NS_IMETHODIMP _MYCLASS_::GetNativeChmUnitInfo(struct chmUnitInfo **_retval NS_OUTPARAM)
 {
     return NS_ERROR_NOT_IMPLEMENTED;
 }

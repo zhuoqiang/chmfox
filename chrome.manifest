@@ -3,3 +3,12 @@ skin chmreader classic/1.0 chrome/skin/
 style chrome://browser/content/browser.xul chrome://chmreader/skin/overlay.css
 style chrome://global/content/customizeToolbar.xul chrome://chmreader/skin/overlay.css
 overlay chrome://browser/content/browser.xul chrome://chmreader/content/overlay.xul
+
+
+component {44ec01d7-e036-41d5-baa6-1c4f6f55c7b5} components/chm_protocol.js
+contract @mozilla.org/network/protocol;1?name=chm {44ec01d7-e036-41d5-baa6-1c4f6f55c7b5}
+
+interfaces components/ICHMFile.xpt
+interfaces components/ICHMUnitInfo.xpt
+
+binary-component platform/Linux_x86-gcc3/components/libchm.so ABI=Linux_x86-gcc3

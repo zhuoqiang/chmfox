@@ -14,7 +14,7 @@
    - The Original Code is "CHM Reader".
    -
    - The Initial Developer of the Original Code is Denis Remondini.
-   - Portions created by the Initial Developer are Copyright (C) 2005-2006 Denis Remondini.  
+   - Portions created by the Initial Developer are Copyright (C) 2005-2006 Denis Remondini.
    - All Rights Reserved.
    -
    - Contributor(s): Ling Li <lilingv AT gmail DOT com>
@@ -31,8 +31,9 @@
    - the provisions above, a recipient may use your version of this file under
    - the terms of any one of the MPL, the GPL or the LGPL.
    -
-   - 
+   -
 ***** END LICENSE BLOCK *****/
+Components.utils.import("resource://gre/modules/XPCOMUtils.jsm");
 
 // Test protocol related
 const kSCHEME = "chm";
@@ -72,6 +73,9 @@ function Protocol()
 
 Protocol.prototype =
 {
+  classID: Components.ID("44ec01d7-e036-41d5-baa6-1c4f6f55c7b5"),
+  // QueryInterface: XPCOMUtils.generateQI([Ci.nsIProtocolHandler, Ci.nsISupports]),
+
   QueryInterface: function(iid)
   {
     if (!iid.equals(nsIProtocolHandler) &&
@@ -84,7 +88,7 @@ Protocol.prototype =
   defaultPort: -1,
   protocolFlags: nsIProtocolHandler.URI_NORELATIVE |
                  nsIProtocolHandler.URI_NOAUTH,
-  
+
   allowPort: function(port, scheme)
   {
     return false;
@@ -290,7 +294,7 @@ Protocol.prototype =
 
     return bc;
   },
-  
+
   removeRelative: function(path) {
     var parts = path.split('/');
     var final = new Array();
@@ -347,8 +351,8 @@ TestModule.registerSelf = function (compMgr, fileSpec, location, type)
   compMgr.registerFactoryLocation(kPROTOCOL_CID,
                                   kPROTOCOL_NAME,
                                   kPROTOCOL_CONTRACTID,
-                                  fileSpec, 
-                                  location, 
+                                  fileSpec,
+                                  location,
                                   type);
 }
 
@@ -359,7 +363,7 @@ TestModule.getClassObject = function (compMgr, cid, iid)
 
   if (!iid.equals(Components.interfaces.nsIFactory))
     throw Components.results.NS_ERROR_NOT_IMPLEMENTED;
-    
+
   return ProtocolFactory;
 }
 
@@ -373,3 +377,6 @@ function NSGetModule(compMgr, fileSpec)
   return TestModule;
 }
 
+if (XPCOMUtils.generateNSGetFactory) {
+    const NSGetFactory = XPCOMUtils.generateNSGetFactory([Protocol]);
+}

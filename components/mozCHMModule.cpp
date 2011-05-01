@@ -34,36 +34,46 @@
    - 
 ***** END LICENSE BLOCK *****/
 
-
-#include "nsIGenericFactory.h"
+#include "mozilla/ModuleUtils.h"
 #include "mozCHMFile.h"
 #include "mozCHMUnitInfo.h"
 #include "mozCHMInputStream.h"
 
 NS_GENERIC_FACTORY_CONSTRUCTOR(mozCHMFile)
-NS_GENERIC_FACTORY_CONSTRUCTOR(mozCHMUnitInfo)
-NS_GENERIC_FACTORY_CONSTRUCTOR(mozCHMInputStream)
+NS_DEFINE_NAMED_CID(MOZ_CHMFILE_CID);
 
-static nsModuleComponentInfo components[] =
-{
-    {
-        MOZ_CHMFILE_CLASSNAME, 
-        MOZ_CHMFILE_CID,
-        MOZ_CHMFILE_CONTRACTID,
-        mozCHMFileConstructor,
-    },
-    {
-        MOZ_CHMUNITINFO_CLASSNAME, 
-        MOZ_CHMUNITINFO_CID, 
-        MOZ_CHMUNITINFO_CONTRACTID, 
-        mozCHMUnitInfoConstructor,
-    },
-    {
-        MOZ_CHMINPUTSTREAM_CLASSNAME,
-        MOZ_CHMINPUTSTREAM_CID,
-        MOZ_CHMINPUTSTREAM_CONTRACTID,
-        mozCHMInputStreamConstructor,
-    }
+NS_GENERIC_FACTORY_CONSTRUCTOR(mozCHMUnitInfo)
+NS_DEFINE_NAMED_CID(MOZ_CHMUNITINFO_CID);
+
+NS_GENERIC_FACTORY_CONSTRUCTOR(mozCHMInputStream)
+NS_DEFINE_NAMED_CID(MOZ_CHMINPUTSTREAM_CID);
+
+static const mozilla::Module::CIDEntry kCIDs[] = {
+    { &kMOZ_CHMFILE_CID, false, NULL, mozCHMFileConstructor},
+    { &kMOZ_CHMUNITINFO_CID, false, NULL, mozCHMUnitInfoConstructor},
+    { &kMOZ_CHMINPUTSTREAM_CID, false, NULL, mozCHMInputStreamConstructor},
+    { NULL }
 };
 
-NS_IMPL_NSGETMODULE("mozCHMModule", components) 
+static const mozilla::Module::ContractIDEntry kContracts[] = {
+    { MOZ_CHMFILE_CONTRACTID, &kMOZ_CHMFILE_CID },
+    { MOZ_CHMUNITINFO_CONTRACTID, &kMOZ_CHMUNITINFO_CID },
+    { MOZ_CHMINPUTSTREAM_CONTRACTID, &kMOZ_CHMINPUTSTREAM_CID },
+    { NULL }
+};
+
+static const mozilla::Module::CategoryEntry kCategories[] = {
+    // { "chmfox-category", "chmfox-key", CHMFOX_CONTRACTID },
+    { NULL }
+};
+
+static const mozilla::Module kModule = {
+    mozilla::Module::kVersion,
+    kCIDs,
+    kContracts,
+    kCategories
+};
+
+NSMODULE_DEFN(mozCHMModule) = &kModule;
+
+NS_IMPL_MOZILLA192_NSGETMODULE(&kModule)
