@@ -1,0 +1,23 @@
+import os
+
+Import('platform_name')
+
+def shlib(pname):
+    if pname[:5] == 'Linux' or pname[:7] == 'FreeBSD':
+        return 'so'
+    elif pname[:5] == 'WINNT':
+        return 'dll'
+    elif pname[:6] == 'Darwin':
+        return 'dylib'
+    return None
+
+r = []
+if isinstance(platform_name, list):
+    for p in platform_name:
+        r.append(os.path.join('platform', p, 'components',
+                              'libchm.' + shlib(p)))
+else:
+    r.append(os.path.join('platform', platform_name, 'components',
+                          'libchm.' + shlib(platform_name)))
+
+Return('r')

@@ -1,0 +1,9 @@
+/*  skin/toolbar-button.css  */
+
+#tb-chmreader-open {
+  list-style-image: url("chrome://chmreader/skin/chmreader_24.png");
+}
+
+toolbar[iconsize="small"] #tb-chmreader-open {
+  list-style-image: url("chrome://chmreader/skin/chmreader_16.png");
+}

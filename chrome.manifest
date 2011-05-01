@@ -1,0 +1,5 @@
+content chmreader chrome/content/
+skin chmreader classic/1.0 chrome/skin/
+style chrome://browser/content/browser.xul chrome://chmreader/skin/overlay.css
+style chrome://global/content/customizeToolbar.xul chrome://chmreader/skin/overlay.css
+overlay chrome://browser/content/browser.xul chrome://chmreader/content/overlay.xul

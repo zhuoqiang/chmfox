@@ -1,0 +1,30 @@
+<?xml version="1.0"?>
+
+<RDF xmlns="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+     xmlns:em="http://www.mozilla.org/2004/em-rdf#">
+
+  <Description about="urn:mozilla:install-manifest">
+    <em:id>{6e098d65-7d2d-46d4-ada0-2f882a29f795}</em:id>
+    <em:version/>
+    <em:type>2</em:type>
+   
+    <!-- Target Application this extension can install into, 
+         with minimum and maximum supported versions. --> 
+    <em:targetApplication>
+      <Description>
+        <em:id>{ec8030f7-c20a-464f-9b0e-13a3a9e97384}</em:id>
+        <em:minVersion>3.0b4</em:minVersion>
+        <em:maxVersion>3.6.*</em:maxVersion>
+      </Description>
+    </em:targetApplication>
+   
+    <!-- Front End MetaData -->
+    <em:name>CHM Reader</em:name>
+    <em:description>An extension make firefox support CHM file reading.</em:description>
+    <em:creator>Ling Li</em:creator>
+    <em:targetPlatform/>
+    <em:homepageURL>http://sourceforge.net/projects/chmreader/</em:homepageURL>
+    <em:updateURL>http://chmreader.sourceforge.net/update.php?appos=%APP_OS%&amp;appabi=%APP_ABI%</em:updateURL>
+    <em:updateKey>MIGfMA0GCSqGSIb3DQEBAQUAA4GNADCBiQKBgQC2KtUCdyMRzIykrpq9IiuNhj1RG+IgRc4DnIy2ypkom+9cWenu3Vw5gFvQo1x1uu3wSApNpHZCb1m6L3WaWpR07w34mNOgvoXomtYpRrEoKE+zoRN8I4eY1o9oIbAUQbYPgwS+mt2JTLqpKAXr6feLksU4igYW2R6oqr/cvjR6CwIDAQAB</em:updateKey>
+  </Description>
+</RDF>

@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<RDF:RDF xmlns:RDF="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+         xmlns:em="http://www.mozilla.org/2004/em-rdf#">
+
+  <RDF:Description about="urn:mozilla:extension:{6e098d65-7d2d-46d4-ada0-2f882a29f795}">
+    <em:updates>
+      <RDF:Seq>
+
+        <RDF:li>
+          <RDF:Description>
+            <em:version>0.2.3</em:version>
+            <em:targetApplication>
+              <RDF:Description>
+                <em:id>{ec8030f7-c20a-464f-9b0e-13a3a9e97384}</em:id>
+                <em:minVersion>3.0b4</em:minVersion>
+                <em:maxVersion>3.0.*</em:maxVersion>
+                <em:updateLink>http://downloads.sourceforge.net/chmreader/chmreader-windows_x86-msvc-0.2.3.xpi</em:updateLink>
+                <em:updateHash>sha1:06676791e029cfea7dda01d05f9cd653f61db51e</em:updateHash>
+              </RDF:Description>
+            </em:targetApplication>
+          </RDF:Description>
+        </RDF:li>
+
+      </RDF:Seq>
+    </em:updates>
+
+  </RDF:Description>
+</RDF:RDF>
