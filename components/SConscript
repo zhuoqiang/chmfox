@@ -5,7 +5,7 @@ Import('platform_name', 'noxpidl')
 
 geckosdk = ''
 
-libs = ['xpcom', 'xpcomglue_s', 'nspr4', 'plds4', 'plc4']
+libs = ['xpcom', 'xpcomglue_s', 'nspr4', 'plds4', 'plc4', 'mozalloc']
 
 # We use firefox development files instead for geckosdk on FreeBSD
 if system() != 'FreeBSD':
