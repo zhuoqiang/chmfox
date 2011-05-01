@@ -1,12 +1,12 @@
-content chmreader chrome/content/
-skin chmreader classic/1.0 chrome/skin/
-style chrome://browser/content/browser.xul chrome://chmreader/skin/overlay.css
-style chrome://global/content/customizeToolbar.xul chrome://chmreader/skin/overlay.css
-overlay chrome://browser/content/browser.xul chrome://chmreader/content/overlay.xul
+content chmfox chrome/content/
+skin chmfox classic/1.0 chrome/skin/
+style chrome://browser/content/browser.xul chrome://chmfox/skin/overlay.css
+style chrome://global/content/customizeToolbar.xul chrome://chmfox/skin/overlay.css
+overlay chrome://browser/content/browser.xul chrome://chmfox/content/overlay.xul
 
 
-component {44ec01d7-e036-41d5-baa6-1c4f6f55c7b5} components/chm_protocol.js
-contract @mozilla.org/network/protocol;1?name=chm {44ec01d7-e036-41d5-baa6-1c4f6f55c7b5}
+component {c152fc51-a5bf-4cc7-99f1-66ca8459d806} components/chm_protocol.js
+contract @mozilla.org/network/protocol;1?name=chm {c152fc51-a5bf-4cc7-99f1-66ca8459d806}
 
 interfaces components/ICHMFile.xpt
 interfaces components/ICHMUnitInfo.xpt

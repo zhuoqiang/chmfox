@@ -30,7 +30,7 @@ def get_platform_name(abi):
     return platform_name
 
 def get_package_name(abi):
-    return 'chmreader-%s_%s-%s' % abi
+    return 'chmfox-%s_%s-%s' % abi
 
 def get_default_abi():
     ss = { 'Linux' : 'linux', 'Windows' : 'windows' , 'Darwin' : 'darwin' ,
@@ -119,7 +119,7 @@ if mode == 'ALLINONE':
     for abi in abis:
         platform_name.append(get_platform_name(abi))
     objs.extend(SConscript('platform/SConscript', exports = 'platform_name'))
-    target = 'chmreader-%s.xpi' % version
+    target = 'chmfox-%s.xpi' % version
     env.Xpi(target, objs, PLATFORM = platform_name, VERSION = version)
     Alias('xpi', target)
 elif mode == 'ALL':

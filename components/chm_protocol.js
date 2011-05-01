@@ -19,7 +19,7 @@ function Protocol() {
 Protocol.prototype = {
   scheme: kScheme,
   classDescription: "CHM Protocol",
-  classID: Components.ID("44ec01d7-e036-41d5-baa6-1c4f6f55c7b5"),
+  classID: Components.ID("c152fc51-a5bf-4cc7-99f1-66ca8459d806"),
   contractID: "@mozilla.org/network/protocol;1?name=" + kScheme,
   QueryInterface: XPCOMUtils.generateQI([Ci.nsIProtocolHandler, Ci.nsISupports]),
 
