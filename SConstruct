@@ -12,7 +12,7 @@ if not system() in ('Linux', 'Windows', 'Darwin'):
     default_noxpidl = '1'
 noxpidl = ARGUMENTS.get('NOXPIDL', default_noxpidl)
 
-opts = Options('custom.py')
+opts = Variables('custom.py')
 opts.Add('MODE', """Set to ALL, build separate xpi for every platform.
       Set to ALLINONE, build one big xpi support all platform.""", None)
 env = Environment(options = opts)
