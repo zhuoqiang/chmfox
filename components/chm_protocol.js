@@ -4,30 +4,34 @@ const Ci = Components.interfaces;
 const Cc = Components.classes;
 // const Cr = Components.results;
 
-function Protocol()
-{
+const kScheme = 'chm';
+
+function log(message) {
+  var console = Cc["@mozilla.org/consoleservice;1"].getService(Ci.nsIConsoleService);
+  var msg = kScheme + ": " + message + "\n";
+  console.logStringMessage(msg);
+  dump(msg);
 }
 
-Protocol.prototype =
-{
+function Protocol() {
+}
+
+Protocol.prototype = {
+  scheme: kScheme,
+  classDescription: "CHM Protocol",
   classID: Components.ID("44ec01d7-e036-41d5-baa6-1c4f6f55c7b5"),
+  contractID: "@mozilla.org/network/protocol;1?name=" + kScheme,
   QueryInterface: XPCOMUtils.generateQI([Ci.nsIProtocolHandler, Ci.nsISupports]),
 
-  scheme: "chm",
   defaultPort: -1,
   protocolFlags: Ci.nsIProtocolHandler.URI_NORELATIVE |
                  Ci.nsIProtocolHandler.URI_NOAUTH,
 
-  allowPort: function(port, scheme)
-  {
+  allowPort: function(port, scheme) {
     return false;
   },
 
-  newURI: function(spec, charset, baseURI)
-  {
-    //dump("spec: " + spec + "\n");
-    //dump("charset: " + charset + "\n");
-    //if (baseURI) dump("basespec: " + baseURI.spec + "\n");
+  newURI: function(spec, charset, baseURI) {
     var uri = Cc["@mozilla.org/network/simple-uri;1"].createInstance(Ci.nsIURI);
     if (spec.substring(0, 1) == "#") {
         var basespec = baseURI.spec;
@@ -242,12 +246,6 @@ Protocol.prototype =
       }
     }
     return '/' + final.join('/');
-  },
-
-  log: function(msg) {
-    var consoleService = Cc["@mozilla.org/consoleservice;1"]
-                                   .getService(Ci.nsIConsoleService);
-    consoleService.logStringMessage("CHM Reader: " + msg);
   }
 };
 
