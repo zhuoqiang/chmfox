@@ -1,3 +1,5 @@
+var chmfox = (function() {
+
 Components.utils.import("resource://gre/modules/XPCOMUtils.jsm");
 
 var Ci = Components.interfaces;
@@ -7,11 +9,11 @@ var Cr = Components.results;
 function log(msg) {
     var console = Cc["@mozilla.org/consoleservice;1"].getService(Ci.nsIConsoleService);
     var message = '[chmfox] ' + msg + '\n';
-    console.logStringMessage(msg);
-    dump(msg);
+    console.logStringMessage(message);
+    dump(message);
 }
 
-var chmListener = {
+var uriContentListener = {
     QueryInterface: XPCOMUtils.generateQI([
         Ci.nsIURIContentListener,
         Ci.nsISupportsWeakReference,
@@ -24,6 +26,8 @@ var chmListener = {
                  if (url.fileExtension == 'chm') {
                      var newUri = "chm:"+uri.spec;
                      log("Redirect to "+newUri);
+                     // @todo using below to change scheme
+                     // uri.scheme = "chm";
                      gBrowser.loadURI(newUri);
                      return true;
                  }
@@ -33,32 +37,6 @@ var chmListener = {
              log(e);
          }
          return false;
-     },
-
-     doContent: function(aContentType, aIsContentPreferred, aRequest, aContentHandler ) {
-           throw Cr.NS_ERROR_NOT_IMPLEMENTED;
-     },
-     canHandleContent: function(aContentType, aIsContentPreferred, aDesiredContentType)
-    {
-           throw Cr.NS_ERROR_NOT_IMPLEMENTED;
-     },
-     isPreferred: function(aContentType, aDesiredContentType)
-    {
-         try
-        {
-             var webNavInfo =
-             Components.classes["@mozilla.org/webnavigation-info;1"]
-                         .getService(Components.interfaces.nsIWebNavigationInfo);
-             return webNavInfo.isTypeSupported(aContentType, null);
-         }
-       catch (e)
-       {
-             return false;
-         }
-     },
-       GetWeakReference : function()
-    {
-        throw Cr.NS_ERROR_NOT_IMPLEMENTED;
      }
 };
 
@@ -67,8 +45,12 @@ var wnd = window.QueryInterface(Components.interfaces.nsIInterfaceRequestor)
                         .QueryInterface(Components.interfaces.nsIDocShell)
                         .QueryInterface(Components.interfaces.nsIInterfaceRequestor)
                   .getInterface(Components.interfaces.nsIURIContentListener);
-wnd.parentContentListener = chmListener;
 
+wnd.parentContentListener = uriContentListener;
+
+return {log:log};
+
+})();
 
 function on_open_chm(e)
 {
