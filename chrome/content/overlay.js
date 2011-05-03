@@ -34,6 +34,79 @@
    -
 ***** END LICENSE BLOCK *****/
 
+var chmListener = {
+    // QueryInterface: XPCOMUtils.generateQI([
+    //     Ci.nsIURIContentListener,
+    //     Ci.nsISupportsWeakReference,
+    //     Ci.nsISupports]),
+    QueryInterface: function(iid) {
+        if (iid.equals(Ci.nsIURIContentListener) ||
+            iid.equals(Ci.nsISupportsWeakReference) ||
+            iid.equals(Ci.nsISupports)) {
+            return this;
+        }
+        throw Cr.NS_NOINTERFACE;
+     },
+
+     onStartURIOpen: function(uri) {
+         dump("uri:"+uri.spec+"\n");
+         if (uri.schemeIs("file"))
+         {
+             dump("scheme match file\n");
+             try {
+                 var url = uri.QueryInterface(Components.interfaces.nsIURL);
+                 dump("file extenstion is:" + url.fileExtension + "\n");
+                 if (url.fileExtension == 'chm') {
+                     var newUri = "chm:"+uri.spec;
+                     dump("uri redirect:"+newUri+"\n");
+                     // gBrowser.loadURI(newUri);
+                     gBrowser.mCurrentTab.linkedBrowser.loadURI(newUri);
+                     return true;
+                 }
+                 else {
+                 }
+             }
+             catch(e) {
+                 dump(e);
+             }
+         }
+         return false;
+     },
+     doContent: function(aContentType, aIsContentPreferred, aRequest, aContentHandler ) {
+           throw Cr.NS_ERROR_NOT_IMPLEMENTED;
+     },
+     canHandleContent: function(aContentType, aIsContentPreferred, aDesiredContentType)
+    {
+           throw Cr.NS_ERROR_NOT_IMPLEMENTED;
+     },
+     isPreferred: function(aContentType, aDesiredContentType)
+    {
+         try
+        {
+             var webNavInfo =
+             Components.classes["@mozilla.org/webnavigation-info;1"]
+                         .getService(Components.interfaces.nsIWebNavigationInfo);
+             return webNavInfo.isTypeSupported(aContentType, null);
+         }
+       catch (e)
+       {
+             return false;
+         }
+     },
+       GetWeakReference : function()
+    {
+        throw Cr.NS_ERROR_NOT_IMPLEMENTED;
+     }
+};
+
+var wnd = window.QueryInterface(Components.interfaces.nsIInterfaceRequestor)
+                        .getInterface(Components.interfaces.nsIWebNavigation)
+                        .QueryInterface(Components.interfaces.nsIDocShell)
+                        .QueryInterface(Components.interfaces.nsIInterfaceRequestor)
+                  .getInterface(Components.interfaces.nsIURIContentListener);
+wnd.parentContentListener = chmListener;
+
+
 function on_open_chm(e)
 {
     var nsIFilePicker = Components.interfaces.nsIFilePicker;
@@ -65,10 +138,10 @@ function on_open_chm(e)
         if (e.target.id == 'ChmfoxOpenFilesItem' ||
             e.target.id == 'tb-chmfox-open') {
             // Call from main window
-            b = getBrowser();
+            b = gBrowser;
         } else {
             // Call from sidebar
-            b = window.parent.getBrowser();
+            b = window.parent.gBrowser;
         }
         b.loadURI("chm:file://" + path);
     }
@@ -196,11 +269,11 @@ function chm_load_local_uri_in_browser(uri,intab) {
     uri = "chm:file://" + encodeURI(f.path);
 
     if (intab) {
-        var tab = getBrowser().addTab(uri);
+        var tab = gBrowser.addTab(uri);
         if (chm_should_new_tab_get_focus())
-            getBrowser().selectedTab = tab;
+            gBrowser.selectedTab = tab;
     } else {
-        getBrowser().loadURI(uri);
+        gBrowser.loadURI(uri);
     }
 }
 
@@ -358,11 +431,11 @@ function chm_log(msg) {
 // Hook mouse click
 
 function chm_init() {
-    getBrowser().addEventListener("click", chm_mouse_click_handler, true);
+    gBrowser.addEventListener("click", chm_mouse_click_handler, true);
 }
 
 function chm_uninit() {
-    getBrowser().removeEventListener("click", chm_mouse_click_handler, true);
+    gBrowser.removeEventListener("click", chm_mouse_click_handler, true);
 }
 
 function getCurrentLocation() {

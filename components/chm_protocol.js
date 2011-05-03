@@ -1,8 +1,10 @@
 Components.utils.import("resource://gre/modules/XPCOMUtils.jsm");
 
+const chmfoxComponents = (function() {
+
 const Ci = Components.interfaces;
 const Cc = Components.classes;
-// const Cr = Components.results;
+const Cr = Components.results;
 
 const kScheme = 'chm';
 
@@ -85,7 +87,7 @@ Protocol.prototype = {
     localfile.initWithPath(path);
     var chmfile = Cc["@zhuoqiang.me/chmfox/CHMFile;1"].createInstance(Ci.ICHMFile);
     if (chmfile.LoadCHM(localfile) != 0) {
-        this.log("file not found: " + localfile.path + "\n");
+        log("file not found: " + localfile.path + "\n");
         // File not found
         var ios = Cc["mozilla.org/network/io-service;1"].getService(Ci.nsIIOService);
         var uri = ios.newURI("about:blank", null, null);
@@ -162,7 +164,7 @@ Protocol.prototype = {
         pagepath_ui = chmfile.resolveObject(pagepath);
     } catch(e) {
         // pagepath not found
-        this.log("pagepath not found: " + pagepath);
+        log("pagepath not found: " + pagepath);
     }
 
     var is = chmfile.getInputStream(pagepath_ui);
@@ -249,9 +251,18 @@ Protocol.prototype = {
   }
 };
 
+
+// var c = Cc["@mozilla.org/uriloader;1"].getService(Ci.nsIURILoader);
+// c.registerContentListener(chmListener);
+// log("registered");
+
+return [Protocol];
+
+})();
+
 if (XPCOMUtils.generateNSGetFactory) {
-    const NSGetFactory = XPCOMUtils.generateNSGetFactory([Protocol]);
+    const NSGetFactory = XPCOMUtils.generateNSGetFactory(chmfoxComponents);
 }
 else {
-    const NSGetModule = XPCOMUtils.generateNSGetModule([Protocol]);
+    const NSGetModule = XPCOMUtils.generateNSGetModule(chmfoxComponents);
 }

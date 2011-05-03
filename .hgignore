@@ -3,3 +3,4 @@
 \.xpi$
 ^install\.rdf$
 \.orig$
+\.so$
