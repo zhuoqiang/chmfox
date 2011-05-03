@@ -4,6 +4,13 @@ var Ci = Components.interfaces;
 var Cc = Components.classes;
 var Cr = Components.results;
 
+function log(msg) {
+    var console = Cc["@mozilla.org/consoleservice;1"].getService(Ci.nsIConsoleService);
+    var message = '[chmfox] ' + msg + '\n';
+    console.logStringMessage(msg);
+    dump(msg);
+}
+
 var chmListener = {
     QueryInterface: XPCOMUtils.generateQI([
         Ci.nsIURIContentListener,
@@ -11,18 +18,18 @@ var chmListener = {
         Ci.nsISupports]),
 
      onStartURIOpen: function(uri) {
-         dump("uri:"+uri.spec+"\n");
+         log("uri:"+uri.spec+"\n");
          if (uri.schemeIs("file"))
          {
-             dump("scheme match file\n");
+             log("scheme match file\n");
              try {
                  var url = uri.QueryInterface(Components.interfaces.nsIURL);
-                 dump("file extenstion is:" + url.fileExtension + "\n");
+                 log("file extenstion is:" + url.fileExtension + "\n");
                  if (url.fileExtension == 'chm') {
                      var newUri = "chm:"+uri.spec;
-                     dump("uri redirect:"+newUri+"\n");
-                     // gBrowser.loadURI(newUri);
-                     gBrowser.mCurrentTab.linkedBrowser.loadURI(newUri);
+                     log("uri redirect:"+newUri+"\n");
+                     gBrowser.loadURI(newUri);
+                     // gBrowser.mCurrentTab.linkedBrowser.loadURI(newUri);
                      return true;
                  }
                  else {
@@ -379,14 +386,6 @@ function chm_is_link_type (linktype, link) {
     } catch(e) {
         return false;
     }
-}
-
-//------------------------------------------------------------------------------
-// Display message on javascript console
-
-function chm_log(msg) {
-    var consoleService = Components.classes["@mozilla.org/consoleservice;1"].getService(Components.interfaces.nsIConsoleService);
-    consoleService.logStringMessage("CHM Reader : " + msg);
 }
 
 //------------------------------------------------------------------------------
