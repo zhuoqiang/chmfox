@@ -18,29 +18,23 @@ var chmListener = {
         Ci.nsISupports]),
 
      onStartURIOpen: function(uri) {
-         log("uri:"+uri.spec+"\n");
-         if (uri.schemeIs("file"))
-         {
-             log("scheme match file\n");
-             try {
-                 var url = uri.QueryInterface(Components.interfaces.nsIURL);
-                 log("file extenstion is:" + url.fileExtension + "\n");
+         try {
+             if (uri.schemeIs("file")) {
+                 var url = uri.QueryInterface(Ci.nsIURL);
                  if (url.fileExtension == 'chm') {
                      var newUri = "chm:"+uri.spec;
-                     log("uri redirect:"+newUri+"\n");
+                     log("Redirect to "+newUri);
                      gBrowser.loadURI(newUri);
-                     // gBrowser.mCurrentTab.linkedBrowser.loadURI(newUri);
                      return true;
                  }
-                 else {
-                 }
              }
-             catch(e) {
-                 dump(e);
-             }
+         }
+         catch(e) {
+             log(e);
          }
          return false;
      },
+
      doContent: function(aContentType, aIsContentPreferred, aRequest, aContentHandler ) {
            throw Cr.NS_ERROR_NOT_IMPLEMENTED;
      },
