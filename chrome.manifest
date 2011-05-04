@@ -3,7 +3,6 @@ skin chmfox classic/1.0 chrome/skin/
 style chrome://browser/content/browser.xul chrome://chmfox/skin/overlay.css
 style chrome://global/content/customizeToolbar.xul chrome://chmfox/skin/overlay.css
 overlay chrome://browser/content/browser.xul chrome://chmfox/content/overlay.xul
-// locale chmfox en-US chrome/locale/en-US/
 
 
 component {c152fc51-a5bf-4cc7-99f1-66ca8459d806} components/chm_protocol.js

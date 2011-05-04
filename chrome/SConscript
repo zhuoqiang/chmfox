@@ -3,5 +3,4 @@ import os
 Import('env')
 
 contents = Glob('content/*.js') + Glob('content/*.xul') + Glob('skin/*.css')
-print contents
 Return('contents')

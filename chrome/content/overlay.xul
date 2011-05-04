@@ -54,12 +54,12 @@
   
     <broadcasterset id="mainBroadcasterSet"> 
         <broadcaster id="viewChmfoxSidebar" 
-                     label="CHM Reader"
+                     label="ChmFox"
                      autoCheck="false"
                      type="checkbox"
                      group="sidebar"
                      sidebarurl="chrome://chmfox/content/sidebar.xul"
-                     sidebartitle="CHM Reader"
+                     sidebartitle="ChmFox"
                      oncommand="toggleSidebar('viewChmfoxSidebar');" />
     </broadcasterset>
 </overlay>

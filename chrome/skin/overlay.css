@@ -1,9 +1,0 @@
-/*  skin/toolbar-button.css  */
-
-#tb-chmfox-open {
-  list-style-image: url("chrome://chmfox/skin/chmfox_24.png");
-}
-
-toolbar[iconsize="small"] #tb-chmfox-open {
-  list-style-image: url("chrome://chmfox/skin/chmfox_16.png");
-}
