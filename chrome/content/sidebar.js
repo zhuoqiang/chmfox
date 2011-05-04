@@ -1,18 +1,45 @@
+Components.utils.import("resource://gre/modules/XPCOMUtils.jsm");
+
+var Ci = Components.interfaces;
+var Cc = Components.classes;
+var Cr = Components.results;
+
+function log(msg) {
+    var console = Cc["@mozilla.org/consoleservice;1"].getService(Ci.nsIConsoleService);
+    var message = '[chmfox] ' + msg + '\n';
+    console.logStringMessage(message);
+    dump(message);
+}
+
 var currentCHMFilePath;
 
+function chm_url(fragment, filePath) {
+    if (!filePath) {
+        filePath = currentCHMFilePath;
+    }
+    return "chm:file://" + encodeURI(filePath) + "!/" + fragment;
+}
+
+function change_to_url(url, chmFilePath) {
+    if (url) {
+        if (! chmFilePath) {
+            chmFilePath = currentCHMFilePath;
+        }
+        var doc = window.parent.content.document;
+        doc.location = chm_url(url, chmFilePath);
+    }
+}
+
 function on_bookmark_select() {
-    var tree = document.getElementById('chmbookmark');
+    var tree = $('#chmbookmark')[0];
     var url = tree.view.getCellText(tree.currentIndex, tree.columns[1]);
-    if (!url) return;
-    var chmmain = window.parent.content.document;
-    chmmain.location = "chm:file://" + encodeURI(currentCHMFilePath) + "!/" + url;
+    change_to_url(url);
 }
 
 function on_index_select() {
-    var tree = document.getElementById('chmindex');
+    var tree = $('#chmindex')[0];
     var url = tree.view.getCellText(tree.currentIndex, tree.columns[1]);
-    var chmmain = window.parent.content.document;
-    chmmain.location = "chm:file://" + encodeURI(currentCHMFilePath) + "!/" + url;
+    change_to_url(url);
 }
 
 function on_find_index_keypress(e) {
@@ -30,7 +57,6 @@ function on_find_index(e) {
     var text = document.getElementById('find_index').value.toLowerCase();
     var tree = document.getElementById('chmindex');
     var view = tree.view;
-    // somebody write a binary search?
     var i;
     for (i = 1; i < view.rowCount; i++) {
         var name = view.getCellText(i, tree.columns[0]).toLowerCase();
@@ -44,18 +70,18 @@ function on_find_index(e) {
 
 function on_chmbookmark_iframe_load(event) {
     var doc = document.getElementById('chmbookmark_iframe').contentDocument;
-    var tree = document.getElementById('chmbookmark')
+    var tree = document.getElementById('chmbookmark');
     iframe2tree(doc, tree);
 }
 
 function on_chmindex_iframe_load(event) {
     var doc = document.getElementById('chmindex_iframe').contentDocument;
-    var tree = document.getElementById('chmindex')
+    var tree = document.getElementById('chmindex');
     iframe2tree(doc, tree);
 }
 
 function iframe2tree(doc, tree) {
-    window.dump('begin to generate content tree');
+    log('begin to generate content tree');
 
     var body = doc.getElementsByTagName('body').item(0);
     var list = new Array();
@@ -74,7 +100,6 @@ function iframe2tree(doc, tree) {
             list[j++] = [ li, isc, false, 0 , -1];
         }
     }
-    //window.dump(list);
 
     tree.view = {
       treeBox: null,
@@ -104,6 +129,7 @@ function iframe2tree(doc, tree) {
             }
             return 'missing ...';
         }
+          return "missing ...";
       },
       isContainer: function(idx)         { return list[idx][1]; },
       isContainerOpen: function(idx)     { return list[idx][2]; },
@@ -113,7 +139,7 @@ function iframe2tree(doc, tree) {
       isEditable: function(idx, column)  { return false; },
 
       getParentIndex: function(idx) {
-        return list[idx][4]
+        return list[idx][4];
       },
       getLevel: function(idx) {
         return list[idx][3];
@@ -121,10 +147,11 @@ function iframe2tree(doc, tree) {
       hasNextSibling: function(idx, after) {
         var thisLevel = this.getLevel(idx);
         for (var t = idx + 1; t < list.length; t++) {
-          var nextLevel = this.getLevel(t)
+          var nextLevel = this.getLevel(t);
           if (nextLevel == thisLevel) return true;
           else if (nextLevel < thisLevel) return false;
         }
+        return false;
       },
       toggleOpenState: function(idx) {
         var item = list[idx];
@@ -167,7 +194,6 @@ function iframe2tree(doc, tree) {
           for (i = 0; i < toinsert.length; i++) {
             list.splice(idx + i + 1, 0, toinsert[i]);
           }
-          //window.dump(list);
           this.treeBox.rowCountChanged(idx + 1, toinsert.length);
         }
       },
@@ -182,27 +208,24 @@ function iframe2tree(doc, tree) {
       performActionOnCell: function(action, index, column) {},
       getRowProperties: function(idx, column, prop) {},
       getCellProperties: function(idx, column, prop) {},
-      getColumnProperties: function(column, element, prop) {},
-
+      getColumnProperties: function(column, element, prop) {}
     };
 }
 
-function load_bookmark(url)
-{
-    var m;
-    if (m = decodeURI(url).match(/chm:file:\/\/(.*\.chm)(!(\/.*))?/i)) {
+function load_bookmark(uri) {
+    var m = decodeURI(uri).match(/chm:file:\/\/(.*\.chm)(!(\/.*))?/i);
+    if (m) {
         if (currentCHMFilePath != m[1]) {
             currentCHMFilePath = m[1];
 
-            var topics_iframe = document.getElementById('chmbookmark_iframe');
-            var url = "chm:file://" + encodeURI(currentCHMFilePath) + "!/#HHC";
+            var topics_iframe = $('#chmbookmark_iframe')[0];
+            var url = chm_url('#HHC');
             topics_iframe.setAttribute('src', url);
-            window.dump('set topics iframe src to ' + url + '\n');
-
-            var index_iframe = document.getElementById('chmindex_iframe');
-            var url = "chm:file://" + encodeURI(currentCHMFilePath) + "!/#HHK";
+            log('set topics iframe src to ' + url);
+            var index_iframe = $('#chmindex_iframe')[0];
+            url = chm_url("#HHK");
             index_iframe.setAttribute('src', url);
-            window.dump('set index iframe src to ' + url + '\n');
+            log('set index iframe src to ' + url);
 
             // load sidebar content after 0.5 second, this is much stable
             // than addEventListener.
@@ -222,8 +245,7 @@ function load_bookmark(url)
     }
 }
 
-function on_browser_document_load(event)
-{
+function on_browser_document_load(event) {
     if (window.parent) {
         var url = window.parent.gURLBar.value;
         load_bookmark(url);
@@ -251,26 +273,13 @@ function on_tab_creation(event)
     document.getElementById('chmindex').datasources = "rdf:null";
 }
 
-function on_sidebar_load()
-{
-    window.dump('sidebar loading\n');
-    // Register for browser document load
+function on_sidebar_load() {
+    log('sidebar loading');
     window.parent.gBrowser.addEventListener("load", on_browser_document_load, true);
-    // Register for tab select
     window.parent.gBrowser.mPanelContainer.addEventListener("select", on_tab_selected, false);
-
-    // Register for tab creation
     window.parent.gBrowser.mPanelContainer.addEventListener("DOMNodeInserted", on_tab_creation, false);
     load_bookmark(window.parent.gURLBar.value);
-
-    // When no longer needed
-    //gBrowser.removeEventListener("load", examplePageLoad, true);
-
-    // When no longer needed
-    //var container = gBrowser.mPanelContainer;
-    //container.removeEventListener("select", exampleTabSelected, false);
-
-    window.dump('sidebar loaded\n');
+    log('sidebar loaded');
 }
 
 window.addEventListener('load', on_sidebar_load, true);

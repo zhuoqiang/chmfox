@@ -1,10 +1,10 @@
 <?xml version="1.0"?>
-<?xml-stylesheet href="chrome://global/skin/" type"text/css" ?>
 <?xml-stylesheet href="chrome://browser/skin/browser.css" type="text/css" ?>
 
-<page id="sbCHMReaderSidebar" title="CHM Reader"
+<page id="sbCHMReaderSidebar" title="ChmFox"
       orient="vertical"
-         xmlns="http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul" >
+      xmlns="http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul">
+  <script src="jquery-1.6.min.js" charset="UTF-8"/>
   <script src="sidebar.js" charset="UTF-8"/>
   <script src="overlay.js" charset="UTF-8"/>
   <tabbox id="content_is_chm" flex="1">

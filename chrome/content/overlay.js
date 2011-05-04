@@ -48,7 +48,7 @@ var uriContentListener = {
             log(e);
         }
         return false;
-    },
+    }
 };
 
 return {log:log, uriContentListener: uriContentListener};
