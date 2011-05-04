@@ -62,63 +62,29 @@ Protocol.prototype = {
 
   newChannel: function(aURI)
   {
-    // aURI is a nsIUri, so get a string from it using .spec
-      log('Raw ' + aURI.spec);
-    var thefile = decodeURI(aURI.spec);
-      log('Decode ' + thefile);
-    var pagepath = '';
+      var urlParts = decodeURI(aURI.spec).split('!');
+      var url = urlParts[0];
+      url = url.substring(4); //Remove "chm:"
+      url = unescape(url);
+      url = url.replace('\\', '/');
+      var ioService = Cc["@mozilla.org/network/io-service;1"].getService(Ci.nsIIOService);
+      url = ioService.newURI(url, null, null);
+      var localfile = url.QueryInterface(Ci.nsIFileURL).file;
 
-    // strip away the kSCHEME: part
-    thefile = thefile.substring(thefile.indexOf(":") + 1);
-      log('Strip scheme ' + thefile);
-    if (thefile == 'null') {
-        var ios = Cc["mozilla.org/network/io-service;1"].getService(Ci.nsIIOService);
-        var uri = ios.newURI("about:blank", null, null);
-        return ios.newChannelFromURI(uri);
-    }
+      var chmfile = Cc["@zhuoqiang.me/chmfox/CHMFile;1"].createInstance(Ci.ICHMFile);
+      if (chmfile.LoadCHM(localfile) != 0) {
+          // @todo should use firefox default handle for file not found
+          log("file not found: " + localfile.path + "\n");
+          var uri = ioService.newURI("about:blank", null, null);
+          return ioService.newChannelFromURI(uri);
+      }
 
-    var pos = thefile.indexOf("!");
-    if (pos > 0) {
-        pagepath = thefile.substring(thefile.indexOf("!") + 1);
-        thefile = thefile.substring(0, thefile.indexOf("!"));
-        log('Strip out !... ' + thefile);
-    }
+      var pagepath = ''
+      if (urlParts.length > 1) {
+          pagepath = urlParts[1];
+      }
 
-    // Load CHM File
-    var path = thefile.substring(thefile.indexOf("://") + 3);
-      log('Strip out :// ' + path);
-      path = 'E:\\a.chm';
-
-    //   var localfile = Cc["@mozilla.org/file/local;1"]
-    //       .createInstance(Ci.nsILocalFile);
-    // localfile.initWithPath(path);
-      
-      log("--------------------------------------------------");
-      var URL = aURI.spec;
-      log("chm:URL! " + URL);
-      URL = URL.substring(4);
-      log("URL! " + URL);
-      URL = URL.split('!')[0];
-      log("URL " + URL);
-      URL = unescape(URL);
-      log("U URL " + URL);      
-      URL = URL.replace('\\', '/');
-      log("URL " + URL);      
-      var ioss = Components.classes["@mozilla.org/network/io-service;1"].getService(Components.interfaces.nsIIOService);
-      var uris = ioss.newURI(URL, null, null);
-      var localfile = uris.QueryInterface(Ci.nsIFileURL).file;
-
-    var chmfile = Cc["@zhuoqiang.me/chmfox/CHMFile;1"].createInstance(Ci.ICHMFile);
-    if (chmfile.LoadCHM(localfile) != 0) {
-        log("file not found: " + localfile.path + "\n");
-        // File not found
-        var ios = Cc["mozilla.org/network/io-service;1"].getService(Ci.nsIIOService);
-        var uri = ios.newURI("about:blank", null, null);
-        return ios.newChannelFromURI(uri);
-    }
-
-    // Show the default page
-    if (pagepath == '') {
+      if (pagepath == '') {
         var html = "<html><head>";
         html += '<meta http-equiv="Refresh" content="0;chm:file://' + encodeURI(localfile.path) + '!' + encodeURI(chmfile.home) + '">';
         html += "</head><body/></html>";
@@ -184,9 +150,9 @@ Protocol.prototype = {
     }
 
     try {
+        /// @todo add "var" will cause firefox crash!
         pagepath_ui = chmfile.resolveObject(pagepath);
     } catch(e) {
-        // pagepath not found
         log("pagepath not found: " + pagepath);
     }
 
@@ -273,11 +239,6 @@ Protocol.prototype = {
     return '/' + final.join('/');
   }
 };
-
-
-// var c = Cc["@mozilla.org/uriloader;1"].getService(Ci.nsIURILoader);
-// c.registerContentListener(chmListener);
-// log("registered");
 
 return [Protocol];
 
