@@ -1,10 +1,10 @@
-var chmfox = (function() {
-
 Components.utils.import("resource://gre/modules/XPCOMUtils.jsm");
 
 var Ci = Components.interfaces;
 var Cc = Components.classes;
 var Cr = Components.results;
+
+var chmfox = (function() {
 
 function log(msg) {
     var console = Cc["@mozilla.org/consoleservice;1"].getService(Ci.nsIConsoleService);
@@ -40,14 +40,14 @@ var uriContentListener = {
      }
 };
 
+return {log:log, uriContentListener: uriContentListener};
+
+})();
+
 var wnd = window.QueryInterface(Ci.nsIInterfaceRequestor)
                       .getInterface(Ci.nsIWebNavigation)
                       .QueryInterface(Ci.nsIDocShell)
                       .QueryInterface(Ci.nsIInterfaceRequestor)
                       .getInterface(Ci.nsIURIContentListener);
 
-wnd.parentContentListener = uriContentListener;
-
-return {log:log};
-
-})();
+wnd.parentContentListener = chmfox.uriContentListener;
