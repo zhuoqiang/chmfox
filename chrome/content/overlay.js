@@ -37,7 +37,18 @@ var uriContentListener = {
              log(e);
          }
          return false;
-     }
+     },
+
+    isPreferred: function(contentType, desiredContentType) {
+        try {
+            var webNavInfo = Cc["@mozilla.org/webnavigation-info;1"].getService(Ci.nsIWebNavigationInfo);
+            return webNavInfo.isTypeSupported(contentType, null);
+        }
+        catch (e) {
+            log(e);
+        }
+        return false;
+    },
 };
 
 return {log:log, uriContentListener: uriContentListener};
