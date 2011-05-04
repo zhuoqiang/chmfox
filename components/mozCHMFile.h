@@ -38,6 +38,7 @@
 #ifndef COMPONENTS_MOZCHMFILE_H
 #define COMPONENTS_MOZCHMFILE_H
 
+#include "mozilla-config.h"
 #include "ICHMFile.h"
 #include "chm_lib.h"
 #include <nsEmbedString.h>

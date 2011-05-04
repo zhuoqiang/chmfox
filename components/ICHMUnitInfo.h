@@ -1,5 +1,5 @@
 /*
- * DO NOT EDIT.  THIS FILE IS GENERATED FROM components/ICHMUnitInfo.idl
+ * DO NOT EDIT.  THIS FILE IS GENERATED FROM components\ICHMUnitInfo.idl
  */
 
 #ifndef __gen_ICHMUnitInfo_h__

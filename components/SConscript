@@ -42,11 +42,11 @@ elif system() == 'Darwin':
 
 elif system() == 'Windows':
     cxxflags = ['/D', 'WIN32', '/D', 'XP_WIN', '/nologo', '/MT', '/O2']
-    inc = os.environ['INCLUDE']
+    inc = os.environ.get('INCLUDE', '')
     if inc:
         for i in inc.split(';'):
             cpppath.append(i)
-    lib = os.environ['LIB']
+    lib = os.environ.get('LIB', '')
     if lib:
         for i in lib.split(';'):
             libpath.append(i)

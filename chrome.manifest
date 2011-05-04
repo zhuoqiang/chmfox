@@ -13,3 +13,4 @@ interfaces components/ICHMFile.xpt
 interfaces components/ICHMUnitInfo.xpt
 
 binary-component platform/Linux_x86-gcc3/components/libchm.so ABI=Linux_x86-gcc3
+binary-component platform/WINNT_x86-msvc/components/libchm.dll ABI=WINNT_x86-msvc

@@ -35,6 +35,7 @@
 ***** END LICENSE BLOCK *****/
 
 
+#include "mozilla-config.h"
 #include "ICHMUnitInfo.h"
 #include "chm_lib.h"
 

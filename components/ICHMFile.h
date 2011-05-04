@@ -1,5 +1,5 @@
 /*
- * DO NOT EDIT.  THIS FILE IS GENERATED FROM components/ICHMFile.idl
+ * DO NOT EDIT.  THIS FILE IS GENERATED FROM components\ICHMFile.idl
  */
 
 #ifndef __gen_ICHMFile_h__

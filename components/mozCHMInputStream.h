@@ -38,6 +38,7 @@
 #ifndef MOZCHMINPUTSTREAM_H
 #define MOZCHMINPUTSTREAM_H
 
+#include "mozilla-config.h"
 #include "nsIInputStream.h"
 #include "ICHMFile.h"
 #include "ICHMUnitInfo.h"
