@@ -63,11 +63,14 @@ Protocol.prototype = {
   newChannel: function(aURI)
   {
     // aURI is a nsIUri, so get a string from it using .spec
+      log('Raw ' + aURI.spec);
     var thefile = decodeURI(aURI.spec);
+      log('Decode ' + thefile);
     var pagepath = '';
 
     // strip away the kSCHEME: part
     thefile = thefile.substring(thefile.indexOf(":") + 1);
+      log('Strip scheme ' + thefile);
     if (thefile == 'null') {
         var ios = Cc["mozilla.org/network/io-service;1"].getService(Ci.nsIIOService);
         var uri = ios.newURI("about:blank", null, null);
@@ -78,13 +81,33 @@ Protocol.prototype = {
     if (pos > 0) {
         pagepath = thefile.substring(thefile.indexOf("!") + 1);
         thefile = thefile.substring(0, thefile.indexOf("!"));
+        log('Strip out !... ' + thefile);
     }
 
     // Load CHM File
-    var localfile = Cc["@mozilla.org/file/local;1"]
-                              .createInstance(Ci.nsILocalFile);
     var path = thefile.substring(thefile.indexOf("://") + 3);
-    localfile.initWithPath(path);
+      log('Strip out :// ' + path);
+      path = 'E:\\a.chm';
+
+    //   var localfile = Cc["@mozilla.org/file/local;1"]
+    //       .createInstance(Ci.nsILocalFile);
+    // localfile.initWithPath(path);
+      
+      log("--------------------------------------------------");
+      var URL = aURI.spec;
+      log("chm:URL! " + URL);
+      URL = URL.substring(4);
+      log("URL! " + URL);
+      URL = URL.split('!')[0];
+      log("URL " + URL);
+      URL = unescape(URL);
+      log("U URL " + URL);      
+      URL = URL.replace('\\', '/');
+      log("URL " + URL);      
+      var ioss = Components.classes["@mozilla.org/network/io-service;1"].getService(Components.interfaces.nsIIOService);
+      var uris = ioss.newURI(URL, null, null);
+      var localfile = uris.QueryInterface(Ci.nsIFileURL).file;
+
     var chmfile = Cc["@zhuoqiang.me/chmfox/CHMFile;1"].createInstance(Ci.ICHMFile);
     if (chmfile.LoadCHM(localfile) != 0) {
         log("file not found: " + localfile.path + "\n");
