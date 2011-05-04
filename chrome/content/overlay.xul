@@ -48,7 +48,7 @@
   
     <keyset id="mainKeyset">
         <key id="key_openChmfoxSidebar" command="viewChmfoxSidebar"
-             key="E" 
+             key="m" 
              modifiers="control" />
     </keyset>
   
