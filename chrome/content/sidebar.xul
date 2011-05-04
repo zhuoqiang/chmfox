@@ -7,7 +7,6 @@
          xmlns="http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul" >
   <script src="sidebar.js" charset="UTF-8"/>
   <script src="overlay.js" charset="UTF-8"/>
-  <button id="content_not_chm" label="Open CHM Files" oncommand="on_open_chm(event)"/>
   <tabbox id="content_is_chm" flex="1">
     <tabs>
       <tab label="Contents" selected="true" accesskey="C"/>

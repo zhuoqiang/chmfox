@@ -42,11 +42,6 @@
 
     <script type="application/x-javascript" src="overlay.js"/>
 
-    <!-- Tools menu -->
-    <menupopup id="menu_FilePopup">
-        <menuitem insertbefore="menu_closeWindow" label="Open CHM Files" id="ChmfoxOpenFilesItem" accesskey="h" oncommand="on_open_chm(event)" />
-    </menupopup>
-
     <menupopup id="viewSidebarMenu">
         <menuitem key="key_openChmfoxSidebar" observes="viewChmfoxSidebar" />
     </menupopup>
@@ -67,10 +62,4 @@
                      sidebartitle="CHM Reader"
                      oncommand="toggleSidebar('viewChmfoxSidebar');" />
     </broadcasterset>
-
-    <toolbarpalette id="BrowserToolbarPalette">
-        <toolbarbutton id="tb-chmfox-open" class="toolbarbutton-1"
-            label="Open CHM" tooltiptext="Open CHM File"
-            oncommand="on_open_chm(event);"/>
-    </toolbarpalette>
 </overlay>

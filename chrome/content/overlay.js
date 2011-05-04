@@ -52,49 +52,8 @@ return {log:log};
 
 })();
 
-function on_open_chm(e)
-{
-    var nsIFilePicker = Components.interfaces.nsIFilePicker;
-    var fp = Components.classes["@mozilla.org/filepicker;1"]
-                       .createInstance(nsIFilePicker);
-    fp.init(window, "Open CHM File", nsIFilePicker.modeOpen);
-
-    var prefs = Components.classes["@mozilla.org/preferences-service;1"]
-                          .getService(Components.interfaces.nsIPrefBranch);
-    var dir;
-    if (prefs.getPrefType("chmfox.opendir") == prefs.PREF_STRING){
-        dir = prefs.getCharPref("chmfox.opendir");
-        var path = Components.classes["@mozilla.org/file/local;1"]
-                             .createInstance(Components.interfaces.nsILocalFile);
-        path.initWithPath(unescape(dir));
-        fp.displayDirectory = path;
-    }
-
-    fp.appendFilter("Compiled HTML Help", "*.chm;*.CHM");
-    fp.appendFilters(nsIFilePicker.filterAll);
-    var res = fp.show();
-    if (res == nsIFilePicker.returnOK) {
-        // Save path
-        prefs.setCharPref("chmfox.opendir", escape(fp.file.parent.path));
-
-        var path = encodeURI(fp.file.path);
-
-        var b;
-        if (e.target.id == 'ChmfoxOpenFilesItem' ||
-            e.target.id == 'tb-chmfox-open') {
-            // Call from main window
-            b = gBrowser;
-        } else {
-            // Call from sidebar
-            b = window.parent.gBrowser;
-        }
-        b.loadURI("chm:file://" + path);
-    }
-}
-
 
 // BEGIN of the code modified from the PDF Download extension
-
 var nsIWBP = Components.interfaces.nsIWebBrowserPersist;
 
 //------------------------------------------------------------------------------
