@@ -10,9 +10,27 @@ const kScheme = 'chm';
 
 function log(message) {
   var console = Cc["@mozilla.org/consoleservice;1"].getService(Ci.nsIConsoleService);
-  var msg = kScheme + ": " + message + "\n";
+  var msg = "[chmfox] " + message + "\n";
   console.logStringMessage(msg);
   dump(msg);
+}
+
+function normlizePath(path) {
+    var parts = path.split('/');
+    var norm = [];
+    for (var i = 0; i < parts.length; ++i) {
+        switch(parts[i]) {
+        case '.':
+        case '':
+            break;
+        case '..':
+            if (norm.length != 0) norm.pop();
+            break;
+      default:
+        norm.push(parts[i]);
+      }
+    }
+    return '/' + norm.join('/');
 }
 
 function Protocol() {
@@ -34,6 +52,10 @@ Protocol.prototype = {
   },
 
   newURI: function(spec, charset, baseURI) {
+    // log('newURI:' + spec + " " + charset);
+    // if (baseURI) {
+    //     log('baseURI:' + baseURI.spec);
+    // }
     var uri = Cc["@mozilla.org/network/simple-uri;1"].createInstance(Ci.nsIURI);
     if (spec.substring(0, 1) == "#") {
         var basespec = baseURI.spec;
@@ -51,7 +73,7 @@ Protocol.prototype = {
         if (pos > 0) {
             var pagepath = basespec.substring(pos + 1, basespec.lastIndexOf('/') + 1) + spec;
             if (pagepath.lastIndexOf('/') >= 1)
-                pagepath = this.removeRelative(pagepath);
+                pagepath = normlizePath(pagepath);
             uri.spec = basespec.substring(0, pos + 1) + pagepath;
         } else
             uri.spec = basespec + "!/" + spec;
@@ -79,7 +101,7 @@ Protocol.prototype = {
           return ioService.newChannelFromURI(uri);
       }
 
-      var pagepath = ''
+      var pagepath = '';
       if (urlParts.length > 1) {
           pagepath = urlParts[1];
       }
@@ -217,26 +239,6 @@ Protocol.prototype = {
     bc.owner = this;
 
     return bc;
-  },
-
-  removeRelative: function(path) {
-    var parts = path.split('/');
-    var final = new Array();
-    var final_length = 0;
-    var i;
-    for (i = 0; i < parts.length; i++) {
-      switch(parts[i]) {
-      case '.':
-      case '':
-        break;
-      case '..':
-        if (final_length > 0) final_length--;
-        break;
-      default:
-        final[final_length++] = parts[i];
-      }
-    }
-    return '/' + final.join('/');
   }
 };
 
