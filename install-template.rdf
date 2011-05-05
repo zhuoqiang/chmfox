@@ -7,7 +7,7 @@
     <em:version />
     <em:creator>ZHUO Qiang</em:creator>
     <em:contributor></em:contributor>
-    <em:description>ChmFox: Provide the best CHM file reading experience</em:description>
+    <em:description>ChmFox: Provide the best CHM file reading experience to all platform</em:description>
     <em:aboutURL>chrome://chmfox/content/about.xul</em:aboutURL>
     <em:optionsURL>chrome://chmfox/content/options.xul</em:optionsURL>
     <em:homepageURL>http://bitbucket.org/zhuoqiang/chmfox</em:homepageURL>
