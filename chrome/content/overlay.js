@@ -23,7 +23,7 @@ var uriContentListener = {
          try {
              if (uri.schemeIs("file")) {
                  var url = uri.QueryInterface(Ci.nsIURL);
-                 if (url.fileExtension == 'chm') {
+                 if (url.fileExtension.toLowerCase() == 'chm') {
                      uri.scheme = "chm";
                      log("redirect to [" + uri.spec + "]");
                      gBrowser.loadURI(uri.spec);
