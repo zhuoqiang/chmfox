@@ -24,11 +24,9 @@ var uriContentListener = {
              if (uri.schemeIs("file")) {
                  var url = uri.QueryInterface(Ci.nsIURL);
                  if (url.fileExtension == 'chm') {
-                     var newUri = "chm:"+uri.spec;
-                     log("Redirect to "+newUri);
-                     // @todo using below to change scheme
-                     // uri.scheme = "chm";
-                     gBrowser.loadURI(newUri);
+                     uri.scheme = "chm";
+                     log("redirect to [" + uri.spec + "]");
+                     gBrowser.loadURI(uri.spec);
                      return true;
                  }
              }

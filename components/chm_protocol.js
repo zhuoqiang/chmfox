@@ -79,6 +79,7 @@ Protocol.prototype = {
             uri.spec = basespec + "!/" + spec;
     }
 
+    log("new uri [" + uri.spec + "]");
     return uri;
   },
 
@@ -87,10 +88,12 @@ Protocol.prototype = {
       var urlParts = decodeURI(aURI.spec).split('!');
       var url = urlParts[0];
       url = url.substring(4); //Remove "chm:"
+      url = "file:" + url;
       url = unescape(url);
       url = url.replace('\\', '/');
       var ioService = Cc["@mozilla.org/network/io-service;1"].getService(Ci.nsIIOService);
       url = ioService.newURI(url, null, null);
+      log("file url [" + url.spec + "]");
       var localfile = url.QueryInterface(Ci.nsIFileURL).file;
 
       var chmfile = Cc["@zhuoqiang.me/chmfox/CHMFile;1"].createInstance(Ci.ICHMFile);
@@ -108,7 +111,7 @@ Protocol.prototype = {
 
       if (pagepath == '') {
         var html = "<html><head>";
-        html += '<meta http-equiv="Refresh" content="0;chm:file://' + encodeURI(localfile.path) + '!' + encodeURI(chmfile.home) + '">';
+        html += '<meta http-equiv="Refresh" content="0;chm://' + encodeURI(localfile.path) + '!' + encodeURI(chmfile.home) + '">';
         html += "</head><body/></html>";
 
         var sis = Cc["@mozilla.org/io/string-input-stream;1"].createInstance(Ci.nsIStringInputStream);

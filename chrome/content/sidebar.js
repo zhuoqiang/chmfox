@@ -17,7 +17,7 @@ function chm_url(fragment, filePath) {
     if (!filePath) {
         filePath = currentCHMFilePath;
     }
-    return "chm:file://" + encodeURI(filePath) + "!/" + fragment;
+    return "chm://" + encodeURI(filePath) + "!/" + fragment;
 }
 
 function change_to_url(url, chmFilePath) {
@@ -213,7 +213,7 @@ function iframe2tree(doc, tree) {
 }
 
 function load_bookmark(uri) {
-    var m = decodeURI(uri).match(/chm:file:\/\/(.*\.chm)(!(\/.*))?/i);
+    var m = decodeURI(uri).match(/chm:\/\/(.*\.chm)(!(\/.*))?/i);
     if (m) {
         if (currentCHMFilePath != m[1]) {
             currentCHMFilePath = m[1];
