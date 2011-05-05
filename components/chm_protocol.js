@@ -104,31 +104,10 @@ Protocol.prototype = {
           return ioService.newChannelFromURI(uri);
       }
 
-      var pagepath = '';
+      var pagepath = chmfile.home;
       if (urlParts.length > 1) {
           pagepath = urlParts[1];
       }
-
-      if (pagepath == '') {
-        var html = "<html><head>";
-        html += '<meta http-equiv="Refresh" content="0;chm://' + encodeURI(localfile.path) + '!' + encodeURI(chmfile.home) + '">';
-        html += "</head><body/></html>";
-
-        var sis = Cc["@mozilla.org/io/string-input-stream;1"].createInstance(Ci.nsIStringInputStream);
-        sis.setData(html, html.length);
-
-        var isc = Cc["@mozilla.org/network/input-stream-channel;1"].createInstance(Ci.nsIInputStreamChannel);
-        isc.contentStream = sis;
-        isc.setURI(aURI);
-
-        var bc = isc.QueryInterface(Ci.nsIChannel);
-        bc.contentType = "text/html";
-        bc.contentLength = html.length;
-        bc.originalURI = aURI;
-        bc.owner = this;
-
-        return bc;
-    }
 
     if (pagepath == "/#HHC") {
         return this.newRawTopicsChannel(aURI, chmfile);
