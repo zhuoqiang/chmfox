@@ -5,7 +5,8 @@ Import('platform_name', 'noxpidl')
 
 geckosdk = ''
 
-libs = ['xpcom', 'xpcomglue_s', 'nspr4', 'plds4', 'plc4', 'mozalloc']
+# See "XPCOM Clue without mozalloc"
+libs = ['xpcom', 'xpcomglue_s_nomozalloc', 'nspr4', 'plds4', 'plc4']
 
 # We use firefox development files instead for geckosdk on FreeBSD
 if system() != 'FreeBSD':
@@ -70,7 +71,7 @@ elif system() == 'FreeBSD':
                '/usr/local/lib/firefox3/sdk/lib']
 
 env = Environment(CPPPATH = cpppath, LIBPATH = libpath, LIBS = libs,
-                  CXXFLAGS= cxxflags)
+                  CXXFLAGS= cxxflags, CPPDEFINES={'MOZ_NO_MOZALLOC':None})
 
 bxpt = Builder(
     action = 'xpidl -w -m typelib -Icomponents -I%s -I%s -e $TARGET $SOURCE' \
