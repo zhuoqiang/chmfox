@@ -6,9 +6,9 @@ version = '0.3'
 mode = ARGUMENTS.get('MODE', '')
 
 default_noxpidl = '0'
-# There is no prebuild xulrunner sdk 1.9.x for systems other than Linux,
-# Windows and MacOS, so we disable xpidl generation by default
-if not system() in ('Linux', 'Windows', 'Darwin'):
+# There is no prebuild xulrunner sdk 2.0 for systems other than Linux,
+# Windows, so we disable xpidl generation by default
+if not system() in ('Linux', 'Windows'):
     default_noxpidl = '1'
 noxpidl = ARGUMENTS.get('NOXPIDL', default_noxpidl)
 
@@ -47,10 +47,13 @@ def get_default_abi():
 def get_abis():
     global mode
     if mode == 'ALL' or mode == 'ALLINONE':
-        abis = (('linux', 'x86', 'gcc3'), ('linux', 'x86_64', 'gcc3'),
-                ('windows', 'x86', 'msvc'),
-                ('darwin', 'x86', 'gcc3'),
-                ('freebsd', 'x86', 'gcc3'))
+        abis = (
+            ('linux', 'x86', 'gcc3'),
+            ('linux', 'x86_64', 'gcc3'),
+            ('windows', 'x86', 'msvc'),
+            ('darwin', 'x86', 'gcc3'),
+            # ('freebsd', 'x86', 'gcc3'),
+            )
     else:
         abis = (get_default_abi(),)
     return abis

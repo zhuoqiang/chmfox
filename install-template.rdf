@@ -7,12 +7,12 @@
     <em:version />
     <em:creator>ZHUO Qiang</em:creator>
     <em:contributor></em:contributor>
-    <em:description>ChmFox: Provide the best CHM file reading experience to all platform</em:description>
-    <em:aboutURL>chrome://chmfox/content/about.xul</em:aboutURL>
-    <em:optionsURL>chrome://chmfox/content/options.xul</em:optionsURL>
+    <em:description>ChmFox provides the best CHM file reading experience to all platforms. This is a modification of extension CHM Reader.</em:description>
+    <!-- <em:aboutURL>chrome://chmfox/content/about.xul</em:aboutURL> -->
+    <!-- <em:optionsURL>chrome://chmfox/content/options.xul</em:optionsURL> -->
     <em:homepageURL>http://bitbucket.org/zhuoqiang/chmfox</em:homepageURL>
     <em:targetPlatform />
-    <em:unpack>true</em:unpack>
+    <em:unpack>true</em:unpack><!-- binary component needs unpack -->
     <em:targetApplication>
       <Description>
         <em:id>{ec8030f7-c20a-464f-9b0e-13a3a9e97384}</em:id><!-- Firefox -->

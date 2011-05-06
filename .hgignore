@@ -8,3 +8,4 @@
 \.exp$
 \.lib$
 \.dll$
+\.dylib$
