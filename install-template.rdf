@@ -7,7 +7,7 @@
     <em:version />
     <em:creator>ZHUO Qiang</em:creator>
     <em:contributor></em:contributor>
-    <em:description>ChmFox provides the best CHM file reading experience to all platforms. This is a modification of extension CHM Reader.</em:description>
+    <em:description>ChmFox brings the best CHM file reading experience to Firefox. Modified from CHM Reader.</em:description>
     <!-- <em:aboutURL>chrome://chmfox/content/about.xul</em:aboutURL> -->
     <!-- <em:optionsURL>chrome://chmfox/content/options.xul</em:optionsURL> -->
     <em:homepageURL>http://bitbucket.org/zhuoqiang/chmfox</em:homepageURL>
@@ -17,7 +17,7 @@
       <Description>
         <em:id>{ec8030f7-c20a-464f-9b0e-13a3a9e97384}</em:id><!-- Firefox -->
         <em:minVersion>3.0b4</em:minVersion>
-        <em:maxVersion>4.*</em:maxVersion>
+        <em:maxVersion>4.0.*</em:maxVersion>
       </Description>
     </em:targetApplication>
     <!-- <em:updateURL></em:updateURL> -->
