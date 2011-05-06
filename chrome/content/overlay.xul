@@ -49,7 +49,7 @@
     <keyset id="mainKeyset">
         <key id="key_openChmfoxSidebar" command="viewChmfoxSidebar"
              key="m" 
-             modifiers="control" />
+             modifiers="accel" />
     </keyset>
   
     <broadcasterset id="mainBroadcasterSet"> 
