@@ -9,3 +9,4 @@
 \.lib$
 \.dll$
 \.dylib$
+components/I.+\.h$

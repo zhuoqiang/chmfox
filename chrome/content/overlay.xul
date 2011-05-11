@@ -40,7 +40,8 @@
 <overlay id="chmfoxOverlay" 
   xmlns="http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul">
 
-    <script type="application/x-javascript" src="overlay.js"/>
+    <script type="application/x-javascript" src="chrome://browser/content/utilityOverlay.js" />
+    <script type="application/x-javascript" src="overlay.js" />
 
     <menupopup id="viewSidebarMenu">
         <menuitem key="key_openChmfoxSidebar" observes="viewChmfoxSidebar" />

@@ -79,7 +79,6 @@ Protocol.prototype = {
             uri.spec = basespec + "!/" + spec;
     }
 
-    log("new uri [" + uri.spec + "]");
     return uri;
   },
 
@@ -93,7 +92,6 @@ Protocol.prototype = {
       url = url.replace('\\', '/');
       var ioService = Cc["@mozilla.org/network/io-service;1"].getService(Ci.nsIIOService);
       url = ioService.newURI(url, null, null);
-      log("file url [" + url.spec + "]");
       var localfile = url.QueryInterface(Ci.nsIFileURL).file;
 
       var chmfile = Cc["@zhuoqiang.me/chmfox/CHMFile;1"].createInstance(Ci.ICHMFile);
