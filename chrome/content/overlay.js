@@ -26,7 +26,13 @@ var uriContentListener = {
                  if (url.fileExtension.toLowerCase() == 'chm') {
                      uri.scheme = "chm";
                      log("redirect to [" + uri.spec + "]");
-                     gBrowser.loadURI(uri.spec);
+                     // gBrowser.addTab(uri.spec);
+                     // gBrowser.loadURI(uri.spec);
+                     // gBrowser.selectedTab.linkedBrowser.loadURI(uri.spec, null, null);
+                     // openUILinkIn(uri.spec, "current");
+                     // window.setTimeout('openUILinkIn("'+ uri.spec+ '", "current")', 10);
+                     window.setTimeout('gBrowser.loadURI("'+ uri.spec+ '")', 10);
+
                      return true;
                  }
              }
@@ -58,5 +64,4 @@ var wnd = window.QueryInterface(Ci.nsIInterfaceRequestor)
                       .QueryInterface(Ci.nsIDocShell)
                       .QueryInterface(Ci.nsIInterfaceRequestor)
                       .getInterface(Ci.nsIURIContentListener);
-
 wnd.parentContentListener = chmfox.uriContentListener;
