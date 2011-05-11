@@ -52,10 +52,6 @@ Protocol.prototype = {
   },
 
   newURI: function(spec, charset, baseURI) {
-    // log('newURI:' + spec + " " + charset);
-    // if (baseURI) {
-    //     log('baseURI:' + baseURI.spec);
-    // }
     var uri = Cc["@mozilla.org/network/simple-uri;1"].createInstance(Ci.nsIURI);
     if (spec.substring(0, 1) == "#") {
         var basespec = baseURI.spec;
@@ -79,12 +75,7 @@ Protocol.prototype = {
             uri.spec = basespec + "!/" + spec;
     }
 
-    return uri;
-  },
-
-  newChannel: function(aURI)
-  {
-      var urlParts = decodeURI(aURI.spec).split('!');
+      var urlParts = decodeURI(uri.spec).split('!');
       var url = urlParts[0];
       url = url.substring(4); //Remove "chm:"
       url = "file:" + url;
@@ -94,18 +85,25 @@ Protocol.prototype = {
       url = ioService.newURI(url, null, null);
       var localfile = url.QueryInterface(Ci.nsIFileURL).file;
 
-      var chmfile = Cc["@zhuoqiang.me/chmfox/CHMFile;1"].createInstance(Ci.ICHMFile);
-      if (chmfile.LoadCHM(localfile) != 0) {
+      this.chmfile = Cc["@zhuoqiang.me/chmfox/CHMFile;1"].createInstance(Ci.ICHMFile);
+      if (this.chmfile.LoadCHM(localfile) != 0) {
           // @todo should use firefox default handle for file not found
           log("file not found: " + localfile.path + "\n");
-          var uri = ioService.newURI("about:blank", null, null);
+          uri = ioService.newURI("about:blank", null, null);
           return ioService.newChannelFromURI(uri);
       }
 
-      var pagepath = chmfile.home;
-      if (urlParts.length > 1) {
-          pagepath = urlParts[1];
+      if (urlParts.length == 1) {
+          urlParts.push(this.chmfile.home);
+          uri = ioService.newURI(urlParts.join('!'), null, null);
       }
+      this.pagepath = urlParts[1];
+    return uri;
+  },
+
+  newChannel: function(aURI) {
+      var chmfile = this.chmfile;
+      var pagepath = this.pagepath;
 
     if (pagepath == "/#HHC") {
         return this.newRawTopicsChannel(aURI, chmfile);
