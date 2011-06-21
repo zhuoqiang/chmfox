@@ -1,5 +1,8 @@
 * About
   ChmFox is a Firefox extension helps to provide the best CHM file reading experience to all platform
+
+  Right now Mozilla has not fully reviewed this extension, however, you could download it here:
+  https://bitbucket.org/zhuoqiang/chmfox/raw/fae79413cfa1/chmfox-0.3.xpi
   
 * Author
   ZHUO Qiang <zhuo.qiang@gmail.com>
