@@ -1,0 +1,51 @@
+<?xml version="1.0"?>
+<?xml-stylesheet href="chrome://global/skin/" type"text/css" ?>
+<?xml-stylesheet href="chrome://browser/skin/browser.css" type="text/css" ?>
+
+<page id="sbCHMReaderSidebar" title="ChmFox"
+      orient="vertical"
+      xmlns="http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul">
+  <script src="jquery-1.6.min.js" charset="UTF-8"/>
+  <script src="sidebar.js" charset="UTF-8"/>
+  <script src="overlay.js" charset="UTF-8"/>
+  <tabbox id="content_is_chm" flex="1">
+    <tabs>
+      <tab label="Contents" selected="true" accesskey="C"/>
+      <tab label="Index" accesskey="I"/>
+    </tabs>
+    <tabpanels flex="1">
+      <tabpanel id="topicspanel" flex="1">
+        <iframe id="chmbookmark_iframe" hidden="true"/>
+        <tree id="chmbookmark" flex="1"
+              hidecolumnpicker="true"
+              seltype="single"
+              onselect="on_bookmark_select()">
+            <treecols>
+                <treecol id="name" primary="true" flex="1" hideheader="true"/>
+                <treecol id="link" hidden="true"/>
+            </treecols>
+            <treechildren/>
+        </tree>
+      </tabpanel>
+      <tabpanel id="indexpanel" flex="1">
+        <iframe id="chmindex_iframe" hidden="true"/>
+        <vbox flex="1">
+          <hbox>
+            <textbox id="find_index" rows="1" flex="1" onkeypress="on_find_index_keypress(event)" onfocus="on_find_index_focus(event)"/>
+            <button id="find_index_btn" label="Find" oncommand="on_find_index(event)"/>
+          </hbox>
+          <tree id="chmindex" flex="1"
+              hidecolumnpicker="true"
+              seltype="single"
+              onselect="on_index_select()">
+            <treecols>
+                <treecol id="name" primary="true" flex="1" hideheader="true"/>
+                <treecol id="link" hidden="true"/>
+            </treecols>
+            <treechildren/>
+          </tree>
+        </vbox>
+      </tabpanel>
+    </tabpanels>
+  </tabbox>
+</page>

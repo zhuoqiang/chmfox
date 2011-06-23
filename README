@@ -1,0 +1,25 @@
+* About
+  ChmFox is a Firefox extension helps to provide the best CHM file reading experience to all platform
+
+  Right now Mozilla has not fully reviewed this extension, however, you could download it here:
+  https://bitbucket.org/zhuoqiang/chmfox/raw/fae79413cfa1/chmfox-0.3.xpi
+  
+* Author
+  ZHUO Qiang <zhuo.qiang@gmail.com>
+  
+* History
+  ChmFox is derived from Firefox extension [CHM Reader]. [CHM Reader], while being great for reading CHM, however, have following pains:
+  - DO NOT support Firefox 4 (Gecko 2)
+  - Cannot open CHM file directly using firefox
+  - Bugs in handling relative url inside CHM file
+  - The default hotkey for show/hide sidebar panel is conflick with other extension and cannot be changed
+
+* License
+  MPL 1.1/GPL 2.0/LGPL 2.1, for details please see ./LICENSE
+  
+* Build
+  You have to install scons and download gecko-sdk 2.0
+  Extract gecko-sdk2.0 and set GECKO_SDK variable to the directory of it.
+  Invoke 
+: scons xpi  
+  in the root path of the chmfox
