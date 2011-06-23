@@ -34,7 +34,7 @@ function normlizePath(path) {
 }
 
 
-function getChmFile(uri) {
+function getChmFileAndModifyUri(uri) {
     var urlParts = decodeURI(uri.spec).split('!');
     var url = urlParts[0];
     url = url.substring(4); //Remove "chm:"
@@ -57,7 +57,7 @@ function getChmFile(uri) {
         uri = ioService.newURI(urlParts.join('!'), null, null);
     }
     var pagepath = urlParts[1];
-    return [chmfile, pagepath];
+    return {'file':chmfile, 'page':pagepath};
 }
 
 function Protocol() {
@@ -80,7 +80,6 @@ Protocol.prototype = {
 
   newURI: function(spec, charset, baseURI) {
     var uri = Cc["@mozilla.org/network/simple-uri;1"].createInstance(Ci.nsIURI);
-    log('spec:' + spec);
     if (spec.substring(0, 1) == "#") {
         var basespec = baseURI.spec;
         var pos = basespec.indexOf("#");
@@ -106,58 +105,33 @@ Protocol.prototype = {
             uri.spec = basespec + "!/" + spec;
     }
 
-      var urlParts = decodeURI(uri.spec).split('!');
-      var url = urlParts[0];
-      url = url.substring(4); //Remove "chm:"
-      url = "file:" + url;
-      url = unescape(url);
-      url = url.replace('\\', '/');
-      var ioService = Cc["@mozilla.org/network/io-service;1"].getService(Ci.nsIIOService);
-      url = ioService.newURI(url, null, null);
-      var localfile = url.QueryInterface(Ci.nsIFileURL).file;
-
-      var chmfile = Cc["@zhuoqiang.me/chmfox/CHMFile;1"].createInstance(Ci.ICHMFile);
-      if (chmfile.LoadCHM(localfile) != 0) {
-          // @todo should use firefox default handle for file not found
-          log("file not found: " + localfile.path + "\n");
-          uri = ioService.newURI("about:blank", null, null);
-          return ioService.newChannelFromURI(uri);
-      }
-
-      if (urlParts.length == 1) {
-          urlParts.push(chmfile.home);
-          uri = ioService.newURI(urlParts.join('!'), null, null);
-      }
-      var pagepath = urlParts[1];
+    getChmFileAndModifyUri(uri);
     return uri;
   },
 
   newChannel: function(aURI) {
-      var ret = getChmFile(aURI);
-      var chmfile = ret[0];
-      var pagepath = ret[1];
+    var chm = getChmFileAndModifyUri(aURI);
 
-    if (pagepath == "/#HHC") {
-        return this.newRawTopicsChannel(aURI, chmfile);
+    if (chm.page == "/#HHC") {
+        return this.newRawTopicsChannel(aURI, chm.file);
     }
 
-    if (pagepath == "/#HHK") {
-        return this.newRawIndexChannel(aURI, chmfile);
+    if (chm.page == "/#HHK") {
+        return this.newRawIndexChannel(aURI, chm.file);
     }
 
-    var pos = pagepath.indexOf("#");
+    var pos = chm.page.indexOf("#");
     if (pos > 0) {
-        pagepath = pagepath.substring(0, pos);
+        chm.page = chm.page.substring(0, pos);
     }
 
     // Create the channel
     var mime = "text/html";
-    pos = pagepath.lastIndexOf(".");
+    pos = chm.page.lastIndexOf(".");
     if (pos > 0) {
-        var ext = pagepath.substring(pos + 1);
+        var ext = chm.page.substring(pos + 1);
         switch (ext.toLowerCase()) {
         case "gif":
-            // log('gif:' + pagepath);
             mime = "image/gif";
             break;
         case "jpg":
@@ -184,16 +158,14 @@ Protocol.prototype = {
         }
     }
 
-    log("pagepath is: " + pagepath);
-
-    var pagepath_ui = '';
+    var page_ui = '';
     try {
-        pagepath_ui = chmfile.resolveObject(pagepath);
+        page_ui = chm.file.resolveObject(chm.page);
     } catch(e) {
-        log("pagepath not found: " + pagepath);
+        log("chm.page not found: " + chm.page);
     }
 
-    var is = chmfile.getInputStream(pagepath_ui);
+    var is = chm.file.getInputStream(page_ui);
 
     var isc = Cc["@mozilla.org/network/input-stream-channel;1"].createInstance(Ci.nsIInputStreamChannel);
     isc.contentStream = is;
@@ -201,7 +173,7 @@ Protocol.prototype = {
 
     var bc = isc.QueryInterface(Ci.nsIChannel);
     bc.contentType = mime;
-    bc.contentLength = pagepath_ui.length;
+    bc.contentLength = page_ui.length;
     bc.originalURI = aURI;
     bc.owner = this;
 
