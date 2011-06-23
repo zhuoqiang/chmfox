@@ -33,6 +33,33 @@ function normlizePath(path) {
     return '/' + norm.join('/');
 }
 
+
+function getChmFile(uri) {
+    var urlParts = decodeURI(uri.spec).split('!');
+    var url = urlParts[0];
+    url = url.substring(4); //Remove "chm:"
+    url = "file:" + url;
+    url = unescape(url);
+    url = url.replace('\\', '/');
+    var ioService = Cc["@mozilla.org/network/io-service;1"].getService(Ci.nsIIOService);
+    url = ioService.newURI(url, null, null);
+    var localfile = url.QueryInterface(Ci.nsIFileURL).file;
+
+    var chmfile = Cc["@zhuoqiang.me/chmfox/CHMFile;1"].createInstance(Ci.ICHMFile);
+    if (chmfile.LoadCHM(localfile) != 0) {
+        // @todo should use firefox default handle for file not found
+        log("file not found: " + localfile.path + "\n");
+        uri = ioService.newURI("about:blank", null, null);
+        return ioService.newChannelFromURI(uri);
+    }
+    if (urlParts.length == 1) {
+        urlParts.push(chmfile.home);
+        uri = ioService.newURI(urlParts.join('!'), null, null);
+    }
+    var pagepath = urlParts[1];
+    return [chmfile, pagepath];
+}
+
 function Protocol() {
 }
 
@@ -53,6 +80,7 @@ Protocol.prototype = {
 
   newURI: function(spec, charset, baseURI) {
     var uri = Cc["@mozilla.org/network/simple-uri;1"].createInstance(Ci.nsIURI);
+    log('spec:' + spec);
     if (spec.substring(0, 1) == "#") {
         var basespec = baseURI.spec;
         var pos = basespec.indexOf("#");
@@ -88,8 +116,8 @@ Protocol.prototype = {
       url = ioService.newURI(url, null, null);
       var localfile = url.QueryInterface(Ci.nsIFileURL).file;
 
-      this.chmfile = Cc["@zhuoqiang.me/chmfox/CHMFile;1"].createInstance(Ci.ICHMFile);
-      if (this.chmfile.LoadCHM(localfile) != 0) {
+      var chmfile = Cc["@zhuoqiang.me/chmfox/CHMFile;1"].createInstance(Ci.ICHMFile);
+      if (chmfile.LoadCHM(localfile) != 0) {
           // @todo should use firefox default handle for file not found
           log("file not found: " + localfile.path + "\n");
           uri = ioService.newURI("about:blank", null, null);
@@ -97,16 +125,17 @@ Protocol.prototype = {
       }
 
       if (urlParts.length == 1) {
-          urlParts.push(this.chmfile.home);
+          urlParts.push(chmfile.home);
           uri = ioService.newURI(urlParts.join('!'), null, null);
       }
-      this.pagepath = urlParts[1];
+      var pagepath = urlParts[1];
     return uri;
   },
 
   newChannel: function(aURI) {
-      var chmfile = this.chmfile;
-      var pagepath = this.pagepath;
+      var ret = getChmFile(aURI);
+      var chmfile = ret[0];
+      var pagepath = ret[1];
 
     if (pagepath == "/#HHC") {
         return this.newRawTopicsChannel(aURI, chmfile);
@@ -155,6 +184,8 @@ Protocol.prototype = {
         }
     }
 
+    log("pagepath is: " + pagepath);
+
     var pagepath_ui = '';
     try {
         pagepath_ui = chmfile.resolveObject(pagepath);
@@ -169,7 +200,7 @@ Protocol.prototype = {
     isc.setURI(aURI);
 
     var bc = isc.QueryInterface(Ci.nsIChannel);
-    bc.contentType = "text/html";
+    bc.contentType = mime;
     bc.contentLength = pagepath_ui.length;
     bc.originalURI = aURI;
     bc.owner = this;
