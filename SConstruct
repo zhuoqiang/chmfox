@@ -2,7 +2,7 @@ import os, zipfile
 from platform import system, machine
 from xml.dom import minidom
 
-version = '0.5'
+version = '1.0'
 mode = ARGUMENTS.get('MODE', '')
 
 default_noxpidl = '0'
