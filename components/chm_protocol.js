@@ -56,7 +56,10 @@ Protocol.prototype = {
     if (spec.substring(0, 1) == "#") {
         var basespec = baseURI.spec;
         var pos = basespec.indexOf("#");
-        uri.spec = basespec.substring(0, pos) + spec;
+        if (pos > 0) {
+            basespec = basespec.substring(0, pos);
+        }
+        uri.spec = basespec + spec;
     }
 
     else if (spec.indexOf(":") > 0) {
@@ -113,44 +116,47 @@ Protocol.prototype = {
         return this.newRawIndexChannel(aURI, chmfile);
     }
 
-    pos = pagepath.indexOf("#");
+    var pos = pagepath.indexOf("#");
     if (pos > 0) {
         pagepath = pagepath.substring(0, pos);
     }
 
     // Create the channel
-    pos = pagepath.lastIndexOf(".");
-    var ext = pagepath.substring(pos + 1);
     var mime = "text/html";
-    switch (ext.toLowerCase()) {
-    case "gif":
-        mime = "image/gif";
-        break;
-    case "jpg":
-    case "jpeg":
-        mime = "image/jpeg";
-        break;
-    case "png":
-        mime = "image/png";
-        break;
-    case "css":
-        mime = "text/css";
-        break;
-    case "mht":
-        mime = "message/rfc822";
-    case "txt":
-        mime = "text/plain";
-        break;
-    case "xml":
-        mime = "text/xml";
-        break;
-    case "xhtml":
-        mime = "text/xhtml";
-        break;
+    pos = pagepath.lastIndexOf(".");
+    if (pos > 0) {
+        var ext = pagepath.substring(pos + 1);
+        switch (ext.toLowerCase()) {
+        case "gif":
+            // log('gif:' + pagepath);
+            mime = "image/gif";
+            break;
+        case "jpg":
+        case "jpeg":
+            mime = "image/jpeg";
+            break;
+        case "png":
+            mime = "image/png";
+            break;
+        case "css":
+            mime = "text/css";
+            break;
+        case "mht":
+            mime = "message/rfc822";
+        case "txt":
+            mime = "text/plain";
+            break;
+        case "xml":
+            mime = "text/xml";
+            break;
+        case "xhtml":
+            mime = "text/xhtml";
+            break;
+        }
     }
 
+    var pagepath_ui = '';
     try {
-        /// @todo add "var" will cause firefox crash!
         pagepath_ui = chmfile.resolveObject(pagepath);
     } catch(e) {
         log("pagepath not found: " + pagepath);
