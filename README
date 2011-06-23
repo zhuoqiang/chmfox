@@ -1,25 +1,43 @@
-* About
-  ChmFox is a Firefox extension helps to provide the best CHM file reading experience to all platform
+ChmFox bring the best CHM file reading experience to all platform
 
-  Right now Mozilla has not fully reviewed this extension, however, you could download it here:
-  https://bitbucket.org/zhuoqiang/chmfox/raw/fae79413cfa1/chmfox-0.3.xpi
+You could open CHM file and reading it directly in Firefox after install this extension under Linux, Windows and Mac.
+
+After CHM file opened, you could use "Ctrl+M" to show/hide the content and index sidebar for the current CHM file
+
+You could also open CHM from command line
+
+    firefox local/path/to/chm/file.chm
+
+or:
+
+    firefox chm:///local/path/to/chm/file.chm
+
+
+ChmFox is derived from the great extension CHM Reader with the following improvements:
+
+- Support Firefox 4 and Firefox 5
+- Support open CHM files directly using standard open file menu
+- Fix bug: Could not handle the relative url "../../some.css" inside CHM
+- Change hotkey for show/hide sidebar to "Ctrl+M" which is not likely to conflick with others
+- Support open CHM files directly in the command line and associate CHM file type to firefox
+
+It's now support following platforms
+
+- Windows
+- Linux
+- Mac (x86)
+
   
 * Author
-  ZHUO Qiang <zhuo.qiang@gmail.com>
+  ZHUO Qiang <http://zhuoqiang.me>
   
-* History
-  ChmFox is derived from Firefox extension [CHM Reader]. [CHM Reader], while being great for reading CHM, however, have following pains:
-  - DO NOT support Firefox 4 (Gecko 2)
-  - Cannot open CHM file directly using firefox
-  - Bugs in handling relative url inside CHM file
-  - The default hotkey for show/hide sidebar panel is conflick with other extension and cannot be changed
 
 * License
   MPL 1.1/GPL 2.0/LGPL 2.1, for details please see ./LICENSE
   
 * Build
-  You have to install scons and download gecko-sdk 2.0
-  Extract gecko-sdk2.0 and set GECKO_SDK variable to the directory of it.
+  You have to install scons and download gecko-sdk
+  Extract gecko-sdk and set GECKO_SDK variable to the directory of it.
   Invoke 
 : scons xpi  
   in the root path of the chmfox
