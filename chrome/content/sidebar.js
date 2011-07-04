@@ -1,59 +1,53 @@
-Components.utils.import("resource://gre/modules/XPCOMUtils.jsm");
+Components.utils.import("resource://chmfox/chm_protocol.js");
 
-var Ci = Components.interfaces;
-var Cc = Components.classes;
-var Cr = Components.results;
+if ("undefined" == typeof(ChmfoxChrome)) {
+  var ChmfoxChrome = {
+  };
+};
 
-function log(msg) {
-    var console = Cc["@mozilla.org/consoleservice;1"].getService(Ci.nsIConsoleService);
-    var message = '[chmfox] ' + msg + '\n';
-    console.logStringMessage(message);
-    dump(message);
-}
+ChmfoxChrome.currentCHMFilePath = null;
 
-var currentCHMFilePath;
-
-function chm_url(fragment, filePath) {
+ChmfoxChrome.chm_url = function(fragment, filePath) {
     if (!filePath) {
-        filePath = currentCHMFilePath;
+        filePath = ChmfoxChrome.currentCHMFilePath;
     }
     return "chm://" + encodeURI(filePath) + "!/" + fragment;
-}
+};
 
-function change_to_url(url, chmFilePath) {
+ChmfoxChrome.change_to_url = function(url, chmFilePath) {
     if (url) {
         if (! chmFilePath) {
-            chmFilePath = currentCHMFilePath;
+            chmFilePath = ChmfoxChrome.currentCHMFilePath;
         }
         var doc = window.parent.content.document;
-        doc.location = chm_url(url, chmFilePath);
+        doc.location = ChmfoxChrome.chm_url(url, chmFilePath);
     }
-}
+};
 
-function on_bookmark_select() {
-    var tree = $('#chmbookmark')[0];
+ChmfoxChrome.on_bookmark_select = function() {
+    var tree = document.getElementById('chmbookmark');
     var url = tree.view.getCellText(tree.currentIndex, tree.columns[1]);
-    change_to_url(url);
+    ChmfoxChrome.change_to_url(url);
 }
 
-function on_index_select() {
-    var tree = $('#chmindex')[0];
+ChmfoxChrome.on_index_select = function() {
+    var tree = document.getElementById('chmindex');
     var url = tree.view.getCellText(tree.currentIndex, tree.columns[1]);
-    change_to_url(url);
+    ChmfoxChrome.change_to_url(url);
 }
 
-function on_find_index_keypress(e) {
+ChmfoxChrome.on_find_index_keypress = function(e) {
     if (e.keyCode == e.DOM_VK_RETURN) {
-        on_find_index(e);
-        on_find_index_focus(e);
+        ChmfoxChrome.on_find_index(e);
+        ChmfoxChrome.on_find_index_focus(e);
     }
 }
 
-function on_find_index_focus(e) {
+ChmfoxChrome.on_find_index_focus = function(e) {
     document.getElementById('find_index').select();
 }
 
-function on_find_index(e) {
+ChmfoxChrome.on_find_index = function(e) {
     var text = document.getElementById('find_index').value.toLowerCase();
     var tree = document.getElementById('chmindex');
     var view = tree.view;
@@ -66,23 +60,21 @@ function on_find_index(e) {
             break;
         }
     }
-}
+};
 
-function on_chmbookmark_iframe_load(event) {
+ChmfoxChrome.on_chmbookmark_iframe_load = function(event) {
     var doc = document.getElementById('chmbookmark_iframe').contentDocument;
     var tree = document.getElementById('chmbookmark');
-    iframe2tree(doc, tree);
-}
+    ChmfoxChrome.iframe2tree(doc, tree);
+};
 
-function on_chmindex_iframe_load(event) {
+ChmfoxChrome.on_chmindex_iframe_load = function(event) {
     var doc = document.getElementById('chmindex_iframe').contentDocument;
     var tree = document.getElementById('chmindex');
-    iframe2tree(doc, tree);
+    ChmfoxChrome.iframe2tree(doc, tree);
 }
 
-function iframe2tree(doc, tree) {
-    log('begin to generate content tree');
-
+ChmfoxChrome.iframe2tree = function(doc, tree) {
     var body = doc.getElementsByTagName('body').item(0);
     var list = new Array();
     var children = body.getElementsByTagName('LI');
@@ -212,74 +204,75 @@ function iframe2tree(doc, tree) {
     };
 }
 
-function load_bookmark(uri) {
+ChmfoxChrome.load_bookmark = function(uri) {
     var m = decodeURI(uri).match(/chm:\/\/(.*\.chm)(!(\/.*))?/i);
     if (m) {
-        if (currentCHMFilePath != m[1]) {
-            currentCHMFilePath = m[1];
+        if (ChmfoxChrome.currentCHMFilePath != m[1]) {
+            ChmfoxChrome.currentCHMFilePath = m[1];
 
-            var topics_iframe = $('#chmbookmark_iframe')[0];
-            var url = chm_url('#HHC');
+            var topics_iframe = document.getElementById('chmbookmark_iframe');
+            var url = ChmfoxChrome.chm_url('#HHC');
             topics_iframe.setAttribute('src', url);
-            log('set topics iframe src to ' + url);
-            var index_iframe = $('#chmindex_iframe')[0];
-            url = chm_url("#HHK");
+            var index_iframe = document.getElementById('chmindex_iframe');
+            url = ChmfoxChrome.chm_url("#HHK");
             index_iframe.setAttribute('src', url);
-            log('set index iframe src to ' + url);
-
             // load sidebar content after 0.5 second, this is much stable
             // than addEventListener.
-            window.setTimeout('on_chmbookmark_iframe_load(null)', 500);
-            window.setTimeout('on_chmindex_iframe_load(null)', 500);
+            window.setTimeout(
+                function(){
+                    ChmfoxChrome.on_chmbookmark_iframe_load(null);
+                }, 500);
+            window.setTimeout(
+                function() {
+                    ChmfoxChrome.on_chmindex_iframe_load(null);
+                }, 500);
         }
         document.getElementById('content_is_chm').hidden = false;
-        document.getElementById('content_not_chm').hidden = true;
     } else {
         var topicstree = document.getElementById('chmbookmark');
         var indextree = document.getElementById('chmindex');
-        currentCHMFilePath = null;
+        ChmfoxChrome.currentCHMFilePath = null;
         topicstree.view = null;
         indextree.view = null;
         document.getElementById('content_is_chm').hidden = true;
-        document.getElementById('content_not_chm').hidden = false;
     }
 }
 
-function on_browser_document_load(event) {
+ChmfoxChrome.on_browser_document_load = function(event) {
     if (window.parent) {
         var url = window.parent.gURLBar.value;
-        load_bookmark(url);
+        ChmfoxChrome.load_bookmark(url);
     }
-}
+};
 
-function on_tab_selected(event)
+ChmfoxChrome.on_tab_selected = function(event)
 {
     var gBrowser = window.parent.gBrowser;
     var browser = gBrowser.getBrowserAtIndex(gBrowser.mTabContainer.selectedIndex);
     // browser is the newly selected tab
     var url = browser.currentURI;
-    if (url) load_bookmark(url.spec);
-}
+    if (url) {
+        ChmfoxChrome.load_bookmark(url.spec);
+    }
+};
 
-function on_tab_creation(event)
+ChmfoxChrome.on_tab_creation = function(event)
 {
     var gBrowser = window.parent.gBrowser;
     // listening for new tabs
     if (event.relatedNode != gBrowser.mPanelContainer)
         return; //Could be anywhere in the DOM (unless bubbling is caught at the interface?)
 
-    currentCHMFilePath = null;
+    ChmfoxChrome.currentCHMFilePath = null;
     document.getElementById('chmbookmark').view = null;
     document.getElementById('chmindex').datasources = "rdf:null";
-}
+};
 
-function on_sidebar_load() {
-    log('sidebar loading');
-    window.parent.gBrowser.addEventListener("load", on_browser_document_load, true);
-    window.parent.gBrowser.mPanelContainer.addEventListener("select", on_tab_selected, false);
-    window.parent.gBrowser.mPanelContainer.addEventListener("DOMNodeInserted", on_tab_creation, false);
-    load_bookmark(window.parent.gURLBar.value);
-    log('sidebar loaded');
-}
+ChmfoxChrome.on_sidebar_load = function() {
+    window.parent.gBrowser.addEventListener("load", ChmfoxChrome.on_browser_document_load, true);
+    window.parent.gBrowser.mPanelContainer.addEventListener("select", ChmfoxChrome.on_tab_selected, false);
+    window.parent.gBrowser.mPanelContainer.addEventListener("DOMNodeInserted", ChmfoxChrome.on_tab_creation, false);
+    ChmfoxChrome.load_bookmark(window.parent.gURLBar.value);
+};
 
-window.addEventListener('load', on_sidebar_load, true);
+window.addEventListener('load', ChmfoxChrome.on_sidebar_load, true);
