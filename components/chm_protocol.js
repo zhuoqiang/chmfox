@@ -1,6 +1,10 @@
 Components.utils.import("resource://gre/modules/XPCOMUtils.jsm");
 
-const chmfoxComponents = (function() {
+var EXPORTED_SYMBOLS = [ "Chmfox" ];
+
+if ("undefined" == typeof(Chmfox)) {
+
+const Chmfox = (function() {
 
 const Ci = Components.interfaces;
 const Cc = Components.classes;
@@ -229,13 +233,62 @@ Protocol.prototype = {
   }
 };
 
-return [Protocol];
+
+function openUri(uri) {
+    const wm = Cc["@mozilla.org/appshell/window-mediator;1"].getService(Ci.nsIWindowMediator);
+    var browserEnumerator = wm.getEnumerator("navigator:browser");
+    wm.getMostRecentWindow("navigator:browser").loadURI(uri);
+}
+
+const uriContentListener = {
+    QueryInterface: XPCOMUtils.generateQI([
+        Ci.nsIURIContentListener,
+        Ci.nsISupportsWeakReference,
+        Ci.nsISupports]),
+
+     onStartURIOpen: function(uri) {
+         try {
+             if (uri.schemeIs("file")) {
+                 var url = uri.QueryInterface(Ci.nsIURL);
+                 if (url.fileExtension.toLowerCase() == 'chm') {
+                     uri.scheme = kScheme;
+                     log("redirect to [" + uri.spec + "]");
+                     const timer = Cc["@mozilla.org/timer;1"]
+                         .createInstance(Ci.nsITimer);
+                     timer.initWithCallback(function() {
+                         openUri(uri.spec);
+                     }, 0, Ci.nsITimer.TYPE_ONE_SHOT);
+                     return true;
+                 }
+             }
+         }
+         catch(e) {
+             log(e);
+         }
+         return false;
+     },
+
+    isPreferred: function(contentType, desiredContentType) {
+        try {
+            var webNavInfo = Cc["@mozilla.org/webnavigation-info;1"].getService(Ci.nsIWebNavigationInfo);
+            return webNavInfo.isTypeSupported(contentType, null);
+        }
+        catch (e) {
+            log(e);
+        }
+        return false;
+    }
+};
+
+return {log:log, protocols: [Protocol], uriContentListener: uriContentListener};
 
 })();
 
+};
+
 if (XPCOMUtils.generateNSGetFactory) {
-    const NSGetFactory = XPCOMUtils.generateNSGetFactory(chmfoxComponents);
+    const NSGetFactory = XPCOMUtils.generateNSGetFactory(Chmfox.protocols);
 }
 else {
-    const NSGetModule = XPCOMUtils.generateNSGetModule(chmfoxComponents);
+    const NSGetModule = XPCOMUtils.generateNSGetModule(Chmfox.protocols);
 }
