@@ -37,6 +37,20 @@ function normlizePath(path) {
     return '/' + norm.join('/');
 }
 
+const ioService = Cc["@mozilla.org/network/io-service;1"].getService(Ci.nsIIOService);
+
+function makeChannel(url, orig) {
+    let uri = ioService.newURI(url, null, null);
+    let channel = ioService.newChannelFromURI(uri);
+    channel.owner = this;
+    channel.originalURI = orig;
+    return channel;
+}
+
+function redirect(to, orig) {
+    var html = <html><head><meta http-equiv="Refresh" content={"0;" + to}/></head></html>.toXMLString();
+    return makeChannel('data:text/html,' + escape(html), orig);
+}
 
 function getChmFileAndModifyUri(uri) {
     var urlParts = decodeURI(uri.spec).split('!');
@@ -45,7 +59,6 @@ function getChmFileAndModifyUri(uri) {
     url = "file:" + url;
     url = unescape(url);
     url = url.replace('\\', '/');
-    var ioService = Cc["@mozilla.org/network/io-service;1"].getService(Ci.nsIIOService);
     url = ioService.newURI(url, null, null);
     var localfile = url.QueryInterface(Ci.nsIFileURL).file;
 
@@ -56,12 +69,17 @@ function getChmFileAndModifyUri(uri) {
         uri = ioService.newURI("about:blank", null, null);
         return ioService.newChannelFromURI(uri);
     }
+
+    var pagepath = null;
+
     if (urlParts.length == 1) {
         urlParts.push(chmfile.home);
         uri = ioService.newURI(urlParts.join('!'), null, null);
     }
-    var pagepath = urlParts[1];
-    return {'file':chmfile, 'page':pagepath};
+    else {
+        pagepath = urlParts[1];
+    }
+    return {'file':chmfile, 'page':pagepath, 'uri':uri};
 }
 
 function Protocol() {
@@ -115,6 +133,10 @@ Protocol.prototype = {
 
   newChannel: function(aURI) {
     var chm = getChmFileAndModifyUri(aURI);
+
+    if (! chm.page) {
+        return redirect(chm.uri.spec, aURI);
+    }
 
     if (chm.page == "/#HHC") {
         return this.newRawTopicsChannel(aURI, chm.file);
