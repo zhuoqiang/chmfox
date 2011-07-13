@@ -28,13 +28,13 @@ ChmfoxChrome.on_bookmark_select = function() {
     var tree = document.getElementById('chmbookmark');
     var url = tree.view.getCellText(tree.currentIndex, tree.columns[1]);
     ChmfoxChrome.change_to_url(url);
-}
+};
 
 ChmfoxChrome.on_index_select = function() {
     var tree = document.getElementById('chmindex');
     var url = tree.view.getCellText(tree.currentIndex, tree.columns[1]);
     ChmfoxChrome.change_to_url(url);
-}
+};
 
 ChmfoxChrome.on_find_index_keypress = function(e) {
     if (e.keyCode == e.DOM_VK_RETURN) {
@@ -51,8 +51,7 @@ ChmfoxChrome.on_find_index = function(e) {
     var text = document.getElementById('find_index').value.toLowerCase();
     var tree = document.getElementById('chmindex');
     var view = tree.view;
-    var i;
-    for (i = 1; i < view.rowCount; i++) {
+    for (var i = 1; i < view.rowCount; i++) {
         var name = view.getCellText(i, tree.columns[0]).toLowerCase();
         if (name.substring(0, text.length) == text) {
             view.selection.select(i);
@@ -72,21 +71,25 @@ ChmfoxChrome.on_chmindex_iframe_load = function(event) {
     var doc = document.getElementById('chmindex_iframe').contentDocument;
     var tree = document.getElementById('chmindex');
     ChmfoxChrome.iframe2tree(doc, tree);
-}
+};
 
 ChmfoxChrome.iframe2tree = function(doc, tree) {
-    var body = doc.getElementsByTagName('body').item(0);
-    var list = new Array();
-    var children = body.getElementsByTagName('LI');
+    var body = doc.getElementsByTagName('body')[0];
+    var children = body.getElementsByTagName('li');
     var j = 0;
-    for (var i = 0; i < children.length; i++) {
-        var li = children.item(i);
+    var list = [];
+    for (var i = 0; i < children.length; ++i) {
+        var li = children[i];
         var isdirect = true;
         var p = li.parentNode;
         while (p != body) {
-            if (p.tagName == 'LI') isdirect = false;
+            if (p.tagName == 'LI')  {
+                isdirect = false;
+                break;
+            }
             p = p.parentNode;
         }
+
         if (isdirect) {
             var isc = li.childNodes.length > 2;
             list[j++] = [ li, isc, false, 0 , -1];
@@ -103,8 +106,7 @@ ChmfoxChrome.iframe2tree = function(doc, tree) {
         if (column.id == 'name') {
             var li = list[idx][0];
             var spans = li.getElementsByTagName('span');
-            var i;
-            for (i = 0; i < spans.length; i++) {
+            for (var i = 0; i < spans.length; i++) {
                 var p = spans.item(i);
                 if (p.getAttribute('name') == 'Name')
                     return p.getAttribute('value');
@@ -113,8 +115,7 @@ ChmfoxChrome.iframe2tree = function(doc, tree) {
         } else if (column.id == 'link') {
             var li = list[idx][0];
             var spans = li.getElementsByTagName('span');
-            var i;
-            for (i = 0; i < spans.length; i++) {
+            for (var i = 0; i < spans.length; i++) {
                 var p = spans.item(i);
                 if (p.getAttribute('name') == 'Local')
                     return p.getAttribute('value').replace(/\.\//, '');
@@ -166,15 +167,18 @@ ChmfoxChrome.iframe2tree = function(doc, tree) {
         else {
           item[2] = true;
 
-          var toinsert = new Array();
+          var toinsert = [];
           var j = 0;
           var children = item[0].getElementsByTagName('LI');
-          for (i = 0; i < children.length; i++) {
+          for (var i = 0; i < children.length; i++) {
             var li = children.item(i);
             var isdirect = true;
             var p = li.parentNode;
             while (p != item[0]) {
-                if (p.tagName == 'LI') isdirect = false;
+                if (p.tagName == 'LI') {
+                    isdirect = false;
+                    break;
+                }
                 p = p.parentNode;
             }
             if (isdirect) {
@@ -183,7 +187,7 @@ ChmfoxChrome.iframe2tree = function(doc, tree) {
             }
           }
 
-          for (i = 0; i < toinsert.length; i++) {
+          for (var i = 0; i < toinsert.length; i++) {
             list.splice(idx + i + 1, 0, toinsert[i]);
           }
           this.treeBox.rowCountChanged(idx + 1, toinsert.length);
@@ -202,7 +206,7 @@ ChmfoxChrome.iframe2tree = function(doc, tree) {
       getCellProperties: function(idx, column, prop) {},
       getColumnProperties: function(column, element, prop) {}
     };
-}
+};
 
 ChmfoxChrome.load_bookmark = function(uri) {
     var m = decodeURI(uri).match(/chm:\/\/(.*\.chm)(!(\/.*))?/i);
@@ -216,16 +220,17 @@ ChmfoxChrome.load_bookmark = function(uri) {
             var index_iframe = document.getElementById('chmindex_iframe');
             url = ChmfoxChrome.chm_url("#HHK");
             index_iframe.setAttribute('src', url);
-            // load sidebar content after 0.5 second, this is much stable
+
+            // load sidebar content using timeout, this is much stable
             // than addEventListener.
             window.setTimeout(
                 function(){
                     ChmfoxChrome.on_chmbookmark_iframe_load(null);
-                }, 500);
+                }, 800);
             window.setTimeout(
                 function() {
                     ChmfoxChrome.on_chmindex_iframe_load(null);
-                }, 500);
+                }, 800);
         }
         document.getElementById('content_is_chm').hidden = false;
     } else {
