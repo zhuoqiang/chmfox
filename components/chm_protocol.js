@@ -177,6 +177,8 @@ Protocol.prototype = {
 
     var bc = isc.QueryInterface(Ci.nsIChannel);
     bc.contentType = mime;
+    // The encoding is in the HTML header
+    // bc.contentCharset = 'utf-8';
     bc.contentLength = page_ui.length;
     bc.originalURI = aURI;
     bc.owner = this;
@@ -190,7 +192,6 @@ Protocol.prototype = {
     content = content.replace(/<\/OBJECT/ig, '</div');
     content = content.replace(/<PARAM/ig, '<span');
     content = content.replace(/<\/PARAM/ig, '</span');
-    content = content.replace(/<head>/ig, '<head><meta http-equiv="ContentType" content="text/html; charset=UTF-8">');
 
     var sis = Cc["@mozilla.org/io/string-input-stream;1"].createInstance(Ci.nsIStringInputStream);
     sis.setData(content, content.length);
@@ -200,6 +201,7 @@ Protocol.prototype = {
     isc.setURI(aURI);
 
     var bc = isc.QueryInterface(Ci.nsIChannel);
+    bc.contentCharset = 'utf-8';
     bc.contentType = "text/html";
     bc.contentLength = content.length;
     bc.originalURI = aURI;
@@ -214,7 +216,6 @@ Protocol.prototype = {
     content = content.replace(/<\/OBJECT/ig, '</div');
     content = content.replace(/<PARAM/ig, '<span');
     content = content.replace(/<\/PARAM/ig, '</span');
-    content = content.replace(/<head>/ig, '<head><meta http-equiv="ContentType" content="text/html; charset=UTF-8">');
 
     var sis = Cc["@mozilla.org/io/string-input-stream;1"].createInstance(Ci.nsIStringInputStream);
     sis.setData(content, content.length);
@@ -224,6 +225,7 @@ Protocol.prototype = {
     isc.setURI(aURI);
 
     var bc = isc.QueryInterface(Ci.nsIChannel);
+    bc.contentCharset = 'utf-8';
     bc.contentType = "text/html";
     bc.contentLength = content.length;
     bc.originalURI = aURI;
