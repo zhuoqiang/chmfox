@@ -12,6 +12,8 @@ const Cr = Components.results;
 
 const kScheme = 'chm';
 
+var CHM_DATA = {};
+
 function log(message) {
   var console = Cc["@mozilla.org/consoleservice;1"].getService(Ci.nsIConsoleService);
   var msg = "[chmfox] " + message + "\n";
@@ -60,14 +62,30 @@ function getChmFileAndModifyUri(uri) {
     url = unescape(url);
     url = url.replace('\\', '/');
     url = ioService.newURI(url, null, null);
-    var localfile = url.QueryInterface(Ci.nsIFileURL).file;
+    var chmfile = CHM_DATA[url.spec] && CHM_DATA[url.spec].file;
+    if (! chmfile) {
+        chmfile = Cc["@zhuoqiang.me/chmfox/CHMFile;1"].createInstance(Ci.ICHMFile);
+        var localfile = url.QueryInterface(Ci.nsIFileURL).file;
+        if (chmfile.LoadCHM(localfile) != 0) {
+            // @todo should use firefox default handle for file not found
+            log("file not found: " + localfile.path + "\n");
+            uri = ioService.newURI("about:blank", null, null);
+            return ioService.newChannelFromURI(uri);
+        }
 
-    var chmfile = Cc["@zhuoqiang.me/chmfox/CHMFile;1"].createInstance(Ci.ICHMFile);
-    if (chmfile.LoadCHM(localfile) != 0) {
-        // @todo should use firefox default handle for file not found
-        log("file not found: " + localfile.path + "\n");
-        uri = ioService.newURI("about:blank", null, null);
-        return ioService.newChannelFromURI(uri);
+        CHM_DATA[url.spec] = {};
+        CHM_DATA[url.spec].file = chmfile;
+        CHM_DATA[url.spec].html_topics = chmfile.topics
+            .replace(/<OBJECT/ig, '<div')
+            .replace(/<\/OBJECT/ig, '</div')
+            .replace(/<PARAM/ig, '<span')
+            .replace(/<\/PARAM/ig, '</span');
+
+        CHM_DATA[url.spec].html_index = chmfile.index
+            .replace(/<OBJECT/ig, '<div')
+            .replace(/<\/OBJECT/ig, '</div')
+            .replace(/<PARAM/ig, '<span')
+            .replace(/<\/PARAM/ig, '</span');
     }
 
     var pagepath = null;
@@ -79,7 +97,11 @@ function getChmFileAndModifyUri(uri) {
     else {
         pagepath = urlParts[1];
     }
-    return {'file':chmfile, 'page':pagepath, 'uri':uri};
+    return {
+        'file':chmfile,
+        'page':pagepath,
+        'uri':uri,
+        'path':url.spec};
 }
 
 function Protocol() {
@@ -139,11 +161,11 @@ Protocol.prototype = {
     }
 
     if (chm.page == "/#HHC") {
-        return this.newRawTopicsChannel(aURI, chm.file);
+        return this.newRawTopicsChannel(aURI, chm.path);
     }
 
     if (chm.page == "/#HHK") {
-        return this.newRawIndexChannel(aURI, chm.file);
+        return this.newRawIndexChannel(aURI, chm.path);
     }
 
     var pos = chm.page.indexOf("#");
@@ -208,13 +230,8 @@ Protocol.prototype = {
     return bc;
   },
 
-  newRawIndexChannel: function(aURI, chmfile) {
-    var content = chmfile.index;
-    content = content.replace(/<OBJECT/ig, '<div');
-    content = content.replace(/<\/OBJECT/ig, '</div');
-    content = content.replace(/<PARAM/ig, '<span');
-    content = content.replace(/<\/PARAM/ig, '</span');
-
+  newRawIndexChannel: function(aURI, chm_path) {
+    var content = CHM_DATA[chm_path].html_index;
     var sis = Cc["@mozilla.org/io/string-input-stream;1"].createInstance(Ci.nsIStringInputStream);
     sis.setData(content, content.length);
 
@@ -232,13 +249,8 @@ Protocol.prototype = {
     return bc;
   },
 
-  newRawTopicsChannel: function(aURI, chmfile) {
-    var content = chmfile.topics;
-    content = content.replace(/<OBJECT/ig, '<div');
-    content = content.replace(/<\/OBJECT/ig, '</div');
-    content = content.replace(/<PARAM/ig, '<span');
-    content = content.replace(/<\/PARAM/ig, '</span');
-
+  newRawTopicsChannel: function(aURI, chm_path) {
+    var content = CHM_DATA[chm_path].html_topics;
     var sis = Cc["@mozilla.org/io/string-input-stream;1"].createInstance(Ci.nsIStringInputStream);
     sis.setData(content, content.length);
 
