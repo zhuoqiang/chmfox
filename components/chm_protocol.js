@@ -62,17 +62,22 @@ function normlizePath(path) {
 
 const ioService = Cc["@mozilla.org/network/io-service;1"].getService(Ci.nsIIOService);
 
-function makeChannel(url, orig) {
-    let uri = ioService.newURI(url, null, null);
-    let channel = ioService.newChannelFromURI(uri);
-    channel.owner = this;
-    channel.originalURI = orig;
-    return channel;
-}
-
 function redirect(to, orig) {
-    var html = <html><head><meta http-equiv="Refresh" content={"0;" + to}/></head></html>.toXMLString();
-    return makeChannel('data:text/html,' + escape(html), orig);
+    var html = '<html><head><meta http-equiv="refresh" content="0; url=' +
+                   utf8Encode(to) + '" /></head></html>';
+    var sis = Cc["@mozilla.org/io/string-input-stream;1"].createInstance(Ci.nsIStringInputStream);
+    sis.setData(html, html.length);
+    var isc = Cc["@mozilla.org/network/input-stream-channel;1"].createInstance(Ci.nsIInputStreamChannel);
+    isc.contentStream = sis;
+    isc.setURI(orig);
+
+    var bc = isc.QueryInterface(Ci.nsIChannel);
+    bc.contentCharset = 'utf-8';
+    bc.contentType = "text/html";
+    bc.contentLength = html.length;
+    bc.originalURI = orig;
+    bc.owner = this;
+    return bc;
 }
 
 function getChmFileAndModifyUri(uri) {
