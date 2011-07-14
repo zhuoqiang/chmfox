@@ -14,6 +14,27 @@ const kScheme = 'chm';
 
 var CHM_DATA = {};
 
+function utf8Encode(string) {
+	var utftext = "";
+
+	for (var n = 0; n < string.length; n++) {
+		var c = string.charCodeAt(n);
+		if (c < 128) {
+			utftext += String.fromCharCode(c);
+		}
+		else if((c > 127) && (c < 2048)) {
+			utftext += String.fromCharCode((c >> 6) | 192);
+			utftext += String.fromCharCode((c & 63) | 128);
+		}
+		else {
+			utftext += String.fromCharCode((c >> 12) | 224);
+			utftext += String.fromCharCode(((c >> 6) & 63) | 128);
+			utftext += String.fromCharCode((c & 63) | 128);
+		}
+	}
+	return utftext;
+};
+
 function log(message) {
   var console = Cc["@mozilla.org/consoleservice;1"].getService(Ci.nsIConsoleService);
   var msg = "[chmfox] " + message + "\n";
@@ -208,7 +229,7 @@ Protocol.prototype = {
 
     var page_ui = '';
     try {
-        page_ui = chm.file.resolveObject(chm.page);
+        page_ui = chm.file.resolveObject(utf8Encode(chm.page));
     } catch(e) {
         log("chm.page not found: " + chm.page);
     }
