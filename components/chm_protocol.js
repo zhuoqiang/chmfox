@@ -1,4 +1,5 @@
 Components.utils.import("resource://gre/modules/XPCOMUtils.jsm");
+Components.utils.import("resource://gre/modules/ctypes.jsm");
 
 var EXPORTED_SYMBOLS = [ "Chmfox" ];
 
@@ -13,6 +14,8 @@ const Cr = Components.results;
 const kScheme = 'chm';
 
 var CHM_DATA = {};
+
+const ioService = Cc["@mozilla.org/network/io-service;1"].getService(Ci.nsIIOService);
 
 function utf8Encode(string) {
 	var utftext = "";
@@ -42,6 +45,93 @@ function log(message) {
   dump(msg);
 }
 
+var lib = {};
+var uri = ioService.newURI('resource://chmfox-lib', null, null);
+if (uri instanceof Components.interfaces.nsIFileURL)
+{
+    lib._libraryPath = uri.file.path;
+    lib._library = ctypes.open(lib._libraryPath);
+
+    lib.test = lib._library.declare(
+        'chmfox_test', ctypes.default_abi,
+        ctypes.char.ptr);
+
+    lib.chmFilePtr = ctypes.StructType("chmFile").ptr;
+
+    lib.open = lib._library.declare(
+        'chmfox_open', ctypes.default_abi,
+        lib.chmFilePtr,
+        ctypes.char.ptr);
+
+    lib.close = lib._library.declare(
+        'chmfox_close', ctypes.default_abi,
+        ctypes.void_t,
+        lib.chmFilePtr);
+
+    lib.set_param = lib._library.declare(
+        'chmfox_set_param', ctypes.default_abi,
+        ctypes.void_t,
+        lib.chmFilePtr, ctypes.int, ctypes.int);
+
+
+    const CHM_MAX_PATH_LENGTH = 512;
+    lib.chmUnitInfo = ctypes.StructType(
+        'chmUnitInfo', [
+            {'start': ctypes.uint64_t},
+            {'length': ctypes.uint64_t},
+            {'space': ctypes.int},
+            {'flags': ctypes.int},
+            {'path': ctypes.char.array(CHM_MAX_PATH_LENGTH+1)}
+        ]);
+
+    lib.resolve_object = lib._library.declare(
+        'chmfox_resolve_object', ctypes.default_abi,
+        ctypes.int,
+        lib.chmFilePtr, ctypes.char.ptr, lib.chmUnitInfo.ptr);
+
+    lib.enumerator = ctypes.FunctionType(
+        ctypes.default_abi,
+        ctypes.int, [
+            lib.chmFilePtr,
+            lib.chmUnitInfo.ptr,
+            ctypes.voidptr_t]);
+
+    lib.retrieve_object = lib._library.declare(
+        'chmfox_retrieve_object', ctypes.default_abi,
+        ctypes.int64_t,
+        lib.chmFilePtr, lib.chmUnitInfo.ptr, ctypes.unsigned_char.ptr,
+        ctypes.uint64_t, ctypes.int64_t);
+
+    lib.CHM_RESOLVE_SUCCESS = 0;
+    lib.CHM_RESOLVE_FAILURE = 1;
+
+    lib.CHM_UNCOMPRESSED = 0;
+    lib.CHM_COMPRESSED = 1;
+
+    lib.CHM_ENUMERATE_NORMAL = 1;
+    lib.CHM_ENUMERATE_META = 2;
+    lib.CHM_ENUMERATE_SPECIAL = 4;
+    lib.CHM_ENUMERATE_FILES = 8;
+    lib.CHM_ENUMERATE_DIRS = 16;
+    lib.CHM_ENUMERATE_ALL = 31;
+    lib.CHM_ENUMERATOR_FAILURE = 0;
+
+    lib.CHM_ENUMERATOR_CONTINUE = 1;
+    lib.CHM_ENUMERATOR_SUCCESS = 2;
+
+    lib.enumerate = lib._library.declare(
+        'chmfox_enumerate', ctypes.default_abi,
+        ctypes.int,
+        lib.chmFilePtr, ctypes.int, lib.enumerator.ptr, ctypes.voidptr_t);
+
+    lib.enumerate_dir = lib._library.declare(
+        'chmfox_enumerate_dir', ctypes.default_abi,
+        ctypes.int,
+        lib.chmFilePtr, ctypes.char.ptr, ctypes.int, lib.enumerator.ptr, ctypes.voidptr_t);
+}
+
+log(lib.test().readString());
+
 function normlizePath(path) {
     var parts = path.split('/');
     var norm = [];
@@ -59,8 +149,6 @@ function normlizePath(path) {
     }
     return '/' + norm.join('/');
 }
-
-const ioService = Cc["@mozilla.org/network/io-service;1"].getService(Ci.nsIIOService);
 
 function redirect(to, orig) {
     var html = '<html><head><meta http-equiv="refresh" content="0; url=' +
