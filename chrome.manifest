@@ -1,5 +1,8 @@
 content chmfox chrome/content/
-resource  chmfox components/
+resource chmfox components/
+
+resource chmfox-lib src/libchmfox.so ABI=Linux_x86-gcc3
+resource chmfox-lib src/chmfox.dll ABI=WINNT_x86-msvc
 
 skin chmfox classic/1.0 chrome/skin/
 overlay chrome://browser/content/browser.xul chrome://chmfox/content/overlay.xul
