@@ -14,6 +14,7 @@ const Cr = Components.results;
 const kScheme = 'chm';
 
 var CHM_DATA = {};
+var CHM_CACHE = {};
 
 const ioService = Cc["@mozilla.org/network/io-service;1"].getService(Ci.nsIIOService);
 
@@ -45,92 +46,328 @@ function log(message) {
   dump(msg);
 }
 
-var lib = {};
-var uri = ioService.newURI('resource://chmfox-lib', null, null);
-if (uri instanceof Components.interfaces.nsIFileURL)
-{
-    lib._libraryPath = uri.file.path;
-    lib._library = ctypes.open(lib._libraryPath);
+var Lib = function(libPath) {
+    if (! libPath) {
+        libPath = ioService.newURI('resource://chmfox-lib', null, null)
+            .QueryInterface(Ci.nsIFileURL).file.path;
+    }
 
-    lib.test = lib._library.declare(
-        'chmfox_test', ctypes.default_abi,
-        ctypes.char.ptr);
+    this._libraryPath = libPath;
+    this._library = ctypes.open(this._libraryPath);
 
-    lib.chmFilePtr = ctypes.StructType("chmFile").ptr;
+    this.CHM_RESOLVE_SUCCESS = 0;
+    this.CHM_RESOLVE_FAILURE = 1;
 
-    lib.open = lib._library.declare(
-        'chmfox_open', ctypes.default_abi,
-        lib.chmFilePtr,
-        ctypes.char.ptr);
+    this.CHM_UNCOMPRESSED = 0;
+    this.CHM_COMPRESSED = 1;
 
-    lib.close = lib._library.declare(
-        'chmfox_close', ctypes.default_abi,
-        ctypes.void_t,
-        lib.chmFilePtr);
+    this.CHM_ENUMERATE_NORMAL = 1;
+    this.CHM_ENUMERATE_META = 2;
+    this.CHM_ENUMERATE_SPECIAL = 4;
+    this.CHM_ENUMERATE_FILES = 8;
+    this.CHM_ENUMERATE_DIRS = 16;
+    this.CHM_ENUMERATE_ALL = 31;
+    this.CHM_ENUMERATOR_FAILURE = 0;
 
-    lib.set_param = lib._library.declare(
-        'chmfox_set_param', ctypes.default_abi,
-        ctypes.void_t,
-        lib.chmFilePtr, ctypes.int, ctypes.int);
+    this.CHM_ENUMERATOR_CONTINUE = 1;
+    this.CHM_ENUMERATOR_SUCCESS = 2;
 
+    this.CHM_MAX_PATH_LENGTH = 512;
 
-    const CHM_MAX_PATH_LENGTH = 512;
-    lib.chmUnitInfo = ctypes.StructType(
+    this.chmFilePtr = ctypes.StructType("chmFile").ptr;
+    this.chmUnitInfo = ctypes.StructType(
         'chmUnitInfo', [
             {'start': ctypes.uint64_t},
             {'length': ctypes.uint64_t},
             {'space': ctypes.int},
             {'flags': ctypes.int},
-            {'path': ctypes.char.array(CHM_MAX_PATH_LENGTH+1)}
+            {'path': ctypes.char.array(this.CHM_MAX_PATH_LENGTH+1)}
         ]);
 
-    lib.resolve_object = lib._library.declare(
-        'chmfox_resolve_object', ctypes.default_abi,
-        ctypes.int,
-        lib.chmFilePtr, ctypes.char.ptr, lib.chmUnitInfo.ptr);
-
-    lib.enumerator = ctypes.FunctionType(
+    this.enumerator = ctypes.FunctionType(
         ctypes.default_abi,
         ctypes.int, [
-            lib.chmFilePtr,
-            lib.chmUnitInfo.ptr,
+            this.chmFilePtr,
+            this.chmUnitInfo.ptr,
             ctypes.voidptr_t]);
 
-    lib.retrieve_object = lib._library.declare(
+    this.open = this._library.declare(
+        'chmfox_open', ctypes.default_abi,
+        this.chmFilePtr,
+        ctypes.char.ptr);
+
+    this.close = this._library.declare(
+        'chmfox_close', ctypes.default_abi,
+        ctypes.void_t,
+        this.chmFilePtr);
+
+    this.set_param = this._library.declare(
+        'chmfox_set_param', ctypes.default_abi,
+        ctypes.void_t,
+        this.chmFilePtr, ctypes.int, ctypes.int);
+
+    this.resolve_object = this._library.declare(
+        'chmfox_resolve_object', ctypes.default_abi,
+        ctypes.int,
+        this.chmFilePtr, ctypes.char.ptr, this.chmUnitInfo.ptr);
+
+    this.retrieve_object = this._library.declare(
         'chmfox_retrieve_object', ctypes.default_abi,
         ctypes.int64_t,
-        lib.chmFilePtr, lib.chmUnitInfo.ptr, ctypes.unsigned_char.ptr,
+        this.chmFilePtr, this.chmUnitInfo.ptr, ctypes.unsigned_char.ptr,
         ctypes.uint64_t, ctypes.int64_t);
 
-    lib.CHM_RESOLVE_SUCCESS = 0;
-    lib.CHM_RESOLVE_FAILURE = 1;
-
-    lib.CHM_UNCOMPRESSED = 0;
-    lib.CHM_COMPRESSED = 1;
-
-    lib.CHM_ENUMERATE_NORMAL = 1;
-    lib.CHM_ENUMERATE_META = 2;
-    lib.CHM_ENUMERATE_SPECIAL = 4;
-    lib.CHM_ENUMERATE_FILES = 8;
-    lib.CHM_ENUMERATE_DIRS = 16;
-    lib.CHM_ENUMERATE_ALL = 31;
-    lib.CHM_ENUMERATOR_FAILURE = 0;
-
-    lib.CHM_ENUMERATOR_CONTINUE = 1;
-    lib.CHM_ENUMERATOR_SUCCESS = 2;
-
-    lib.enumerate = lib._library.declare(
+    this.enumerate = this._library.declare(
         'chmfox_enumerate', ctypes.default_abi,
         ctypes.int,
-        lib.chmFilePtr, ctypes.int, lib.enumerator.ptr, ctypes.voidptr_t);
+        this.chmFilePtr, ctypes.int, this.enumerator.ptr, ctypes.voidptr_t);
 
-    lib.enumerate_dir = lib._library.declare(
+    this.enumerate_dir = this._library.declare(
         'chmfox_enumerate_dir', ctypes.default_abi,
         ctypes.int,
-        lib.chmFilePtr, ctypes.char.ptr, ctypes.int, lib.enumerator.ptr, ctypes.voidptr_t);
+        this.chmFilePtr, ctypes.char.ptr, ctypes.int, this.enumerator.ptr, ctypes.voidptr_t);
+
+    return this;
+};
+
+var lib = Lib();
+
+function getString(array, index, len) {
+    return ctypes.cast(array.addressOfElement(index), ctypes.char.ptr).readString();
 }
 
-log(lib.test().readString());
+function getUInt32(array, index) {
+    return ctypes.cast(array.addressOfElement(index), ctypes.uint32_t.ptr).contents;
+}
+
+function getUInt64(array, index) {
+    return ctypes.cast(array.addressOfElement(index), ctypes.uint64_t.ptr).contents;
+}
+
+function prependSlash(str) {
+    if (str[0] != '/') {
+        return '/' + str;
+    }
+    return str;
+}
+
+var ChmFile = function(path) {
+    this.path = path;
+    this.handle = lib.open(this.path);
+    log(this.handle.toSource());
+
+    this.isValid = function() {
+        return !this.handle.isNull();
+    };
+
+
+    this.getSystemInfo = function () {
+        var ui = lib.chmUnitInfo();
+        if (lib.CHM_RESOLVE_FAILURE == lib.resolve_object(this.handle, '/#SYSTEM', ui.address())) {
+            log('getSystemInfo error: #SYSTEM does not exists in ' + this.path);
+            return ;
+        }
+
+        var buffer = ctypes.unsigned_char.array(ui.length)();
+        var length = lib.retrieve_object(
+            this.handle, ui.address(),
+            buffer.addressOfElement(0),
+            4, buffer.length);
+        if (length == 0) {
+            log('getSystemInfo error: #SYSTEM retrieved 0 bytes in ' + this.path);
+            return;
+        }
+        var index = 0;
+        while (index < length) {
+            var type = buffer[index] + (buffer[index+1] * 256);
+            index += 2;
+            var len = buffer[index] + (buffer[index+1] * 256);
+            index += 2;
+            log("type:" + type + " " + len);
+            switch(type) {
+                case 0:
+                    this.topics = "/" + getString(buffer, index, len);
+                    break;
+                case 1:
+                    this.index = "/" + getString(buffer, index, len);
+                    break;
+                case 2:
+                    this.home = "/" + getString(buffer, index, len);
+                    log("home: " + this.home);
+                    break;
+                case 3:
+                    this.title = getString(buffer, index, len);
+                    log("title: " + this.title);
+                    break;
+                case 4:
+                    this.lcid = getUInt32(buffer, index);
+                    this.use_dbcs = getUInt32(buffer, index+0x4);
+                    this.searchable = getUInt32(buffer, index+0x8);
+                    this.has_klinks = getUInt32(buffer, index+0xc);
+                    this.has_alinks = getUInt32(buffer, index+0x10);
+                    this.timestamp = getUInt64(buffer, index+0x14);
+                    log(this.lcid + ", " + this.use_dbcs + ", " + this.searchable);
+                    break;
+                case 5: // Always "main"?
+                    this.default_window = getString(buffer, index, len);
+                case 6: // Project name '.hhc' '.hhk'
+                    this.project = getString(buffer, index, len);
+                case 7:
+                    this.has_binary_index = getUInt32(buffer, index);
+                    break;
+                case 9: // Encoder
+                    this.compiled_by = getString(buffer, index, len);
+                    break;
+                case 10: // Unknown
+                    break;
+                case 11:
+                    this.has_binary_toc = getUInt32(buffer, index);
+                    break;
+                case 12: // Unknown
+                case 13: // Unknown
+                case 15: // Unknown
+                    break;
+                case 16:
+                    this.encoding = getString(buffer, index, len);
+                    log('encoding: ' + this.encoding);
+                    break;
+            }
+            index += len;
+        }
+
+        // Gets information from the #WINDOWS file.
+        // Checks the #WINDOWS file to see if it has any info that was
+        // not found in #SYSTEM (topics, index or default page.
+        if (lib.CHM_RESOLVE_FAILURE == lib.resolve_object(this.handle, '/#WINDOWS', ui.address())) {
+            log('getSystemInfo error: #WINDOWS does not exists in ' + this.path);
+            return;
+        }
+
+        log("home: " + this.home);
+        log("index: " + this.index);
+        log("topics: " + this.topics);
+
+        const WINDOWS_HEADER_LENGTH = 8;
+        buffer = ctypes.unsigned_char.array(WINDOWS_HEADER_LENGTH)();
+        length = lib.retrieve_object(
+            this.handle, ui.address(),
+            buffer.addressOfElement(0), 0, buffer.length);
+        if (length < buffer.length) {
+            log('getSystemInfo error: /#WINDOWS header retrive error in ' + this.path);
+            return;
+        }
+        var entries = getUInt32(buffer, 0);
+        var entry_size = getUInt32(buffer, 4);
+        buffer = ctypes.unsigned_char.array(entries*entry_size)();
+        length = lib.retrieve_object(
+            this.handle, ui.address(),
+            buffer.addressOfElement(0), WINDOWS_HEADER_LENGTH, buffer.length);
+
+        if (length == 0) {
+            log('getSystemInfo error: /#WINDOWS retrive error in ' + this.path);
+            return;
+        }
+
+        if (lib.resolve_object(this.handle, "/#STRINGS", ui.address()) != lib.CHM_RESOLVE_SUCCESS) {
+            log('getSystemInfo error: /#STRINGS resolve error in ' + this.path);
+            return;
+        }
+
+        var size = 0;
+        var factor_buffer = ctypes.unsigned_char.array(4096)();
+
+        for (var i = 0; i < entries; ++i) {
+            var offset = i * entry_size;
+            var off_title = getUInt32(buffer, offset + 0x14);
+            var off_home = getUInt32(buffer, offset + 0x68);
+            var off_hhc = getUInt32(buffer, offset + 0x60);
+            var off_hhk = getUInt32(buffer, offset + 0x64);
+            var factor = off_title / 4096;
+            if (size == 0) {
+                size = lib.retrieve_object(
+                    this.handle, ui.address(),
+                    factor_buffer.addressOfElement(0),
+                    factor * 4096, factor_buffer.length);
+            }
+            if (size && off_title) {
+                this.title = prependSlash(getString(factor_buffer, off_title % 4096));
+            }
+
+            if (size && off_home && !this.home) {
+                this.home = prependSlash(getString(factor_buffer, off_home % 4096));
+            }
+
+            if (factor != off_hhc/4096) {
+				factor = off_hhc / 4096;
+				size = lib.retrieve_object(
+                    this.handle, ui.address(),
+					factor_buffer.addressOfElement(0),
+					factor * 4096,
+					factor_buffer.length);
+			}
+
+			if (size && off_hhc && !this.topics) {
+                this.topics = prependSlash(getString(factor_buffer, off_hhc % 4096));
+            }
+
+            if (factor != off_hhk / 4096) {
+				factor = off_hhk / 4096;
+				size = lib.retrieve_object(
+                    this.handle, ui.address(),
+				    factor_buffer.addressOfElement(0),
+				    factor * 4096,
+				    factor_buffer.length);
+			}
+
+			if(size && off_hhk && !this.index) {
+                this.index = prependSlash(getString(factor_buffer, off_hhk % 4096));
+            }
+
+            log("home: " + this.home);
+            log("index: " + this.index);
+            log("topics: " + this.topics);
+        };
+
+    };
+
+    this.getSystemInfo();
+
+    /// get topics content
+    if (this.topics) {
+        var ui = lib.chmUnitInfo();
+        if (lib.CHM_RESOLVE_SUCCESS == lib.resolve_object(
+                this.handle, this.topics, ui.address())) {
+            var buf = ctypes.unsigned_char.array(ui.length+1)();
+            var r = lib.retrieve_object(
+                this.handle, ui.address(),
+                buf.addressOfElement(0), 0, ui.length);
+            if (r > 0) {
+                this.topics_content = getString(buf, 0);
+                log('topics is:' + this.topics_content);
+            }
+            else {
+                log('retrive topic failed');
+            }
+        }
+        else {
+            log('resolve topic failed');
+        }
+    }
+
+    return this;
+
+        // CHM_CACHE[url.spec].html_topics = chmfile.topics
+        //     .replace(/<OBJECT/ig, '<div')
+        //     .replace(/<\/OBJECT/ig, '</div')
+        //     .replace(/<PARAM/ig, '<span')
+        //     .replace(/<\/PARAM/ig, '</span');
+
+        // CHM_CACHE[url.spec].html_index = chmfile.index
+        //     .replace(/<OBJECT/ig, '<div')
+        //     .replace(/<\/OBJECT/ig, '</div')
+        //     .replace(/<PARAM/ig, '<span')
+        //     .replace(/<\/PARAM/ig, '</span');
+};
 
 function normlizePath(path) {
     var parts = path.split('/');
@@ -186,7 +423,6 @@ function getChmFileAndModifyUri(uri) {
             uri = ioService.newURI("about:blank", null, null);
             return ioService.newChannelFromURI(uri);
         }
-
         CHM_DATA[url.spec] = {};
         CHM_DATA[url.spec].file = chmfile;
         CHM_DATA[url.spec].html_topics = chmfile.topics
@@ -200,6 +436,22 @@ function getChmFileAndModifyUri(uri) {
             .replace(/<\/OBJECT/ig, '</div')
             .replace(/<PARAM/ig, '<span')
             .replace(/<\/PARAM/ig, '</span');
+    }
+
+    var chm = CHM_CACHE[url.spec] && CHM_DATA[url.spec].file;
+    if (! chm) {
+        chm = ChmFile(url.QueryInterface(Ci.nsIFileURL).file.path);
+        if (! chm.isValid()) {
+            // @todo should use firefox default handle for file not found
+            log("file not found: " + localfile.path + "\n");
+            uri = ioService.newURI("about:blank", null, null);
+            return ioService.newChannelFromURI(uri);
+        }
+
+        log('chm file open: ' + chm.isValid());
+        chm.getSystemInfo();
+        CHM_CACHE[url.spec] = {};
+        CHM_CACHE[url.spec].file = chm;
     }
 
     var pagepath = null;
