@@ -151,6 +151,14 @@ function prependSlash(str) {
     return str;
 }
 
+function HtmlizeObject(str) {
+    return str
+        .replace(/<OBJECT/ig, '<div')
+        .replace(/<\/OBJECT/ig, '</div')
+        .replace(/<PARAM/ig, '<span')
+        .replace(/<\/PARAM/ig, '</span');
+}
+
 var ChmFile = function(path) {
     this.path = path;
     this.handle = lib.open(this.path);
@@ -282,23 +290,31 @@ var ChmFile = function(path) {
             var off_home = getUInt32(buffer, offset + 0x68);
             var off_hhc = getUInt32(buffer, offset + 0x60);
             var off_hhk = getUInt32(buffer, offset + 0x64);
-            var factor = off_title / 4096;
+            var factor = Math.floor(off_title / 4096);
             if (size == 0) {
                 size = lib.retrieve_object(
                     this.handle, ui.address(),
                     factor_buffer.addressOfElement(0),
-                    factor * 4096, factor_buffer.length);
+                    factor*4096, factor_buffer.length);
             }
-            if (size && off_title) {
+            if (size && off_title && this.title) {
                 this.title = prependSlash(getString(factor_buffer, off_title % 4096));
             }
+
+			if(factor != Math.floor(off_home / 4096)) {
+				factor = Math.floor(off_home / 4096);
+                size = lib.retrieve_object(
+                    this.handle, ui.address(),
+                    factor_buffer.addressOfElement(0),
+                    factor*4096, factor_buffer.length);
+			}
 
             if (size && off_home && !this.home) {
                 this.home = prependSlash(getString(factor_buffer, off_home % 4096));
             }
 
-            if (factor != off_hhc/4096) {
-				factor = off_hhc / 4096;
+            if (factor != Math.floor(off_hhc/4096)) {
+				factor = Math.floor(off_hhc / 4096);
 				size = lib.retrieve_object(
                     this.handle, ui.address(),
 					factor_buffer.addressOfElement(0),
@@ -310,8 +326,8 @@ var ChmFile = function(path) {
                 this.topics = prependSlash(getString(factor_buffer, off_hhc % 4096));
             }
 
-            if (factor != off_hhk / 4096) {
-				factor = off_hhk / 4096;
+            if (factor != Math.floor(off_hhk / 4096)) {
+				factor = Math.floor(off_hhk / 4096);
 				size = lib.retrieve_object(
                     this.handle, ui.address(),
 				    factor_buffer.addressOfElement(0),
@@ -337,36 +353,34 @@ var ChmFile = function(path) {
         var ui = lib.chmUnitInfo();
         if (lib.CHM_RESOLVE_SUCCESS == lib.resolve_object(
                 this.handle, this.topics, ui.address())) {
-            var buf = ctypes.unsigned_char.array(ui.length+1)();
+            var buf = ctypes.unsigned_char.array(Math.floor(ui.length+1))();
             var r = lib.retrieve_object(
                 this.handle, ui.address(),
                 buf.addressOfElement(0), 0, ui.length);
             if (r > 0) {
                 this.topics_content = getString(buf, 0);
-                log('topics is:' + this.topics_content);
-            }
-            else {
-                log('retrive topic failed');
+                this.html_topics = HtmlizeObject(this.topics_content);
             }
         }
-        else {
-            log('resolve topic failed');
+    }
+
+    /// get index content
+    if (this.topics) {
+        var ui = lib.chmUnitInfo();
+        if (lib.CHM_RESOLVE_SUCCESS == lib.resolve_object(
+                this.handle, this.index, ui.address())) {
+            var buf = ctypes.unsigned_char.array(Math.floor(ui.length+1))();
+            var r = lib.retrieve_object(
+                this.handle, ui.address(),
+                buf.addressOfElement(0), 0, ui.length);
+            if (r > 0) {
+                this.index_content = getString(buf, 0);
+                this.html_index = HtmlizeObject(this.index_content);
+            }
         }
     }
 
     return this;
-
-        // CHM_CACHE[url.spec].html_topics = chmfile.topics
-        //     .replace(/<OBJECT/ig, '<div')
-        //     .replace(/<\/OBJECT/ig, '</div')
-        //     .replace(/<PARAM/ig, '<span')
-        //     .replace(/<\/PARAM/ig, '</span');
-
-        // CHM_CACHE[url.spec].html_index = chmfile.index
-        //     .replace(/<OBJECT/ig, '<div')
-        //     .replace(/<\/OBJECT/ig, '</div')
-        //     .replace(/<PARAM/ig, '<span')
-        //     .replace(/<\/PARAM/ig, '</span');
 };
 
 function normlizePath(path) {
