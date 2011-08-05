@@ -14,7 +14,6 @@ const Cr = Components.results;
 const kScheme = 'chm';
 
 var CHM_DATA = {};
-var CHM_CACHE = {};
 
 const ioService = Cc["@mozilla.org/network/io-service;1"].getService(Ci.nsIIOService);
 
@@ -365,7 +364,7 @@ var ChmFile = function(path) {
     }
 
     /// get index content
-    if (this.topics) {
+    if (this.index) {
         var ui = lib.chmUnitInfo();
         if (lib.CHM_RESOLVE_SUCCESS == lib.resolve_object(
                 this.handle, this.index, ui.address())) {
@@ -380,6 +379,20 @@ var ChmFile = function(path) {
         }
     }
 
+
+    this.getContent = function (page) {
+        var ui = lib.chmUnitInfo();
+        if (lib.CHM_RESOLVE_SUCCESS != lib.resolve_object(this.handle, page, ui.address())) {
+            return;
+        }
+        var buffer = ctypes.unsigned_char.array(Math.floor(ui.length+1))();
+        var length = lib.retrieve_object(
+                this.handle, ui.address(),
+                buffer.addressOfElement(0), 0, ui.length);
+        if (length > 0) {
+            return getString(buffer, 0);
+        }
+    };
     return this;
 };
 
@@ -427,32 +440,7 @@ function getChmFileAndModifyUri(uri) {
     url = unescape(url);
     url = url.replace('\\', '/');
     url = ioService.newURI(url, null, null);
-    var chmfile = CHM_DATA[url.spec] && CHM_DATA[url.spec].file;
-    if (! chmfile) {
-        chmfile = Cc["@zhuoqiang.me/chmfox/CHMFile;1"].createInstance(Ci.ICHMFile);
-        var localfile = url.QueryInterface(Ci.nsIFileURL).file;
-        if (chmfile.LoadCHM(localfile) != 0) {
-            // @todo should use firefox default handle for file not found
-            log("file not found: " + localfile.path + "\n");
-            uri = ioService.newURI("about:blank", null, null);
-            return ioService.newChannelFromURI(uri);
-        }
-        CHM_DATA[url.spec] = {};
-        CHM_DATA[url.spec].file = chmfile;
-        CHM_DATA[url.spec].html_topics = chmfile.topics
-            .replace(/<OBJECT/ig, '<div')
-            .replace(/<\/OBJECT/ig, '</div')
-            .replace(/<PARAM/ig, '<span')
-            .replace(/<\/PARAM/ig, '</span');
-
-        CHM_DATA[url.spec].html_index = chmfile.index
-            .replace(/<OBJECT/ig, '<div')
-            .replace(/<\/OBJECT/ig, '</div')
-            .replace(/<PARAM/ig, '<span')
-            .replace(/<\/PARAM/ig, '</span');
-    }
-
-    var chm = CHM_CACHE[url.spec] && CHM_DATA[url.spec].file;
+    var chm = CHM_DATA[url.spec];
     if (! chm) {
         chm = ChmFile(url.QueryInterface(Ci.nsIFileURL).file.path);
         if (! chm.isValid()) {
@@ -461,24 +449,19 @@ function getChmFileAndModifyUri(uri) {
             uri = ioService.newURI("about:blank", null, null);
             return ioService.newChannelFromURI(uri);
         }
-
-        log('chm file open: ' + chm.isValid());
-        chm.getSystemInfo();
-        CHM_CACHE[url.spec] = {};
-        CHM_CACHE[url.spec].file = chm;
     }
 
     var pagepath = null;
 
     if (urlParts.length == 1) {
-        urlParts.push(chmfile.home);
+        urlParts.push(chm.home);
         uri = ioService.newURI(urlParts.join('!'), null, null);
     }
     else {
         pagepath = urlParts[1];
     }
     return {
-        'file':chmfile,
+        'file':chm,
         'page':pagepath,
         'uri':uri,
         'path':url.spec};
@@ -586,15 +569,12 @@ Protocol.prototype = {
         }
     }
 
-    var page_ui = '';
-    try {
-        page_ui = chm.file.resolveObject(utf8Encode(chm.page));
-    } catch(e) {
-        log("chm.page not found: " + chm.page);
+    var content = chm.file.getContent(chm.page);
+    if (! content) {
+        return;
     }
-
-    var is = chm.file.getInputStream(page_ui);
-
+    var is = Cc["@mozilla.org/io/string-input-stream;1"].createInstance(Ci.nsIStringInputStream);
+    is.setData(content, content.length);
     var isc = Cc["@mozilla.org/network/input-stream-channel;1"].createInstance(Ci.nsIInputStreamChannel);
     isc.contentStream = is;
     isc.setURI(aURI);
@@ -603,7 +583,8 @@ Protocol.prototype = {
     bc.contentType = mime;
     // The encoding is in the HTML header
     // bc.contentCharset = 'utf-8';
-    bc.contentLength = page_ui.length;
+    log('content length:' + content.length);
+    bc.contentLength = content.length;
     bc.originalURI = aURI;
     bc.owner = this;
 
