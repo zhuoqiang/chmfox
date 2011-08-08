@@ -272,8 +272,17 @@ var Lib = function(libPath) {
 
 var lib = Lib();
 
-function getString(array, index, len) {
-    return ctypes.cast(array.addressOfElement(index), ctypes.char.ptr).readString();
+function getString(array, index) {
+    var out = '';
+    while (true) {
+        var i = array[index++];
+        if (i == 0) {
+            break;
+        }
+        out += String.fromCharCode(i);
+    }
+    return out;
+    // return ctypes.cast(array.addressOfElement(index), ctypes.char.ptr).readString();
 }
 
 function getBuffer(array, index, len) {
@@ -284,7 +293,6 @@ function getBuffer(array, index, len) {
     }
     return out;
 }
-
 
 function getUInt32(array, index) {
     return ctypes.cast(array.addressOfElement(index), ctypes.uint32_t.ptr).contents;
@@ -348,16 +356,16 @@ var ChmFile = function(path) {
             index += 2;
             switch(type) {
                 case 0:
-                    this.topics = "/" + getString(buffer, index, len);
+                    this.topics = prependSlash(getString(buffer, index, len));
                     break;
                 case 1:
-                    this.index = "/" + getString(buffer, index, len);
+                    this.index = prependSlash(getString(buffer, index, len));
                     break;
                 case 2:
-                    this.home = "/" + getString(buffer, index, len);
+                    this.home = prependSlash(getString(buffer, index, len));
                     break;
                 case 3:
-                    this.title = getString(buffer, index, len);
+                    this.title = prependSlash(getString(buffer, index, len));
                     break;
                 case 4:
                     this.lcid = getUInt32(buffer, index);
@@ -387,7 +395,7 @@ var ChmFile = function(path) {
                 case 15: // Unknown
                     break;
                 case 16:
-                    this.encoding = getString(buffer, index, len);
+                    this.encoding = getBuffer(buffer, index, len);
                     break;
             }
             index += len;
@@ -437,31 +445,33 @@ var ChmFile = function(path) {
             var off_hhc = getUInt32(buffer, offset + 0x60);
             var off_hhk = getUInt32(buffer, offset + 0x64);
             var factor = Math.floor(off_title / 4096);
+
             if (size == 0) {
                 size = lib.retrieve_object(
                     this.handle, ui.address(),
                     factor_buffer.addressOfElement(0),
                     factor*4096, factor_buffer.length);
             }
-            if (size && off_title && this.title) {
-                this.title = prependSlash(getString(factor_buffer, off_title % 4096, size));
+
+            if (size > 0 && off_title && this.title) {
+                this.title = getString(factor_buffer, off_title % 4096, ui.length);
             }
 
-			if(factor != Math.floor(off_home / 4096)) {
-				factor = Math.floor(off_home / 4096);
+			if (factor != Math.floor(off_home / 4096)) {
+                factor = Math.floor(off_home / 4096);
                 size = lib.retrieve_object(
                     this.handle, ui.address(),
                     factor_buffer.addressOfElement(0),
                     factor*4096, factor_buffer.length);
 			}
 
-            if (size && off_home && !this.home) {
-                this.home = prependSlash(getString(factor_buffer, off_home % 4096, 4096));
+            if (size > 0 && off_home && !this.home) {
+                this.home = prependSlash(getString(factor_buffer, off_home % 4096, ui.length));
             }
 
             if (factor != Math.floor(off_hhc/4096)) {
 				factor = Math.floor(off_hhc / 4096);
-				size = lib.retrieve_object(
+                    size = lib.retrieve_object(
                     this.handle, ui.address(),
 					factor_buffer.addressOfElement(0),
 					factor * 4096,
@@ -469,7 +479,7 @@ var ChmFile = function(path) {
 			}
 
 			if (size && off_hhc && !this.topics) {
-                this.topics = prependSlash(getString(factor_buffer, off_hhc % 4096, 4096));
+                this.topics = prependSlash(getString(factor_buffer, off_hhc % 4096, ui.length));
             }
 
             if (factor != Math.floor(off_hhk / 4096)) {
@@ -482,7 +492,7 @@ var ChmFile = function(path) {
 			}
 
 			if(size && off_hhk && !this.index) {
-                this.index = prependSlash(getString(factor_buffer, off_hhk % 4096, 4096));
+                this.index = prependSlash(getString(factor_buffer, off_hhk % 4096, ui.length));
             }
 
             log('System information for ' + this.path);
@@ -542,7 +552,6 @@ var ChmFile = function(path) {
                 this.handle, ui.address(),
                 buffer.addressOfElement(0), 0, ui.length);
         if (length > 0) {
-            log('page retrieve successfully: ' + this.path + '  ' + page + '\t\t ' + length);
             return getBuffer(buffer, 0, length);
         }
         else {
