@@ -18,7 +18,7 @@ var CHM_DATA = {};
 const ioService = Cc["@mozilla.org/network/io-service;1"].getService(Ci.nsIIOService);
 
 function utf8Encode(string) {
-	var utftext = "";
+    var utftext = "";
 
 	for (var n = 0; n < string.length; n++) {
 		var c = string.charCodeAt(n);
@@ -131,9 +131,19 @@ var Lib = function(libPath) {
 
 var lib = Lib();
 
-function getString(array, index, len) {
+function getString(array, index) {
     return ctypes.cast(array.addressOfElement(index), ctypes.char.ptr).readString();
 }
+
+function getBuffer(array, index, len) {
+    var out = '';
+    var end = index + len;
+    for (var i = index; i < end; ++ i) {
+        out += String.fromCharCode(array[i]);
+    }
+    return out;
+}
+
 
 function getUInt32(array, index) {
     return ctypes.cast(array.addressOfElement(index), ctypes.uint32_t.ptr).contents;
@@ -161,8 +171,6 @@ function HtmlizeObject(str) {
 var ChmFile = function(path) {
     this.path = path;
     this.handle = lib.open(this.path);
-    log(this.handle.toSource());
-
     this.isValid = function() {
         return !this.handle.isNull();
     };
@@ -190,7 +198,6 @@ var ChmFile = function(path) {
             index += 2;
             var len = buffer[index] + (buffer[index+1] * 256);
             index += 2;
-            log("type:" + type + " " + len);
             switch(type) {
                 case 0:
                     this.topics = "/" + getString(buffer, index, len);
@@ -383,6 +390,7 @@ var ChmFile = function(path) {
     this.getContent = function (page) {
         var ui = lib.chmUnitInfo();
         if (lib.CHM_RESOLVE_SUCCESS != lib.resolve_object(this.handle, page, ui.address())) {
+            log('page not found: ' + this.path + ' ' + page);
             return;
         }
         var buffer = ctypes.unsigned_char.array(Math.floor(ui.length+1))();
@@ -390,8 +398,12 @@ var ChmFile = function(path) {
                 this.handle, ui.address(),
                 buffer.addressOfElement(0), 0, ui.length);
         if (length > 0) {
-            return getString(buffer, 0);
+            return getBuffer(buffer, 0, length);
         }
+        else {
+            log('page retrieve failed: ' + this.path + ' ' + page);
+        }
+        return;
     };
     return this;
 };
@@ -449,6 +461,7 @@ function getChmFileAndModifyUri(uri) {
             uri = ioService.newURI("about:blank", null, null);
             return ioService.newChannelFromURI(uri);
         }
+        CHM_DATA[url.spec] = chm;
     }
 
     var pagepath = null;
@@ -583,7 +596,6 @@ Protocol.prototype = {
     bc.contentType = mime;
     // The encoding is in the HTML header
     // bc.contentCharset = 'utf-8';
-    log('content length:' + content.length);
     bc.contentLength = content.length;
     bc.originalURI = aURI;
     bc.owner = this;
