@@ -19,7 +19,6 @@ const ioService = Cc["@mozilla.org/network/io-service;1"].getService(Ci.nsIIOSer
 
 function utf8Encode(string) {
     var utftext = "";
-
 	for (var n = 0; n < string.length; n++) {
 		var c = string.charCodeAt(n);
 		if (c < 128) {
@@ -43,6 +42,148 @@ function log(message) {
   var msg = "[chmfox] " + message + "\n";
   console.logStringMessage(msg);
   dump(msg);
+}
+
+function getCharsetFromLcid(lcid) {
+    switch (lcid) {
+    case 0x0436: return "ISO-8859-1"; // "Afrikaans", "Western Europe & US"
+    case 0x041c: return "ISO-8859-2"; // "Albanian", "Central Europe"
+    case 0x0401: return "ISO-8859-6"; // "Arabic_Saudi_Arabia", "Arabic"
+    case 0x0801: return "ISO-8859-6"; // "Arabic_Iraq", "Arabic"
+    case 0x0c01: return "ISO-8859-6"; // "Arabic_Egypt", "Arabic"
+    case 0x1001: return "ISO-8859-6"; // "Arabic_Libya", "Arabic"
+    case 0x1401: return "ISO-8859-6"; // "Arabic_Algeria", "Arabic"
+    case 0x1801: return "ISO-8859-6"; // "Arabic_Morocco", "Arabic"
+    case 0x1c01: return "ISO-8859-6"; // "Arabic_Tunisia", "Arabic"
+    case 0x2001: return "ISO-8859-6"; // "Arabic_Oman", "Arabic"
+    case 0x2401: return "ISO-8859-6"; // "Arabic_Yemen", "Arabic"
+    case 0x2801: return "ISO-8859-6"; // "Arabic_Syria", "Arabic"
+    case 0x2c01: return "ISO-8859-6"; // "Arabic_Jordan", "Arabic"
+    case 0x3001: return "ISO-8859-6"; // "Arabic_Lebanon", "Arabic"
+    case 0x3401: return "ISO-8859-6"; // "Arabic_Kuwait", "Arabic"
+    case 0x3801: return "ISO-8859-6"; // "Arabic_UAE", "Arabic"
+    case 0x3c01: return "ISO-8859-6"; // "Arabic_Bahrain", "Arabic"
+    case 0x4001: return "ISO-8859-6"; // "Arabic_Qatar", "Arabic"
+    case 0x042b: return null; //        "Armenian","Armenian"
+    case 0x042c: return "ISO-8859-9"; // "Azeri_Latin", "Turkish"
+    case 0x082c: return "cp1251"; //    "Azeri_Cyrillic", "Cyrillic"
+    case 0x042d: return "ISO-8859-1"; // "Basque", "Western Europe & US"
+    case 0x0423: return "cp1251"; //    "Belarusian", "Cyrillic"
+    case 0x0402: return "cp1251"; //    "Bulgarian", "Cyrillic"
+    case 0x0403: return "ISO-8859-1"; // "Catalan", "Western Europe & US"
+    case 0x0404: return "BIG5"; //      "Chinese_Taiwan", "Traditional Chinese"
+    case 0x0804: return "GBK"; //       "Chinese_PRC", "Simplified Chinese"
+    case 0x0c04: return "BIG5"; //      "Chinese_Hong_Kong", "Traditional Chinese"
+    case 0x1004: return "GBK"; //       "Chinese_Singapore", "Simplified Chinese"
+    case 0x1404: return "BIG5"; //      "Chinese_Macau", "Traditional Chinese"
+    case 0x041a: return "ISO-8859-2"; // "Croatian", "Central Europe"
+    case 0x0405: return "ISO-8859-2"; // "Czech", "Central Europe"
+    case 0x0406: return "ISO-8859-1"; // "Danish", "Western Europe & US"
+    case 0x0413: return "ISO-8859-1"; // "Dutch_Standard", "Western Europe & US"
+    case 0x0813: return "ISO-8859-1"; // "Dutch_Belgian", "Western Europe & US"
+    case 0x0409: return "ISO-8859-1"; // "English_United_States", "Western Europe & US"
+    case 0x0809: return "ISO-8859-1"; // "English_United_Kingdom", "Western Europe & US"
+    case 0x0c09: return "ISO-8859-1"; // "English_Australian", "Western Europe & US"
+    case 0x1009: return "ISO-8859-1"; // "English_Canadian", "Western Europe & US"
+    case 0x1409: return "ISO-8859-1"; // "English_New_Zealand", "Western Europe & US"
+    case 0x1809: return "ISO-8859-1"; // "English_Irish", "Western Europe & US"
+    case 0x1c09: return "ISO-8859-1"; // "English_South_Africa", "Western Europe & US"
+    case 0x2009: return "ISO-8859-1"; // "English_Jamaica", "Western Europe & US"
+    case 0x2409: return "ISO-8859-1"; // "English_Caribbean", "Western Europe & US"
+    case 0x2809: return "ISO-8859-1"; // "English_Belize", "Western Europe & US"
+    case 0x2c09: return "ISO-8859-1"; // "English_Trinidad", "Western Europe & US"
+    case 0x3009: return "ISO-8859-1"; // "English_Zimbabwe", "Western Europe & US"
+    case 0x3409: return "ISO-8859-1"; // "English_Philippines", "Western Europe & US"
+    case 0x0425: return "ISO-8859-13"; //"Estonian", "Baltic"
+    case 0x0438: return "ISO-8859-1"; // "Faeroese", "Western Europe & US"
+    case 0x0429: return "ISO-8859-6"; // "Farsi", "Arabic"
+    case 0x040b: return "ISO-8859-1"; // "Finnish", "Western Europe & US"
+    case 0x040c: return "ISO-8859-1"; // "French_Standard", "Western Europe & US"
+    case 0x080c: return "ISO-8859-1"; // "French_Belgian", "Western Europe & US"
+    case 0x0c0c: return "ISO-8859-1"; // "French_Canadian", "Western Europe & US"
+    case 0x100c: return "ISO-8859-1"; // "French_Swiss", "Western Europe & US"
+    case 0x140c: return "ISO-8859-1"; // "French_Luxembourg", "Western Europe & US"
+    case 0x180c: return "ISO-8859-1"; // "French_Monaco", "Western Europe & US"
+    case 0x0437: return null; //        "Georgian", "Georgian"
+    case 0x0407: return "ISO-8859-1"; // "German_Standard", "Western Europe & US"
+    case 0x0807: return "ISO-8859-1"; // "German_Swiss", "Western Europe & US"
+    case 0x0c07: return "ISO-8859-1"; // "German_Austrian", "Western Europe & US"
+    case 0x1007: return "ISO-8859-1"; // "German_Luxembourg", "Western Europe & US"
+    case 0x1407: return "ISO-8859-1"; // "German_Liechtenstein", "Western Europe & US"
+    case 0x0408: return "ISO-8859-7"; // "Greek", "Greek"
+    case 0x040d: return "ISO-8859-8"; // "Hebrew", "Hebrew"
+    case 0x0439: return null; //        "Hindi", "Indic"
+    case 0x040e: return "ISO-8859-2"; // "Hungarian", "Central Europe"
+    case 0x040f: return "ISO-8859-1"; // "Icelandic", "Western Europe & US"
+    case 0x0421: return "ISO-8859-1"; // "Indonesian", "Western Europe & US"
+    case 0x0410: return "ISO-8859-1"; // "Italian_Standard", "Western Europe & US"
+    case 0x0810: return "ISO-8859-1"; // "Italian_Swiss", "Western Europe & US"
+    case 0x0411: return "cp932"; //     "Japanese", "Japanese"
+    case 0x043f: return "cp1251"; //    "Kazakh", "Cyrillic"
+    case 0x0457: return null; //        "Konkani", "Indic"
+    case 0x0412: return "cp949"; //     "Korean", "Korean"
+    case 0x0426: return "ISO-8859-13"; //"Latvian", "Baltic"
+    case 0x0427: return "ISO-8859-13"; //"Lithuanian", "Baltic"
+    case 0x042f: return "cp1251"; //    "Macedonian", "Cyrillic"
+    case 0x043e: return "ISO-8859-1"; // "Malay_Malaysia", "Western Europe & US"
+    case 0x083e: return "ISO-8859-1"; // "Malay_Brunei_Darussalam", "Western Europe & US"
+    case 0x044e: return null; //        "Marathi", "Indic"
+    case 0x0414: return "ISO-8859-1"; // "Norwegian_Bokmal", "Western Europe & US"
+    case 0x0814: return "ISO-8859-1"; // "Norwegian_Nynorsk", "Western Europe & US"
+    case 0x0415: return "ISO-8859-2"; // "Polish", "Central Europe"
+    case 0x0416: return "ISO-8859-1"; // "Portuguese_Brazilian", "Western Europe & US"
+    case 0x0816: return "ISO-8859-1"; // "Portuguese_Standard", "Western Europe & US"
+    case 0x0418: return "ISO-8859-2"; // "Romanian", "Central Europe"
+    case 0x0419: return "cp1251"; //    "Russian", "Cyrillic"
+    case 0x044f: return null; //        "Sanskrit", "Indic"
+    case 0x081a: return "ISO-8859-2"; // "Serbian_Latin", "Central Europe"
+    case 0x0c1a: return "cp1251"; //    "Serbian_Cyrillic", "Cyrillic"
+    case 0x041b: return "ISO-8859-2"; // "Slovak", "Central Europe"
+    case 0x0424: return "ISO-8859-2"; // "Slovenian", "Central Europe"
+    case 0x040a: return "ISO-8859-1"; // "Spanish_Trad_Sort", "Western Europe & US"
+    case 0x080a: return "ISO-8859-1"; // "Spanish_Mexican", "Western Europe & US"
+    case 0x0c0a: return "ISO-8859-1"; // "Spanish_Modern_Sort", "Western Europe & US"
+    case 0x100a: return "ISO-8859-1"; // "Spanish_Guatemala", "Western Europe & US"
+    case 0x140a: return "ISO-8859-1"; // "Spanish_Costa_Rica", "Western Europe & US"
+    case 0x180a: return "ISO-8859-1"; // "Spanish_Panama", "Western Europe & US"
+    case 0x1c0a: return "ISO-8859-1"; // "Spanish_Dominican_Repub", "Western Europe & US"
+    case 0x200a: return "ISO-8859-1"; // "Spanish_Venezuela", "Western Europe & US"
+    case 0x240a: return "ISO-8859-1"; // "Spanish_Colombia", "Western Europe & US"
+    case 0x280a: return "ISO-8859-1"; // "Spanish_Peru", "Western Europe & US"
+    case 0x2c0a: return "ISO-8859-1"; // "Spanish_Argentina", "Western Europe & US"
+    case 0x300a: return "ISO-8859-1"; // "Spanish_Ecuador", "Western Europe & US"
+    case 0x340a: return "ISO-8859-1"; // "Spanish_Chile", "Western Europe & US"
+    case 0x380a: return "ISO-8859-1"; // "Spanish_Uruguay", "Western Europe & US"
+    case 0x3c0a: return "ISO-8859-1"; // "Spanish_Paraguay", "Western Europe & US"
+    case 0x400a: return "ISO-8859-1"; // "Spanish_Bolivia", "Western Europe & US"
+    case 0x440a: return "ISO-8859-1"; // "Spanish_El_Salvador", "Western Europe & US"
+    case 0x480a: return "ISO-8859-1"; // "Spanish_Honduras", "Western Europe & US"
+    case 0x4c0a: return "ISO-8859-1"; // "Spanish_Nicaragua", "Western Europe & US"
+    case 0x500a: return "ISO-8859-1"; // "Spanish_Puerto_Rico", "Western Europe & US"
+    case 0x0441: return "ISO-8859-1"; // "Swahili", "Western Europe & US"
+    case 0x041d: return "ISO-8859-1"; // "Swedish", "Western Europe & US"
+    case 0x081d: return "ISO-8859-1"; // "Swedish_Finland", "Western Europe & US"
+    case 0x0449: return null; //        "Tamil", "Indic"
+    case 0x0444: return "cp1251"; //    "Tatar", "Cyrillic"
+    case 0x041e: return "ISO-8859-11"; //"Thai", "Thai"
+    case 0x041f: return "ISO-8859-9"; // "Turkish", "Turkish"
+    case 0x0422: return "cp1251"; //    "Ukrainian", "Cyrillic"
+    case 0x0420: return "ISO-8859-6"; // "Urdu", "Arabic"
+    case 0x0443: return "ISO-8859-9"; // "Uzbek_Latin", "Turkish"
+    case 0x0843: return "cp1251"; //    "Uzbek_Cyrillic", "Cyrillic"
+    case 0x042a: return null; //        "Vietnamese", "Vietnamese"
+    }
+    return 'UTF-8';
+}
+
+var utf8Converter = Cc["@mozilla.org/intl/utf8converterservice;1"].getService(Ci.nsIUTF8ConverterService);
+
+function nativeToUtf8(nativeString, lcid) {
+    var charset = getCharsetFromLcid(lcid);
+    if (! charset) {
+        return nativeString;
+    }
+    return utf8Converter.convertStringToUTF8(nativeString, charset, 0);
 }
 
 var Lib = function(libPath) {
@@ -131,7 +272,7 @@ var Lib = function(libPath) {
 
 var lib = Lib();
 
-function getString(array, index) {
+function getString(array, index, len) {
     return ctypes.cast(array.addressOfElement(index), ctypes.char.ptr).readString();
 }
 
@@ -171,12 +312,19 @@ function HtmlizeObject(str) {
 var ChmFile = function(path) {
     this.path = path;
     this.handle = lib.open(this.path);
+
     this.isValid = function() {
         return !this.handle.isNull();
     };
 
+    if (! this.isValid()) {
+        log('open chm file failed: ' + this.path);
+        return this;
+    }
 
     this.getSystemInfo = function () {
+        log('getting system information for ' + this.path);
+
         var ui = lib.chmUnitInfo();
         if (lib.CHM_RESOLVE_FAILURE == lib.resolve_object(this.handle, '/#SYSTEM', ui.address())) {
             log('getSystemInfo error: #SYSTEM does not exists in ' + this.path);
@@ -296,7 +444,7 @@ var ChmFile = function(path) {
                     factor*4096, factor_buffer.length);
             }
             if (size && off_title && this.title) {
-                this.title = prependSlash(getString(factor_buffer, off_title % 4096));
+                this.title = prependSlash(getString(factor_buffer, off_title % 4096, size));
             }
 
 			if(factor != Math.floor(off_home / 4096)) {
@@ -308,7 +456,7 @@ var ChmFile = function(path) {
 			}
 
             if (size && off_home && !this.home) {
-                this.home = prependSlash(getString(factor_buffer, off_home % 4096));
+                this.home = prependSlash(getString(factor_buffer, off_home % 4096, 4096));
             }
 
             if (factor != Math.floor(off_hhc/4096)) {
@@ -321,7 +469,7 @@ var ChmFile = function(path) {
 			}
 
 			if (size && off_hhc && !this.topics) {
-                this.topics = prependSlash(getString(factor_buffer, off_hhc % 4096));
+                this.topics = prependSlash(getString(factor_buffer, off_hhc % 4096, 4096));
             }
 
             if (factor != Math.floor(off_hhk / 4096)) {
@@ -334,9 +482,10 @@ var ChmFile = function(path) {
 			}
 
 			if(size && off_hhk && !this.index) {
-                this.index = prependSlash(getString(factor_buffer, off_hhk % 4096));
+                this.index = prependSlash(getString(factor_buffer, off_hhk % 4096, 4096));
             }
 
+            log('System information for ' + this.path);
             log("home: " + this.home);
             log("index: " + this.index);
             log("topics: " + this.topics);
@@ -359,7 +508,7 @@ var ChmFile = function(path) {
                 this.handle, ui.address(),
                 buf.addressOfElement(0), 0, ui.length);
             if (r > 0) {
-                this.topics_content = getString(buf, 0);
+                this.topics_content = utf8Encode(nativeToUtf8(getBuffer(buf, 0, r), this.lcid));
                 this.html_topics = HtmlizeObject(this.topics_content);
             }
         }
@@ -375,7 +524,7 @@ var ChmFile = function(path) {
                 this.handle, ui.address(),
                 buf.addressOfElement(0), 0, ui.length);
             if (r > 0) {
-                this.index_content = getString(buf, 0);
+                this.index_content = utf8Encode(nativeToUtf8(getBuffer(buf, 0, r), this.lcid));
                 this.html_index = HtmlizeObject(this.index_content);
             }
         }
@@ -393,6 +542,7 @@ var ChmFile = function(path) {
                 this.handle, ui.address(),
                 buffer.addressOfElement(0), 0, ui.length);
         if (length > 0) {
+            log('page retrieve successfully: ' + this.path + '  ' + page + '\t\t ' + length);
             return getBuffer(buffer, 0, length);
         }
         else {
