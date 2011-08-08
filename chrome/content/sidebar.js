@@ -226,11 +226,11 @@ ChmfoxChrome.load_bookmark = function(uri) {
             window.setTimeout(
                 function(){
                     ChmfoxChrome.on_chmbookmark_iframe_load(null);
-                }, 800);
+                }, 700);
             window.setTimeout(
                 function() {
                     ChmfoxChrome.on_chmindex_iframe_load(null);
-                }, 800);
+                }, 700);
         }
         document.getElementById('content_is_chm').hidden = false;
     } else {

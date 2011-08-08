@@ -207,11 +207,9 @@ var ChmFile = function(path) {
                     break;
                 case 2:
                     this.home = "/" + getString(buffer, index, len);
-                    log("home: " + this.home);
                     break;
                 case 3:
                     this.title = getString(buffer, index, len);
-                    log("title: " + this.title);
                     break;
                 case 4:
                     this.lcid = getUInt32(buffer, index);
@@ -220,7 +218,6 @@ var ChmFile = function(path) {
                     this.has_klinks = getUInt32(buffer, index+0xc);
                     this.has_alinks = getUInt32(buffer, index+0x10);
                     this.timestamp = getUInt64(buffer, index+0x14);
-                    log(this.lcid + ", " + this.use_dbcs + ", " + this.searchable);
                     break;
                 case 5: // Always "main"?
                     this.default_window = getString(buffer, index, len);
@@ -243,7 +240,6 @@ var ChmFile = function(path) {
                     break;
                 case 16:
                     this.encoding = getString(buffer, index, len);
-                    log('encoding: ' + this.encoding);
                     break;
             }
             index += len;
@@ -256,10 +252,6 @@ var ChmFile = function(path) {
             log('getSystemInfo error: #WINDOWS does not exists in ' + this.path);
             return;
         }
-
-        log("home: " + this.home);
-        log("index: " + this.index);
-        log("topics: " + this.topics);
 
         const WINDOWS_HEADER_LENGTH = 8;
         buffer = ctypes.unsigned_char.array(WINDOWS_HEADER_LENGTH)();
@@ -348,6 +340,9 @@ var ChmFile = function(path) {
             log("home: " + this.home);
             log("index: " + this.index);
             log("topics: " + this.topics);
+            log("lcid: " + this.lcid);
+            log("use dbcs: " + this.use_dbcs);
+            log("searchable: " + this.searchable);
         };
 
     };
@@ -454,7 +449,7 @@ function getChmFileAndModifyUri(uri) {
     url = ioService.newURI(url, null, null);
     var chm = CHM_DATA[url.spec];
     if (! chm) {
-        chm = ChmFile(url.QueryInterface(Ci.nsIFileURL).file.path);
+        chm = new ChmFile(url.QueryInterface(Ci.nsIFileURL).file.path);
         if (! chm.isValid()) {
             // @todo should use firefox default handle for file not found
             log("file not found: " + localfile.path + "\n");
@@ -473,6 +468,7 @@ function getChmFileAndModifyUri(uri) {
     else {
         pagepath = urlParts[1];
     }
+
     return {
         'file':chm,
         'page':pagepath,
@@ -537,11 +533,11 @@ Protocol.prototype = {
     }
 
     if (chm.page == "/#HHC") {
-        return this.newRawTopicsChannel(aURI, chm.path);
+        return this.newRawTopicsChannel(aURI, chm.file);
     }
 
     if (chm.page == "/#HHK") {
-        return this.newRawIndexChannel(aURI, chm.path);
+        return this.newRawIndexChannel(aURI, chm.file);
     }
 
     var pos = chm.page.indexOf("#");
@@ -584,7 +580,7 @@ Protocol.prototype = {
 
     var content = chm.file.getContent(chm.page);
     if (! content) {
-        return;
+        content = chm.file.path + '! ' + chm.path + '  Not Found!';
     }
     var is = Cc["@mozilla.org/io/string-input-stream;1"].createInstance(Ci.nsIStringInputStream);
     is.setData(content, content.length);
@@ -603,8 +599,11 @@ Protocol.prototype = {
     return bc;
   },
 
-  newRawIndexChannel: function(aURI, chm_path) {
-    var content = CHM_DATA[chm_path].html_index;
+  newRawIndexChannel: function(aURI, chm) {
+    var content = chm.html_index;
+    if (! content) {
+        content = '';
+    }
     var sis = Cc["@mozilla.org/io/string-input-stream;1"].createInstance(Ci.nsIStringInputStream);
     sis.setData(content, content.length);
 
@@ -622,8 +621,11 @@ Protocol.prototype = {
     return bc;
   },
 
-  newRawTopicsChannel: function(aURI, chm_path) {
-    var content = CHM_DATA[chm_path].html_topics;
+  newRawTopicsChannel: function(aURI, chm) {
+    var content = chm.html_topics;
+    if (! content) {
+        content = '';
+    }
     var sis = Cc["@mozilla.org/io/string-input-stream;1"].createInstance(Ci.nsIStringInputStream);
     sis.setData(content, content.length);
 
