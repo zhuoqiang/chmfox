@@ -2,15 +2,8 @@ import os, zipfile
 from platform import system, machine
 from xml.dom import minidom
 
-version = '1.2'
+version = '2.0'
 mode = ARGUMENTS.get('MODE', '')
-
-default_noxpidl = '0'
-# There is no prebuild xulrunner sdk 2.0 for systems other than Linux,
-# Windows, so we disable xpidl generation by default
-if not system() in ('Linux', 'Windows'):
-    default_noxpidl = '1'
-noxpidl = ARGUMENTS.get('NOXPIDL', default_noxpidl)
 
 opts = Variables('custom.py')
 opts.Add('MODE', """Set to ALL, build separate xpi for every platform.
@@ -51,7 +44,9 @@ def get_abis():
             ('linux', 'x86', 'gcc3'),
             ('linux', 'x86_64', 'gcc3'),
             ('windows', 'x86', 'msvc'),
+            ('windows', 'x86_64', 'msvc'),
             ('darwin', 'x86', 'gcc3'),
+            # ('darwin', 'x86_64', 'gcc3'),
             # ('freebsd', 'x86', 'gcc3'),
             )
     else:
@@ -112,9 +107,9 @@ platform_name = get_platform_name(get_default_abi())
 abis = get_abis()
 objs = ['chrome.manifest']
 
-for subdir in ['chrome', 'components']:
+for subdir in ['chrome', 'components', 'src']:
     objs.extend(SConscript(['%s/SConscript' % subdir],
-                           exports = ['env', 'platform_name', 'noxpidl']))
+                           exports=['env', 'platform_name']))
 
 
 if mode == 'ALLINONE':
