@@ -2,9 +2,12 @@ content chmfox chrome/content/
 resource chmfox components/
 
 skin chmfox classic/1.0 chrome/skin/
+locale chmfox en-US chrome/locale/en-US/
+locale chmfox zh-CN chrome/locale/zh-CN/
+
 overlay chrome://browser/content/browser.xul chrome://chmfox/content/overlay.xul
 
-component {c152fc51-a5bf-4cc7-99f1-66ca8459d806} components/chm_protocol.js
+component {c152fc51-a5bf-4cc7-99f1-66ca8459d806} components/chmfox.js
 contract @mozilla.org/network/protocol;1?name=chm {c152fc51-a5bf-4cc7-99f1-66ca8459d806}
 
 
