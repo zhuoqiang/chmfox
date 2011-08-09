@@ -584,7 +584,7 @@ var ChmFile = function(path) {
                 }
             }
             if (! this.index) {
-                this.topics = prependSlash(lib.find_ext(this.handle, '.hhk'));
+                this.index = prependSlash(lib.find_ext(this.handle, '.hhk'));
             }
             if (! this.index) {
                 return;
@@ -607,7 +607,7 @@ var ChmFile = function(path) {
     this.getTopics();
     this.getIndex();
 
-    this.getContent = function (page) {
+    this.getContent = function(page) {
         var ui = lib.chmUnitInfo();
         if (lib.CHM_RESOLVE_SUCCESS != lib.resolve_object(this.handle, page, ui.address())) {
             log('page not found: ' + this.path + ' ' + page);
@@ -932,9 +932,4 @@ return {log:log, protocols: [Protocol], uriContentListener: uriContentListener};
 
 };
 
-if (XPCOMUtils.generateNSGetFactory) {
-    const NSGetFactory = XPCOMUtils.generateNSGetFactory(Chmfox.protocols);
-}
-else {
-    const NSGetModule = XPCOMUtils.generateNSGetModule(Chmfox.protocols);
-}
+const NSGetFactory = XPCOMUtils.generateNSGetFactory(Chmfox.protocols);

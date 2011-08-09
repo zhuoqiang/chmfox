@@ -1,4 +1,4 @@
-Components.utils.import("resource://chmfox/chm_protocol.js");
+Components.utils.import("resource://chmfox/chmfox.js");
 
 window.QueryInterface(Ci.nsIInterfaceRequestor)
       .getInterface(Ci.nsIWebNavigation)
