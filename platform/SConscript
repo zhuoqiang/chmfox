@@ -15,9 +15,9 @@ r = []
 if isinstance(platform_name, list):
     for p in platform_name:
         r.append(os.path.join('platform', p, 'components',
-                              'libchm.' + shlib(p)))
+                              'libchmfox.' + shlib(p)))
 else:
     r.append(os.path.join('platform', platform_name, 'components',
-                          'libchm.' + shlib(platform_name)))
+                          'libchmfox.' + shlib(platform_name)))
 
 Return('r')

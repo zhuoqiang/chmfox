@@ -1,19 +1,18 @@
 content chmfox chrome/content/
 resource chmfox components/
 
-resource chmfox-lib src/libchmfox.so ABI=Linux_x86-gcc3
-resource chmfox-lib src/chmfox.dll ABI=WINNT_x86-msvc
-
 skin chmfox classic/1.0 chrome/skin/
 overlay chrome://browser/content/browser.xul chrome://chmfox/content/overlay.xul
 
 component {c152fc51-a5bf-4cc7-99f1-66ca8459d806} components/chm_protocol.js
 contract @mozilla.org/network/protocol;1?name=chm {c152fc51-a5bf-4cc7-99f1-66ca8459d806}
 
-interfaces components/ICHMFile.xpt
-interfaces components/ICHMUnitInfo.xpt
 
-binary-component platform/Linux_x86-gcc3/components/libchm.so ABI=Linux_x86-gcc3
-binary-component platform/WINNT_x86-msvc/components/libchm.dll ABI=WINNT_x86-msvc
-binary-component platform/Linux_x86_64-gcc3/components/libchm.so ABI=Linux_x86_64-gcc3
-binary-component platform/Darwin_x86-gcc3/components/libchm.dylib ABI=Darwin_x86-gcc3
+resource chmfox-lib platform/WINNT_x86-msvc/components/libchmfox.dll ABI=WINNT_x86-msvc
+resource chmfox-lib platform/WINNT_x86_64-msvc/components/libchmfox.dll ABI=WINNT_x86_64-msvc
+
+resource chmfox-lib platform/Linux_x86-gcc3/components/libchmfox.so ABI=Linux_x86-gcc3
+resource chmfox-lib platform/Linux_x86_64-gcc3/components/libchmfox.so ABI=Linux_x86_64-gcc3
+
+resource chmfox-lib platform/Darwin_x86-gcc3/components/libchmfox.dylib ABI=Darwin_x86-gcc3
+resource chmfox-lib platform/Darwin_x86_64-gcc3/components/libchmfox.dylib ABI=Darwin_x86_64-gcc3

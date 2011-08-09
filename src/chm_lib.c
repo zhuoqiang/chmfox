@@ -56,9 +56,7 @@
 
 #include "lzx.h"
 
-#ifndef WIN32
 #include <stdint.h>
-#endif
 #include <stdlib.h>
 #include <string.h>
 #ifdef CHM_DEBUG
@@ -81,9 +79,7 @@
 #endif
 #else
 /* basic Linux system includes */
-#ifndef _XOPEN_SOURCE
 #define _XOPEN_SOURCE 500
-#endif
 #include <unistd.h>
 #include <sys/types.h>
 #include <sys/stat.h>
@@ -477,7 +473,7 @@ static int _unmarshal_itsp_header(unsigned char **pData,
 }
 
 /* structure of PMGL headers */
-static const char _chm_pmgl_marker[5] = "PMGL";
+static const char _chm_pmgl_marker[4] = "PMGL";
 #define _CHM_PMGL_LEN (0x14)
 struct chmPmglHeader
 {
@@ -511,7 +507,7 @@ static int _unmarshal_pmgl_header(unsigned char **pData,
 }
 
 /* structure of PMGI headers */
-static const char _chm_pmgi_marker[5] = "PMGI";
+static const char _chm_pmgi_marker[4] = "PMGI";
 #define _CHM_PMGI_LEN (0x08)
 struct chmPmgiHeader
 {
@@ -705,8 +701,8 @@ static Int64 _chm_fetch_bytes(struct chmFile *h,
         /* awkward Win32 Seek/Tell */
         offsetLo = (unsigned int)(os & 0xffffffffL);
         offsetHi = (unsigned int)((os >> 32) & 0xffffffffL);
-        origOffsetLo = SetFilePointer(h->fd, 0, (PLONG) &origOffsetHi, FILE_CURRENT);
-        offsetLo = SetFilePointer(h->fd, offsetLo, (PLONG) &offsetHi, FILE_BEGIN);
+        origOffsetLo = SetFilePointer(h->fd, 0, &origOffsetHi, FILE_CURRENT);
+        offsetLo = SetFilePointer(h->fd, offsetLo, &offsetHi, FILE_BEGIN);
 
         /* read the data */
         if (ReadFile(h->fd,
@@ -719,7 +715,7 @@ static Int64 _chm_fetch_bytes(struct chmFile *h,
             readLen = 0;
 
         /* restore original position */
-        SetFilePointer(h->fd, origOffsetLo, (PLONG) &origOffsetHi, FILE_BEGIN);
+        SetFilePointer(h->fd, origOffsetLo, &origOffsetHi, FILE_BEGIN);
     }
 #else
 #ifdef CHM_USE_PREAD
@@ -793,7 +789,7 @@ struct chmFile *chm_open(const char *filename)
 #else
     if ((newHandle->fd=CreateFileA(filename,
                                    GENERIC_READ,
-                                   FILE_SHARE_READ,
+                                   0,
                                    NULL,
                                    OPEN_EXISTING,
                                    FILE_ATTRIBUTE_NORMAL,
@@ -1260,7 +1256,7 @@ int chm_resolve_object(struct chmFile *h,
 
     /* buffer to hold whatever page we're looking at */
     /* RWE 6/12/2003 */
-    UChar *page_buf = (UChar *)malloc(h->block_len);
+    UChar *page_buf = malloc(h->block_len);
     if (page_buf == NULL)
         return CHM_RESOLVE_FAILURE;
 
@@ -1300,9 +1296,8 @@ int chm_resolve_object(struct chmFile *h,
         }
 
         /* else, if it is a branch node: */
-        else if (memcmp(page_buf, _chm_pmgi_marker, 4) == 0) {
+        else if (memcmp(page_buf, _chm_pmgi_marker, 4) == 0)
             curPage = _chm_find_in_PMGI(page_buf, h->block_len, objPath);
-        }
 
         /* else, we are confused.  give up. */
         else
@@ -1388,7 +1383,7 @@ static Int64 _chm_decompress_block(struct chmFile *h,
                                    UInt64 block,
                                    UChar **ubuffer)
 {
-    UChar *cbuffer = (UChar *)malloc(((unsigned int)h->reset_table.block_len + 6144));
+    UChar *cbuffer = malloc(((unsigned int)h->reset_table.block_len + 6144));
     UInt64 cmpStart;                                    /* compressed start  */
     Int64 cmpLen;                                       /* compressed len    */
     int indexSlot;                                      /* cache index slot  */
@@ -1400,8 +1395,8 @@ static Int64 _chm_decompress_block(struct chmFile *h,
         return -1;
 
     /* let the caching system pull its weight! */
-    if (block - blockAlign <= (UInt64) h->lzx_last_block  &&
-        block              >= (UInt64) h->lzx_last_block)
+    if (block - blockAlign <= h->lzx_last_block  &&
+        block              >= h->lzx_last_block)
         blockAlign = (block - h->lzx_last_block);
 
     /* check if we need previous blocks */
@@ -1413,7 +1408,7 @@ static Int64 _chm_decompress_block(struct chmFile *h,
             UInt32 curBlockIdx = block - i;
 
             /* check if we most recently decompressed the previous block */
-            if ((UInt64) h->lzx_last_block != curBlockIdx)
+            if (h->lzx_last_block != curBlockIdx)
             {
                 if ((curBlockIdx % h->reset_blkcount) == 0)
                 {
@@ -1440,7 +1435,7 @@ static Int64 _chm_decompress_block(struct chmFile *h,
 #endif
                 if (!_chm_get_cmpblock_bounds(h, curBlockIdx, &cmpStart, &cmpLen) ||
                     cmpLen < 0                                                    ||
-                    (UInt64) cmpLen > (UInt64) h->reset_table.block_len + 6144                      ||
+                    cmpLen > h->reset_table.block_len + 6144                      ||
                     _chm_fetch_bytes(h, cbuffer, cmpStart, cmpLen) != cmpLen      ||
                     LZXdecompress(h->lzx_state, cbuffer, lbuffer, (int)cmpLen,
                                   (int)h->reset_table.block_len) != DECR_OK)
@@ -1513,7 +1508,7 @@ static Int64 _chm_decompress_region(struct chmFile *h,
     UInt64 nBlock, nOffset;
     UInt64 nLen;
     UInt64 gotLen;
-    UChar *ubuffer = NULL;
+    UChar *ubuffer;
 
     if (len <= 0)
         return (Int64)0;
@@ -1626,7 +1621,7 @@ int chm_enumerate(struct chmFile *h,
 
     /* buffer to hold whatever page we're looking at */
     /* RWE 6/12/2003 */
-    UChar *page_buf = (UChar *)malloc((unsigned int)h->block_len);
+    UChar *page_buf = malloc((unsigned int)h->block_len);
     struct chmPmglHeader header;
     UChar *end;
     UChar *cur;
@@ -1750,7 +1745,7 @@ int chm_enumerate_dir(struct chmFile *h,
 
     /* buffer to hold whatever page we're looking at */
     /* RWE 6/12/2003 */
-    UChar *page_buf = (UChar *)malloc((unsigned int)h->block_len);
+    UChar *page_buf = malloc((unsigned int)h->block_len);
     struct chmPmglHeader header;
     UChar *end;
     UChar *cur;

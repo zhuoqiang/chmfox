@@ -1,6 +1,7 @@
 Components.utils.import("resource://gre/modules/XPCOMUtils.jsm");
 Components.utils.import("resource://gre/modules/ctypes.jsm");
 
+
 var EXPORTED_SYMBOLS = [ "Chmfox" ];
 
 if ("undefined" == typeof(Chmfox)) {
@@ -43,6 +44,7 @@ function log(message) {
   console.logStringMessage(msg);
   dump(msg);
 }
+
 
 function getCharsetFromLcid(lcid) {
     switch (lcid) {
@@ -229,7 +231,7 @@ var Lib = function(libPath) {
         ctypes.int, [
             this.chmFilePtr,
             this.chmUnitInfo.ptr,
-            ctypes.voidptr_t]);
+            ctypes.voidptr_t]).ptr;
 
     this.open = this._library.declare(
         'chmfox_open', ctypes.default_abi,
@@ -260,17 +262,47 @@ var Lib = function(libPath) {
     this.enumerate = this._library.declare(
         'chmfox_enumerate', ctypes.default_abi,
         ctypes.int,
-        this.chmFilePtr, ctypes.int, this.enumerator.ptr, ctypes.voidptr_t);
+        this.chmFilePtr, ctypes.int, this.enumerator, ctypes.voidptr_t);
 
     this.enumerate_dir = this._library.declare(
         'chmfox_enumerate_dir', ctypes.default_abi,
         ctypes.int,
-        this.chmFilePtr, ctypes.char.ptr, ctypes.int, this.enumerator.ptr, ctypes.voidptr_t);
+        this.chmFilePtr, ctypes.char.ptr, ctypes.int, this.enumerator, ctypes.voidptr_t);
+
+    // extensions
+    this.find_ext = function(handle, ext, where) {
+        let callback_t = ctypes.FunctionType(
+            ctypes.default_abi,
+            ctypes.int, [
+            this.chmFilePtr,
+            this.chmUnitInfo.ptr,
+            ctypes.voidptr_t]).ptr;
+
+        if (! where) {
+            where = '/';
+        }
+
+        var result = null;
+        let compare = function(handle, ui, context) {
+            var path = ui.contents.path.readString();
+            if (path.substr(path.length - ext.length) == ext) {
+                result = path;
+                return this.CHM_ENUMERATOR_SUCCESS;
+            }
+            return this.CHM_ENUMERATOR_CONTINUE;
+        };
+
+        let callback = this.enumerator(compare);
+        var n = ctypes.voidptr_t();
+        this.enumerate_dir(handle, where, this.CHM_ENUMERATE_NORMAL,
+                          callback, null);
+        return result;
+    };
 
     return this;
 };
 
-var lib = Lib();
+var lib = new Lib();
 
 function getString(array, index) {
     var out = '';
@@ -303,7 +335,7 @@ function getUInt64(array, index) {
 }
 
 function prependSlash(str) {
-    if (str[0] != '/') {
+    if (str && str[0] != '/') {
         return '/' + str;
     }
     return str;
@@ -377,7 +409,7 @@ var ChmFile = function(path) {
                     break;
                 case 5: // Always "main"?
                     this.default_window = getString(buffer, index, len);
-                case 6: // Project name '.hhc' '.hhk'
+                case 6: // Project name
                     this.project = getString(buffer, index, len);
                 case 7:
                     this.has_binary_index = getUInt32(buffer, index);
@@ -497,8 +529,6 @@ var ChmFile = function(path) {
 
             log('System information for ' + this.path);
             log("home: " + this.home);
-            log("index: " + this.index);
-            log("topics: " + this.topics);
             log("lcid: " + this.lcid);
             log("use dbcs: " + this.use_dbcs);
             log("searchable: " + this.searchable);
@@ -508,25 +538,59 @@ var ChmFile = function(path) {
 
     this.getSystemInfo();
 
-    /// get topics content
-    if (this.topics) {
+    this.getTopics = function() {
+        if (! this.isValid()) {
+            return;
+        }
         var ui = lib.chmUnitInfo();
+        if (! this.topics) {
+            if (this.project) {
+                var try_topics_page = '/' + this.project + '.hhc';
+                if (lib.CHM_RESOLVE_SUCCESS == lib.resolve_object(
+                        this.handle, try_topics_page, ui.address())) {
+                    this.topics = try_topics_page;
+                }
+            }
+            if (! this.topics) {
+                this.topics = prependSlash(lib.find_ext(this.handle, '.hhc'));
+            }
+            if (! this.topics) {
+                return;
+            }
+        }
+
+        log("topics: " + this.topics);
         if (lib.CHM_RESOLVE_SUCCESS == lib.resolve_object(
-                this.handle, this.topics, ui.address())) {
+            this.handle, this.topics, ui.address())) {
             var buf = ctypes.unsigned_char.array(Math.floor(ui.length+1))();
             var r = lib.retrieve_object(
                 this.handle, ui.address(),
                 buf.addressOfElement(0), 0, ui.length);
             if (r > 0) {
-                this.topics_content = utf8Encode(nativeToUtf8(getBuffer(buf, 0, r), this.lcid));
+                this.topics_content = utf8Encode(nativeToUtf8(getString(buf, 0), this.lcid));
                 this.html_topics = HtmlizeObject(this.topics_content);
             }
         }
-    }
+    };
 
-    /// get index content
-    if (this.index) {
+    this.getIndex = function() {
         var ui = lib.chmUnitInfo();
+        if (! this.index) {
+            if (this.project) {
+                var try_index_page = '/' + this.project + '.hhk';
+                if (lib.CHM_RESOLVE_SUCCESS == lib.resolve_object(
+                        this.handle, try_index_page, ui.address())) {
+                    this.topics = try_index_page;
+                }
+            }
+            if (! this.index) {
+                this.topics = prependSlash(lib.find_ext(this.handle, '.hhk'));
+            }
+            if (! this.index) {
+                return;
+            }
+        }
+        log("index: " + this.index);
         if (lib.CHM_RESOLVE_SUCCESS == lib.resolve_object(
                 this.handle, this.index, ui.address())) {
             var buf = ctypes.unsigned_char.array(Math.floor(ui.length+1))();
@@ -538,8 +602,10 @@ var ChmFile = function(path) {
                 this.html_index = HtmlizeObject(this.index_content);
             }
         }
-    }
+    };
 
+    this.getTopics();
+    this.getIndex();
 
     this.getContent = function (page) {
         var ui = lib.chmUnitInfo();
@@ -715,6 +781,7 @@ Protocol.prototype = {
             break;
         case "jpg":
         case "jpeg":
+        case "jpe":
             mime = "image/jpeg";
             break;
         case "png":
@@ -734,6 +801,15 @@ Protocol.prototype = {
         case "xhtml":
             mime = "text/xhtml";
             break;
+        case 'html':
+        case 'htm':
+            mime = 'text/html';
+            break;
+        case 'bmp':
+            mime = 'image/bitmap';
+            break;
+        default:
+            mime = "application/octet-stream";
         }
     }
 
