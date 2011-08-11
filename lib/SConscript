@@ -14,10 +14,8 @@ def shlib(pname):
 r = []
 if isinstance(platform_name, list):
     for p in platform_name:
-        r.append(os.path.join('platform', p, 'components',
-                              'libchmfox.' + shlib(p)))
+        r.append(os.path.join('lib', p, 'libchmfox.' + shlib(p)))
 else:
-    r.append(os.path.join('platform', platform_name, 'components',
-                          'libchmfox.' + shlib(platform_name)))
+    r.append(os.path.join('lib', platform_name, 'libchmfox.' + shlib(platform_name)))
 
 Return('r')
