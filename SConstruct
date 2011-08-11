@@ -51,7 +51,7 @@ def get_abis():
             ('windows', 'x86', 'msvc'),
             ('windows', 'x86_64', 'msvc'),
             ('darwin', 'x86', 'gcc3'),
-            # ('darwin', 'x86_64', 'gcc3'),
+            ('darwin', 'x86_64', 'gcc3'),
             # ('freebsd', 'x86', 'gcc3'),
             )
     else:
