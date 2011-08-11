@@ -1,8 +1,20 @@
 #include "extra.h"
-#include <inttypes.h>
 #include <stdlib.h>
-#include <strings.h>
 #include <string.h>
+
+#ifndef _WIN32
+#include <inttypes.h>
+#include <strings.h>
+#else
+/* Win32 Fix */
+typedef unsigned __int8 uint8_t;
+typedef unsigned __int16 uint16_t;
+typedef unsigned __int32 uint32_t;
+typedef unsigned __int64 uint64_t;
+#define strcasecmp _stricmp
+#define strncasecmp _strnicmp
+#define inline
+#endif
 
 #define false 0
 #define true 1
