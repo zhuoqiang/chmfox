@@ -233,6 +233,13 @@ var Lib = function(libPath) {
             this.chmUnitInfo.ptr,
             ctypes.voidptr_t]).ptr;
 
+    this.search_enumerator = ctypes.FunctionType(
+        ctypes.default_abi,
+        ctypes.int, [
+            this.chmFilePtr,
+            ctypes.char.ptr,
+            ctypes.char.ptr]).ptr;
+
     this.open = this._library.declare(
         'chmfox_open', ctypes.default_abi,
         this.chmFilePtr,
@@ -269,15 +276,13 @@ var Lib = function(libPath) {
         ctypes.int,
         this.chmFilePtr, ctypes.char.ptr, ctypes.int, this.enumerator, ctypes.voidptr_t);
 
+    this.search = this._library.declare(
+        'chmfox_search', ctypes.default_abi,
+        ctypes.int,
+        this.chmFilePtr, ctypes.char.ptr, ctypes.int, ctypes.int, this.search_enumerator);
+
     // extensions
     this.find_ext = function(handle, ext, where) {
-        let callback_t = ctypes.FunctionType(
-            ctypes.default_abi,
-            ctypes.int, [
-            this.chmFilePtr,
-            this.chmUnitInfo.ptr,
-            ctypes.voidptr_t]).ptr;
-
         if (! where) {
             where = '/';
         }
@@ -296,6 +301,18 @@ var Lib = function(libPath) {
         var n = ctypes.voidptr_t();
         this.enumerate_dir(handle, where, this.CHM_ENUMERATE_NORMAL,
                           callback, null);
+        return result;
+    };
+
+    this.search_all = function(handle, keywords, whole_words, titles_only) {
+        var result = [];
+        let store = function(handle, topic, url) {
+            result.push([topic.readString(), url.readString()]);
+            return this.CHM_ENUMERATOR_CONTINUE;
+        };
+
+        let callback = this.search_enumerator(store);
+        this.search(handle, keywords, whole_words, titles_only, callback);
         return result;
     };
 
@@ -625,6 +642,7 @@ var ChmFile = function(path) {
         }
         return;
     };
+
     return this;
 };
 
