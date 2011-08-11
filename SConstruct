@@ -5,9 +5,17 @@ from xml.dom import minidom
 version = '2.0'
 mode = ARGUMENTS.get('MODE', '')
 
+def get_arch(a):
+    ms = { 'i686' : 'x86', 'i586' : 'x86', 'i486' : 'x86', 'i386' : 'x86',
+           'x86' : 'x86', 'x86_64' : 'x86_64', 'mips64' : 'mipsel', 'x64' : 'x86_64' }
+    return ms[a]
+
+arch = get_arch(ARGUMENTS.get('ARCH', machine()))
+
 opts = Variables('custom.py')
 opts.Add('MODE', """Set to ALL, build separate xpi for every platform.
       Set to ALLINONE, build one big xpi support all platform.""", None)
+opts.Add('ARCH', """x86 or x64""", None)
 env = Environment(options = opts)
 Help(opts.GenerateHelpText(env))
     
@@ -29,13 +37,10 @@ def get_default_abi():
     ss = { 'Linux' : 'linux', 'Windows' : 'windows' , 'Darwin' : 'darwin' ,
            'FreeBSD' : 'freebsd' }
     s = ss[system()]
-    ms = { 'i686' : 'x86', 'i586' : 'x86', 'i486' : 'x86', 'i386' : 'x86',
-           'x86' : 'x86', 'x86_64' : 'x86_64', 'mips64' : 'mipsel' }
-    m = ms[machine()]
     cs = { 'Linux' : 'gcc3', 'Windows' : 'msvc' , 'Darwin' : 'gcc3' ,
            'FreeBSD' : 'gcc3' }
     c = cs[system()]
-    return (s, m, c)
+    return (s, arch, c)
 
 def get_abis():
     global mode
@@ -111,7 +116,7 @@ for subdir in ['chrome', 'components']:
     objs.extend(SConscript('%s/SConscript' % subdir,
                            exports=['env', 'platform_name']))
 
-objs.extend(SConscript('src/SConscript', exports = 'platform_name', build_dir='build'))
+objs.extend(SConscript('src/SConscript', exports=['platform_name', 'arch'], build_dir='build/' + platform_name))
 
 if mode == 'ALLINONE':
     platform_name = []
