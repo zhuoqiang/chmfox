@@ -17,7 +17,15 @@ if system() == 'Linux':
                 '-pthread', '-pipe']
 
 elif system() == 'Darwin':
-    cflags = []
+    cflags = ['-Wall', '-O2',
+                '-fno-exceptions',
+                '-Wconversion',
+                '-Wpointer-arith',
+                '-Wcast-align',
+                '-Wno-long-long',
+                '-pedantic',
+                '-fshort-wchar',
+                '-pthread', '-pipe']
 
 elif system() == 'Windows':
     cflags = ['/DWIN32', '/DXP_WIN', '/nologo', '/MT', '/O2']
@@ -26,21 +34,30 @@ elif system() == 'FreeBSD':
     cflags = ['-DOSTYPE="FreeBSD7"',
                 '-DOSARCH=FreeBSD',
                 '-Wall', '-O2',
-                '-fPIC', '-fno-rtti', '-fno-exceptions',
+                '-fPIC', '-fno-exceptions',
                 '-fno-strict-aliasing', '-pipe', '-fshort-wchar',
                 '-Wconversion', '-Wpointer-arith',
-                '-Woverloaded-virtual', '-Wsynth',
-                '-Wno-ctor-dtor-privacy', '-Wno-non-virtual-dtor',
                 '-Wcast-align', '-Wno-long-long',
                 '-DNDEBUG', '-DTRIMMED',]
-    
 
-env = Environment(LIBS=libs,
-                  CFLAGS=cflags, TARGET_ARCH=arch)
+linkflags = []
 
 
-libchmfox = env.SharedLibrary('libchmfox',
-                              ['chm_lib.c', 'lzx.c', 'export.c', 'extra.c'])
+env = Environment(
+    LIBS=libs,
+    CFLAGS=cflags,
+    TARGET_ARCH=arch)
+
+if system() != 'Windows':
+    if arch == 'x86_64':
+        # you need to install libc6-dev-amd64 g++-multilib lib64stdc++6
+        env.AppendUnique(CFLAGS=['-m64'], LINKFLAGS=['-m64'])
+    else:
+        env.AppendUnique(CFLAGS=['-m32'], LINKFLAGS=['-m32'])
+
+libchmfox = env.SharedLibrary(
+    'libchmfox',
+    ['chm_lib.c', 'lzx.c', 'export.c', 'extra.c'])
 
 install = env.Install('#lib/%s' % platform_name, libchmfox[0])
 
