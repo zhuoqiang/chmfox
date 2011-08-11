@@ -1,13 +1,5 @@
 \.DS_Store
 \.dblite$
-\.os$
-\.xpi$
-^install\.rdf$
 \.orig$
-\.so$
-\.obj$
-\.exp$
-\.lib$
-\.dll$
-\.dylib$
-components/I.+\.h$
+^install\.rdf$
+build/

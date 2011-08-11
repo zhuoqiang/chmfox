@@ -1,4 +1,4 @@
 import os
 
-xpts = [os.path.join('components', 'chm_protocol.js')]
+xpts = [os.path.join('components', 'chmfox.js')]
 Return('xpts')

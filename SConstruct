@@ -107,17 +107,18 @@ platform_name = get_platform_name(get_default_abi())
 abis = get_abis()
 objs = ['chrome.manifest', 'icon.png']
 
-for subdir in ['chrome', 'components', 'src']:
-    objs.extend(SConscript(['%s/SConscript' % subdir],
+for subdir in ['chrome', 'components']:
+    objs.extend(SConscript('%s/SConscript' % subdir,
                            exports=['env', 'platform_name']))
 
+objs.extend(SConscript('src/SConscript', exports = 'platform_name', build_dir='build'))
 
 if mode == 'ALLINONE':
     platform_name = []
     for abi in abis:
         platform_name.append(get_platform_name(abi))
-    objs.extend(SConscript('platform/SConscript', exports = 'platform_name'))
-    target = 'chmfox-%s.xpi' % version
+    objs.extend(SConscript('lib/SConscript', exports = 'platform_name'))
+    target = 'build/chmfox-%s.xpi' % version
     env.Xpi(target, objs, PLATFORM = platform_name, VERSION = version)
     Alias('xpi', target)
 elif mode == 'ALL':
@@ -126,23 +127,23 @@ elif mode == 'ALL':
 
         source.extend(objs)
         platform_name = get_platform_name(abi)
-        source.extend(SConscript('platform/SConscript', exports = 'platform_name'))
+        source.extend(SConscript('lib/SConscript', exports = 'platform_name'))
 
         package_name = get_package_name(abi)
-        target = '%s-%s.xpi' % (package_name, version)
+        target = 'build/%s-%s.xpi' % (package_name, version)
         env.Xpi(target, source, PLATFORM = platform_name, VERSION = version)
         Alias('xpi', target)
 elif mode == 'NOABI':
-    dll = SConscript('platform/SConscript', exports = 'platform_name')
+    dll = SConscript('lib/SConscript', exports = 'platform_name')
     objs.append(env.Install('components', dll))
     package_name = get_package_name(get_default_abi())
-    target = '%s-%s.xpi' % (package_name, version)
+    target = 'build/%s-%s.xpi' % (package_name, version)
     env.Xpi(target, objs, PLATFORM = platform_name, VERSION = version)
     Alias('xpi', target)
 else:
-    objs.extend(SConscript('platform/SConscript', exports = 'platform_name'))
+    objs.extend(SConscript('lib/SConscript', exports = 'platform_name'))
     package_name = get_package_name(get_default_abi())
-    target = '%s-%s.xpi' % (package_name, version)
+    target = 'build/%s-%s.xpi' % (package_name, version)
     env.Xpi(target, objs, PLATFORM = platform_name, VERSION = version)
     Alias('xpi', target)
 
