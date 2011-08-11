@@ -530,53 +530,55 @@ chm_search (struct chmFile *chmfile,
   return partial;
 }
 
-// typedef struct {
-//   const char *file;
-//   int offset;
-// } Langrec;
+/* @todo move it to javascript
+typedef struct {
+  const char *file;
+  int offset;
+} Langrec;
 
-// Langrec lang_files[] = {
-//   {"/$FIftiMain",               0x7E},
-//   {"$WWKeywordLinks/BTree",     0x34},
-//   {"$WWAssociativeLinks/BTree", 0x34}
-// };
+Langrec lang_files[] = {
+  {"/$FIftiMain",               0x7E},
+  {"$WWKeywordLinks/BTree",     0x34},
+  {"$WWAssociativeLinks/BTree", 0x34}
+};
 
-// #define LANG_FILES_SIZE (sizeof(lang_files)/sizeof(Langrec))
+#define LANG_FILES_SIZE (sizeof(lang_files)/sizeof(Langrec))
 
-// int
-// chm_get_lcid (struct chmFile *chmfile) {
-//   struct chmUnitInfo ui;
-//   uint32_t lang;
-//   int i;
+int
+chm_get_lcid (struct chmFile *chmfile) {
+  struct chmUnitInfo ui;
+  uint32_t lang;
+  int i;
 
-//   for (i=0; i<LANG_FILES_SIZE; i++) {
+  for (i=0; i<LANG_FILES_SIZE; i++) {
   
-//     if (chm_resolve_object (chmfile, lang_files[i].file, &ui) == 
-//         CHM_RESOLVE_SUCCESS) {
+    if (chm_resolve_object (chmfile, lang_files[i].file, &ui) == 
+        CHM_RESOLVE_SUCCESS) {
     
-//       if (chm_retrieve_object (chmfile, &ui, (unsigned char *) &lang, 
-//                                lang_files[i].offset, sizeof(uint32_t)) != 0)
-//         return lang;
-//     }
-//   }
+      if (chm_retrieve_object (chmfile, &ui, (unsigned char *) &lang, 
+                               lang_files[i].offset, sizeof(uint32_t)) != 0)
+        return lang;
+    }
+  }
 
-//   return -1;
-// }
+  return -1;
+}
 
-// int
-// is_searchable (struct chmFile* file) {
-//   struct chmUnitInfo ui;
-//   if (file) {
-//       if (chm_resolve_object(file, "/$FIftiMain", &ui) != CHM_RESOLVE_SUCCESS || 
-//           chm_resolve_object(file, "/#TOPICS", &ui) != CHM_RESOLVE_SUCCESS ||
-//           chm_resolve_object(file, "/#STRINGS", &ui) != CHM_RESOLVE_SUCCESS ||
-//           chm_resolve_object(file, "/#URLTBL", &ui) != CHM_RESOLVE_SUCCESS ||
-//           chm_resolve_object(file, "/#URLSTR", &ui) != CHM_RESOLVE_SUCCESS) {
-//           return 0;
-//       }
-//       else {
-//           return 1;
-//       }
-//   }
-//   return 0;
-// }
+int
+is_searchable (struct chmFile* file) {
+  struct chmUnitInfo ui;
+  if (file) {
+      if (chm_resolve_object(file, "/$FIftiMain", &ui) != CHM_RESOLVE_SUCCESS || 
+          chm_resolve_object(file, "/#TOPICS", &ui) != CHM_RESOLVE_SUCCESS ||
+          chm_resolve_object(file, "/#STRINGS", &ui) != CHM_RESOLVE_SUCCESS ||
+          chm_resolve_object(file, "/#URLTBL", &ui) != CHM_RESOLVE_SUCCESS ||
+          chm_resolve_object(file, "/#URLSTR", &ui) != CHM_RESOLVE_SUCCESS) {
+          return 0;
+      }
+      else {
+          return 1;
+      }
+  }
+  return 0;
+}
+*/
