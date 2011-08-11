@@ -116,7 +116,10 @@ for subdir in ['chrome', 'components']:
     objs.extend(SConscript('%s/SConscript' % subdir,
                            exports=['env', 'platform_name']))
 
-objs.extend(SConscript('src/SConscript', exports=['platform_name', 'arch'], build_dir='build/' + platform_name))
+objs.extend(SConscript(
+        'src/SConscript',
+        exports=['platform_name', 'arch'],
+        variant_dir='build/' + platform_name))
 
 if mode == 'ALLINONE':
     platform_name = []
