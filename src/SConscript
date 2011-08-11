@@ -6,7 +6,7 @@ Import('platform_name')
 libs = []
 
 if system() == 'Linux':
-    cxxflags = ['-Wall', '-O2',
+    cflags = ['-Wall', '-O2',
                 '-fno-rtti', '-fno-exceptions',
                 '-Wconversion',
                 '-Wpointer-arith',
@@ -21,13 +21,13 @@ if system() == 'Linux':
                 '-pthread', '-pipe']
 
 elif system() == 'Darwin':
-    cxxflags = []
+    cflags = []
 
 elif system() == 'Windows':
-    cxxflags = ['/D', 'WIN32', '/D', 'XP_WIN', '/nologo', '/MT', '/O2']
+    cflags = ['/DWIN32', '/DXP_WIN', '/nologo', '/MT', '/O2']
 
 elif system() == 'FreeBSD':
-    cxxflags = ['-DOSTYPE="FreeBSD7"',
+    cflags = ['-DOSTYPE="FreeBSD7"',
                 '-DOSARCH=FreeBSD',
                 '-Wall', '-O2',
                 '-fPIC', '-fno-rtti', '-fno-exceptions',
@@ -40,7 +40,7 @@ elif system() == 'FreeBSD':
     
 
 env = Environment(LIBS = libs,
-                  CXXFLAGS= cxxflags)
+                  CFLAGS= cflags)
 
 
 libchmfox = env.SharedLibrary('#lib/%s/libchmfox' % platform_name,
