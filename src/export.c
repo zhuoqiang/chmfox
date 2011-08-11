@@ -9,7 +9,7 @@
 #define _EXPORT_H_2287019_
 
 #include "chm_lib.h"
-#include "stdio.h"
+#include "extra.h"
 
 #if defined _WIN32 || defined __CYGWIN__
 
@@ -90,6 +90,15 @@ extern "C" {
     }
 
     
+    CHMFOX_EXPORT int chmfox_search(
+        struct chmFile *h,
+        const char *text, int whole_words, 
+        int titles_only, pychm_search_enumerator enumerator)
+    {
+        return chm_search(h, text, whole_words, titles_only, enumerator);
+    }
+
+
 #ifdef __cplusplus
 }
 #endif

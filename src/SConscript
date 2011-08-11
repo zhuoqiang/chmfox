@@ -44,7 +44,7 @@ env = Environment(LIBS = libs,
 
 
 libchmfox = env.SharedLibrary('#platform/%s/components/libchmfox' % platform_name,
-                              ['chm_lib.c', 'lzx.c', 'export.c'])
+                              ['chm_lib.c', 'lzx.c', 'export.c', 'extra.c'])
 
 env.Alias('binary', libchmfox)
 
