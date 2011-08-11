@@ -1,7 +1,7 @@
 import string, sys, os
 from platform import system
 
-Import('platform_name')
+Import('platform_name arch')
 
 libs = []
 
@@ -35,14 +35,16 @@ elif system() == 'FreeBSD':
                 '-DNDEBUG', '-DTRIMMED',]
     
 
-env = Environment(LIBS = libs,
-                  CFLAGS= cflags)
+env = Environment(LIBS=libs,
+                  CFLAGS=cflags, TARGET_ARCH=arch)
 
 
-libchmfox = env.SharedLibrary('#lib/%s/libchmfox' % platform_name,
+libchmfox = env.SharedLibrary('libchmfox',
                               ['chm_lib.c', 'lzx.c', 'export.c', 'extra.c'])
 
-env.Alias('binary', libchmfox)
+install = env.Install('#lib/%s' % platform_name, libchmfox[0])
+
+env.Alias('binary', install)
 
 xpts = []
 Return('xpts')
