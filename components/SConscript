@@ -1,0 +1,4 @@
+import os
+
+xpts = [os.path.join('components', 'chmfox.js')]
+Return('xpts')

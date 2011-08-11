@@ -1,0 +1,47 @@
+ChmFox bring the best CHM file reading experience to all platform
+
+Installation:
+
+https://addons.mozilla.org/zh-CN/firefox/addon/chmfox/
+
+You could open CHM file and reading it directly in Firefox after install this extension under Linux, Windows and Mac.
+
+After CHM file opened, you could use "Ctrl+M" to show/hide the content and index sidebar for the current CHM file
+
+You could also open CHM from command line
+
+    firefox local/path/to/chm/file.chm
+
+or:
+
+    firefox chm:///local/path/to/chm/file.chm
+
+
+ChmFox is derived from the great extension CHM Reader with the following improvements:
+
+- Support Firefox 4 and Firefox 5
+- Support open CHM files directly using standard open file menu
+- Fix bug: Could not handle the relative url "../../some.css" inside CHM
+- Change hotkey for show/hide sidebar to "Ctrl+M" which is not likely to conflick with others
+- Support open CHM files directly in the command line and associate CHM file type to firefox
+
+It's now support following platforms
+
+- Windows
+- Linux
+- Mac (x86)
+
+  
+* Author
+  ZHUO Qiang <http://zhuoqiang.me>
+  
+
+* License
+  MPL 1.1/GPL 2.0/LGPL 2.1, for details please see ./LICENSE
+  
+* Build
+  You have to install scons and download gecko-sdk
+  Extract gecko-sdk and set GECKO_SDK variable to the directory of it.
+  Invoke 
+: scons xpi  
+  in the root path of the chmfox
