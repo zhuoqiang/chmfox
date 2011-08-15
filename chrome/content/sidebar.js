@@ -5,11 +5,23 @@ if ("undefined" == typeof(ChmfoxChrome)) {
   };
 };
 
-ChmfoxChrome.currentCHMFilePath = null;
+ChmfoxChrome.currentChm = null;
+
+ChmfoxChrome.HTMLParser = function(aHTMLString) {
+    var html = document.implementation.createDocument('', "html", null);
+    var body = document.createElement("body");
+    html.documentElement.appendChild(body);
+
+    body.appendChild(Components.classes["@mozilla.org/feed-unescapehtml;1"]
+                     .getService(Components.interfaces.nsIScriptableUnescapeHTML)
+                     .parseFragment(aHTMLString, false, null, body));
+    return body;
+};
+
 
 ChmfoxChrome.chm_url = function(fragment, filePath) {
     if (!filePath) {
-        filePath = ChmfoxChrome.currentCHMFilePath;
+        filePath = ChmfoxChrome.currentChm.path;
     }
     return "chm://" + encodeURI(filePath) + "!/" + fragment;
 };
@@ -61,17 +73,22 @@ ChmfoxChrome.on_find_index = function(e) {
 ChmfoxChrome.on_chmfoxBookmark_iframe_load = function(event) {
     var doc = document.getElementById('chmfoxBookmark_iframe').contentDocument;
     var tree = document.getElementById('chmfoxBookmark');
-    ChmfoxChrome.iframe2tree(doc, tree);
+    if (! ChmfoxChrome.currentChm.contentTreeView) {
+        ChmfoxChrome.currentChm.contentTreeView = ChmfoxChrome.iframe2tree(doc, tree);
+    }
+    tree.view = ChmfoxChrome.currentChm.contentTreeView;
 };
 
 ChmfoxChrome.on_chmfoxIndex_iframe_load = function(event) {
     var doc = document.getElementById('chmfoxIndex_iframe').contentDocument;
     var tree = document.getElementById('chmfoxIndex');
-    ChmfoxChrome.iframe2tree(doc, tree);
+    if (! ChmfoxChrome.currentChm.indexTreeView) {
+        ChmfoxChrome.currentChm.indexTreeView = ChmfoxChrome.iframe2tree(doc, tree);
+    }
+    tree.view = ChmfoxChrome.currentChm.indexTreeView;
 };
 
 ChmfoxChrome.iframe2tree = function(doc, tree) {
-    Chmfox.log('start...');
     var body = doc.getElementsByTagName('body')[0];
     var children = body.getElementsByTagName('li');
     var j = 0;
@@ -94,7 +111,7 @@ ChmfoxChrome.iframe2tree = function(doc, tree) {
         }
     }
 
-    tree.view = {
+    var view = {
       treeBox: null,
       selection: null,
 
@@ -204,15 +221,16 @@ ChmfoxChrome.iframe2tree = function(doc, tree) {
       getCellProperties: function(idx, column, prop) {},
       getColumnProperties: function(column, element, prop) {}
     };
-    Chmfox.log('end...');
+    return view;
 };
 
 ChmfoxChrome.load_bookmark = function(uri) {
     var m = decodeURI(uri).match(/chm:\/\/(.*\.chm)(!(\/.*))?/i);
     if (m) {
-        if (ChmfoxChrome.currentCHMFilePath != m[1]) {
-            ChmfoxChrome.currentCHMFilePath = m[1];
-
+        var file_path = 'file://' + m[1];
+        var chm = Application.storage.get(file_path, null);
+        if (ChmfoxChrome.currentChm != chm) {
+            ChmfoxChrome.currentChm = chm;
             var topics_iframe = document.getElementById('chmfoxBookmark_iframe');
             var url = ChmfoxChrome.chm_url('#HHC');
             topics_iframe.setAttribute('src', url);
@@ -235,7 +253,7 @@ ChmfoxChrome.load_bookmark = function(uri) {
     } else {
         var topicstree = document.getElementById('chmfoxBookmark');
         var indextree = document.getElementById('chmfoxIndex');
-        ChmfoxChrome.currentCHMFilePath = null;
+        ChmfoxChrome.currentChm = null;
         topicstree.view = null;
         indextree.view = null;
         document.getElementById('content_is_chm').hidden = true;
@@ -267,7 +285,7 @@ ChmfoxChrome.on_tab_creation = function(event)
     if (event.relatedNode != gBrowser.mPanelContainer)
         return; //Could be anywhere in the DOM (unless bubbling is caught at the interface?)
 
-    ChmfoxChrome.currentCHMFilePath = null;
+    ChmfoxChrome.currentChm = null;
     document.getElementById('chmfoxBookmark').view = null;
     document.getElementById('chmfoxIndex').datasources = "rdf:null";
 };
