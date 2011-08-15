@@ -2,7 +2,7 @@ Components.utils.import("resource://gre/modules/XPCOMUtils.jsm");
 Components.utils.import("resource://gre/modules/ctypes.jsm");
 
 
-var EXPORTED_SYMBOLS = [ "Chmfox" ];
+var EXPORTED_SYMBOLS = [ "Chmfox"];
 
 if ("undefined" == typeof(Chmfox)) {
 
@@ -11,10 +11,9 @@ const Chmfox = (function() {
 const Ci = Components.interfaces;
 const Cc = Components.classes;
 const Cr = Components.results;
+var Application = Cc["@mozilla.org/fuel/application;1"].getService(Ci.fuelIApplication);
 
 const kScheme = 'chm';
-
-var CHM_DATA = {};
 
 const ioService = Cc["@mozilla.org/network/io-service;1"].getService(Ci.nsIIOService);
 
@@ -358,16 +357,23 @@ function prependSlash(str) {
     return str;
 }
 
+
 function HtmlizeObject(str) {
-    return str
-        .replace(/<OBJECT/ig, '<div')
+    var r = str.replace(/<OBJECT/ig, '<div')
         .replace(/<\/OBJECT/ig, '</div')
         .replace(/<PARAM/ig, '<span')
         .replace(/<\/PARAM/ig, '</span');
+    return r;
+    // var i = r.indexOf('<UL>');
+    // var j = r.lastIndexOf('</BODY>');
+    // log(i + ' ' + j);
+    // r = r.substring(i, j-1);
+    // return r;
 }
 
 var ChmFile = function(path) {
     this.path = path;
+    log('open chm file:' + this.path);
     this.handle = lib.open(this.path);
 
     this.isValid = function() {
@@ -690,7 +696,7 @@ function getChmFileAndModifyUri(uri) {
     url = unescape(url);
     url = url.replace('\\', '/');
     url = ioService.newURI(url, null, null);
-    var chm = CHM_DATA[url.spec];
+    var chm = Application.storage.get(url.spec, null);
     if (! chm) {
         chm = new ChmFile(url.QueryInterface(Ci.nsIFileURL).file.path);
         if (! chm.isValid()) {
@@ -699,7 +705,7 @@ function getChmFileAndModifyUri(uri) {
             uri = ioService.newURI("about:blank", null, null);
             return ioService.newChannelFromURI(uri);
         }
-        CHM_DATA[url.spec] = chm;
+        Application.storage.set(url.spec, chm);
     }
 
     var pagepath = null;
