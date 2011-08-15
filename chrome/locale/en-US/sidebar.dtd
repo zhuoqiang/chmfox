@@ -1,3 +1,6 @@
 <!ENTITY chmfoxSidebar.title "ChmFox">
 <!ENTITY openChmfoxSidebar.commandkey "M">
 <!ENTITY openChmfoxSidebar.modifierskey "accel">
+<!ENTITY chmfoxSidebar.contents "Contents">
+<!ENTITY chmfoxSidebar.index "Index">
+<!ENTITY chmfoxSidebar.find "Find">

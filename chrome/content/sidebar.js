@@ -16,22 +16,19 @@ ChmfoxChrome.chm_url = function(fragment, filePath) {
 
 ChmfoxChrome.change_to_url = function(url, chmFilePath) {
     if (url) {
-        if (! chmFilePath) {
-            chmFilePath = ChmfoxChrome.currentCHMFilePath;
-        }
         var doc = window.parent.content.document;
         doc.location = ChmfoxChrome.chm_url(url, chmFilePath);
     }
 };
 
 ChmfoxChrome.on_bookmark_select = function() {
-    var tree = document.getElementById('chmbookmark');
+    var tree = document.getElementById('chmfoxBookmark');
     var url = tree.view.getCellText(tree.currentIndex, tree.columns[1]);
     ChmfoxChrome.change_to_url(url);
 };
 
 ChmfoxChrome.on_index_select = function() {
-    var tree = document.getElementById('chmindex');
+    var tree = document.getElementById('chmfoxIndex');
     var url = tree.view.getCellText(tree.currentIndex, tree.columns[1]);
     ChmfoxChrome.change_to_url(url);
 };
@@ -41,15 +38,15 @@ ChmfoxChrome.on_find_index_keypress = function(e) {
         ChmfoxChrome.on_find_index(e);
         ChmfoxChrome.on_find_index_focus(e);
     }
-}
+};
 
 ChmfoxChrome.on_find_index_focus = function(e) {
     document.getElementById('find_index').select();
-}
+};
 
 ChmfoxChrome.on_find_index = function(e) {
     var text = document.getElementById('find_index').value.toLowerCase();
-    var tree = document.getElementById('chmindex');
+    var tree = document.getElementById('chmfoxIndex');
     var view = tree.view;
     for (var i = 1; i < view.rowCount; i++) {
         var name = view.getCellText(i, tree.columns[0]).toLowerCase();
@@ -61,19 +58,20 @@ ChmfoxChrome.on_find_index = function(e) {
     }
 };
 
-ChmfoxChrome.on_chmbookmark_iframe_load = function(event) {
-    var doc = document.getElementById('chmbookmark_iframe').contentDocument;
-    var tree = document.getElementById('chmbookmark');
+ChmfoxChrome.on_chmfoxBookmark_iframe_load = function(event) {
+    var doc = document.getElementById('chmfoxBookmark_iframe').contentDocument;
+    var tree = document.getElementById('chmfoxBookmark');
     ChmfoxChrome.iframe2tree(doc, tree);
 };
 
-ChmfoxChrome.on_chmindex_iframe_load = function(event) {
-    var doc = document.getElementById('chmindex_iframe').contentDocument;
-    var tree = document.getElementById('chmindex');
+ChmfoxChrome.on_chmfoxIndex_iframe_load = function(event) {
+    var doc = document.getElementById('chmfoxIndex_iframe').contentDocument;
+    var tree = document.getElementById('chmfoxIndex');
     ChmfoxChrome.iframe2tree(doc, tree);
 };
 
 ChmfoxChrome.iframe2tree = function(doc, tree) {
+    Chmfox.log('start...');
     var body = doc.getElementsByTagName('body')[0];
     var children = body.getElementsByTagName('li');
     var j = 0;
@@ -206,6 +204,7 @@ ChmfoxChrome.iframe2tree = function(doc, tree) {
       getCellProperties: function(idx, column, prop) {},
       getColumnProperties: function(column, element, prop) {}
     };
+    Chmfox.log('end...');
 };
 
 ChmfoxChrome.load_bookmark = function(uri) {
@@ -214,10 +213,10 @@ ChmfoxChrome.load_bookmark = function(uri) {
         if (ChmfoxChrome.currentCHMFilePath != m[1]) {
             ChmfoxChrome.currentCHMFilePath = m[1];
 
-            var topics_iframe = document.getElementById('chmbookmark_iframe');
+            var topics_iframe = document.getElementById('chmfoxBookmark_iframe');
             var url = ChmfoxChrome.chm_url('#HHC');
             topics_iframe.setAttribute('src', url);
-            var index_iframe = document.getElementById('chmindex_iframe');
+            var index_iframe = document.getElementById('chmfoxIndex_iframe');
             url = ChmfoxChrome.chm_url("#HHK");
             index_iframe.setAttribute('src', url);
 
@@ -225,17 +224,17 @@ ChmfoxChrome.load_bookmark = function(uri) {
             // than addEventListener.
             window.setTimeout(
                 function(){
-                    ChmfoxChrome.on_chmbookmark_iframe_load(null);
+                    ChmfoxChrome.on_chmfoxBookmark_iframe_load(null);
                 }, 700);
             window.setTimeout(
                 function() {
-                    ChmfoxChrome.on_chmindex_iframe_load(null);
+                    ChmfoxChrome.on_chmfoxIndex_iframe_load(null);
                 }, 700);
         }
         document.getElementById('content_is_chm').hidden = false;
     } else {
-        var topicstree = document.getElementById('chmbookmark');
-        var indextree = document.getElementById('chmindex');
+        var topicstree = document.getElementById('chmfoxBookmark');
+        var indextree = document.getElementById('chmfoxIndex');
         ChmfoxChrome.currentCHMFilePath = null;
         topicstree.view = null;
         indextree.view = null;
@@ -269,8 +268,8 @@ ChmfoxChrome.on_tab_creation = function(event)
         return; //Could be anywhere in the DOM (unless bubbling is caught at the interface?)
 
     ChmfoxChrome.currentCHMFilePath = null;
-    document.getElementById('chmbookmark').view = null;
-    document.getElementById('chmindex').datasources = "rdf:null";
+    document.getElementById('chmfoxBookmark').view = null;
+    document.getElementById('chmfoxIndex').datasources = "rdf:null";
 };
 
 ChmfoxChrome.on_sidebar_load = function() {
