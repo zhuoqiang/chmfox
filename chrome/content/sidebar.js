@@ -71,18 +71,20 @@ ChmfoxChrome.on_find_index = function(e) {
 };
 
 ChmfoxChrome.on_chmfoxBookmark_iframe_load = function(event) {
-    var doc = document.getElementById('chmfoxBookmark_iframe').contentDocument;
     var tree = document.getElementById('chmfoxBookmark');
     if (! ChmfoxChrome.currentChm.contentTreeView) {
+        var doc = event.originalTarget;
+        // var doc = document.getElementById('chmfoxBookmark_iframe').contentDocument;
         ChmfoxChrome.currentChm.contentTreeView = ChmfoxChrome.iframe2tree(doc, tree);
     }
     tree.view = ChmfoxChrome.currentChm.contentTreeView;
 };
 
 ChmfoxChrome.on_chmfoxIndex_iframe_load = function(event) {
-    var doc = document.getElementById('chmfoxIndex_iframe').contentDocument;
     var tree = document.getElementById('chmfoxIndex');
     if (! ChmfoxChrome.currentChm.indexTreeView) {
+        // var doc = document.getElementById('chmfoxIndex_iframe').contentDocument;
+        var doc = event.originalTarget;
         ChmfoxChrome.currentChm.indexTreeView = ChmfoxChrome.iframe2tree(doc, tree);
     }
     tree.view = ChmfoxChrome.currentChm.indexTreeView;
@@ -238,16 +240,8 @@ ChmfoxChrome.load_bookmark = function(uri) {
             url = ChmfoxChrome.chm_url("#HHK");
             index_iframe.setAttribute('src', url);
 
-            // load sidebar content using timeout, this is much stable
-            // than addEventListener.
-            window.setTimeout(
-                function(){
-                    ChmfoxChrome.on_chmfoxBookmark_iframe_load(null);
-                }, 700);
-            window.setTimeout(
-                function() {
-                    ChmfoxChrome.on_chmfoxIndex_iframe_load(null);
-                }, 700);
+            topics_iframe.addEventListener("DOMContentLoaded", ChmfoxChrome.on_chmfoxBookmark_iframe_load, true);
+            index_iframe.addEventListener("DOMContentLoaded", ChmfoxChrome.on_chmfoxIndex_iframe_load, true);
         }
         document.getElementById('content_is_chm').hidden = false;
     } else {
