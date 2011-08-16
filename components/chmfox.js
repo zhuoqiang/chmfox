@@ -565,6 +565,10 @@ var ChmFile = function(path) {
     this.getSystemInfo();
 
     this.getTopics = function() {
+        if (this.html_topics) {
+            return this.html_topics;
+        }
+        log('getting topics');
         if (! this.isValid()) {
             return;
         }
@@ -597,9 +601,14 @@ var ChmFile = function(path) {
                 this.html_topics = HtmlizeObject(this.topics_content);
             }
         }
+        return this.html_topics;
     };
 
     this.getIndex = function() {
+        if (this.html_index) {
+            return this.html_index;
+        }
+        log('getting index');
         var ui = lib.chmUnitInfo();
         if (! this.index) {
             if (this.project) {
@@ -628,10 +637,8 @@ var ChmFile = function(path) {
                 this.html_index = HtmlizeObject(this.index_content);
             }
         }
+        return this.html_index;
     };
-
-    this.getTopics();
-    this.getIndex();
 
     this.getContent = function(page) {
         var ui = lib.chmUnitInfo();
@@ -862,7 +869,7 @@ Protocol.prototype = {
   },
 
   newRawIndexChannel: function(aURI, chm) {
-    var content = chm.html_index;
+    var content = chm.getIndex();
     if (! content) {
         content = '';
     }
@@ -884,7 +891,7 @@ Protocol.prototype = {
   },
 
   newRawTopicsChannel: function(aURI, chm) {
-    var content = chm.html_topics;
+    var content = chm.getTopics();
     if (! content) {
         content = '';
     }

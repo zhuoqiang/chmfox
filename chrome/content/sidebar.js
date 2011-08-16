@@ -244,7 +244,7 @@ ChmfoxChrome.load_bookmark = function(uri) {
                 topics_iframe.addEventListener(
                     "DOMContentLoaded",
                     ChmfoxChrome.on_chmfoxBookmark_iframe_load,
-                    true);
+                    false);
             }
             else {
                 ChmfoxChrome.on_chmfoxBookmark_iframe_load();
@@ -256,7 +256,7 @@ ChmfoxChrome.load_bookmark = function(uri) {
                 index_iframe.addEventListener(
                     "DOMContentLoaded",
                     ChmfoxChrome.on_chmfoxIndex_iframe_load,
-                    true);
+                    false);
             }
             else {
                 ChmfoxChrome.on_chmfoxIndex_iframe_load();
@@ -275,18 +275,21 @@ ChmfoxChrome.load_bookmark = function(uri) {
 
 ChmfoxChrome.on_browser_document_load = function(event) {
     if (window.parent) {
-        var url = window.parent.gURLBar.value;
+        var doc = window.parent.content.document;
+        var url = doc.location.href;
         ChmfoxChrome.load_bookmark(url);
     }
 };
 
 ChmfoxChrome.on_tab_selected = function(event)
 {
-    var gBrowser = window.parent.gBrowser;
-    var browser = gBrowser.getBrowserAtIndex(gBrowser.mTabContainer.selectedIndex);
-    var url = browser.currentURI;
+    // var gBrowser = window.parent.gBrowser;
+    // var browser = gBrowser.getBrowserAtIndex(gBrowser.mTabContainer.selectedIndex);
+    // var url = browser.currentURI;
+    var doc = window.parent.content.document;
+    var url = doc.location.href;
     if (url) {
-        ChmfoxChrome.load_bookmark(url.spec);
+        ChmfoxChrome.load_bookmark(url);
     }
 };
 
@@ -321,7 +324,9 @@ ChmfoxChrome.on_sidebar_load = function() {
         sidebar_closebutton.addEventListener('command', ChmfoxChrome.on_sidebar_close, false);
     }
 
-    ChmfoxChrome.load_bookmark(window.parent.gURLBar.value);
+    var doc = window.parent.content.document;
+    var url = doc.location.href;
+    ChmfoxChrome.load_bookmark(url);
 
     // var doc = window.parent.content.document;
     // var url = doc.location.href;
