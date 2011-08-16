@@ -47,7 +47,6 @@ function log(message) {
   dump(msg);
 }
 
-
 function getCharsetFromLcid(lcid) {
     switch (lcid) {
     case 0x0436: return "ISO-8859-1"; // "Afrikaans", "Western Europe & US"
@@ -700,13 +699,13 @@ function redirect(to, orig) {
 
 function getChmFileAndModifyUri(uri) {
     var urlParts = decodeURI(uri.spec).split('!');
-    var url = urlParts[0];
-    url = url.substring(4); //Remove "chm:"
+    var chm_uri = urlParts[0];
+    var url = chm_uri.substring(4); //Remove "chm:"
     url = "file:" + url;
     url = unescape(url);
     url = url.replace('\\', '/');
     url = ioService.newURI(url, null, null);
-    var chm = Application.storage.get(url.spec, null);
+    var chm = Application.storage.get(chm_uri, null);
     if (! chm) {
         chm = new ChmFile(url.QueryInterface(Ci.nsIFileURL).file.path);
         if (! chm.isValid()) {
@@ -715,7 +714,7 @@ function getChmFileAndModifyUri(uri) {
             uri = ioService.newURI("about:blank", null, null);
             return ioService.newChannelFromURI(uri);
         }
-        Application.storage.set(url.spec, chm);
+        Application.storage.set(chm_uri, chm);
     }
 
     var pagepath = null;

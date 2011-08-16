@@ -33,23 +33,36 @@ ChmfoxChrome.toggleSidebar = function(event) {
     }
     var opened = ChmfoxChrome.IsSidebarOpen();
     toggleSidebar('viewChmfoxSidebar');
-    Chmfox.prefs.setBoolPref(url+".autoOpenSidebar", !opened);
+    Chmfox.prefs.setBoolPref("autoOpenSidebar." + url, !opened);
 };
 
 ChmfoxChrome.on_new_url = function(event) {
     var browser = gBrowser.getBrowserAtIndex(gBrowser.mTabContainer.selectedIndex);
     var url = browser.contentDocument.location.href;
-    url = decodeURI(url).split('!')[0];
-    if (url.substr(0, 7) != 'chm:///') {
+    var m = decodeURI(url).match(/(chm:\/\/.+\.chm)(!(\/.*))?/i);
+    if (! m) {
         if (ChmfoxChrome.IsSidebarOpen()) {
             toggleSidebar('viewChmfoxSidebar');
         }
         return;
     }
 
+    url = m[1];
+    var title = gBrowser.contentDocument.title;
+    if (! gBrowser.contentDocument.title) {
+        var chm = Application.storage.get(url, null);
+        if (chm) {
+            gBrowser.contentDocument.title = chm.title;
+        }
+    }
+    var logo = gBrowser.contentDocument.title.substr(gBrowser.contentDocument.title.length-8);
+    if (logo != '[ChmFox]') {
+        gBrowser.contentDocument.title = gBrowser.contentDocument.title + ' |[ChmFox]';
+    }
+
     var autoOpenSidebar = Chmfox.prefs.getBoolPref("autoOpenSidebar");
     try {
-        autoOpenSidebar = Chmfox.prefs.getBoolPref(url+".autoOpenSidebar");
+        autoOpenSidebar = Chmfox.prefs.getBoolPref("autoOpenSidebar." + url);
     }
     catch (e) {
     }
