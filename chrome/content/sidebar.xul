@@ -7,10 +7,10 @@
       xmlns="http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul">
   <script src="sidebar.js" charset="UTF-8" />
   <!-- <checkbox label="auto open" /> -->
-  <tabbox id="content_is_chm" flex="1">
+  <tabbox id="chmfoxTabbox" flex="1">
     <tabs>
-      <tab label="&chmfoxSidebar.contents;" selected="true" accesskey="C"/>
-      <tab label="&chmfoxSidebar.index;" accesskey="N"/>
+      <tab id="chmfoxContentTab" label="&chmfoxSidebar.contents;" selected="true" accesskey="C"/>
+      <tab id="chmfoxIndexTab" label="&chmfoxSidebar.index;" accesskey="N"/>
     </tabs>
     <tabpanels flex="1">
       <tabpanel id="topicspanel" flex="1">

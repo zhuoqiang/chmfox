@@ -230,6 +230,37 @@ ChmfoxChrome.iframe2tree = function(doc, tree) {
     return view;
 };
 
+
+ChmfoxChrome.load_content_panel = function () {
+    if (! ChmfoxChrome.currentChm.contentTreeView) {
+        var topics_iframe = document.getElementById('chmfoxBookmark_iframe');
+        var url = ChmfoxChrome.chm_url('#HHC');
+        topics_iframe.setAttribute('src', url);
+        topics_iframe.addEventListener(
+            "DOMContentLoaded",
+            ChmfoxChrome.on_chmfoxBookmark_iframe_load,
+            false);
+    }
+    else {
+        ChmfoxChrome.on_chmfoxBookmark_iframe_load();
+    }
+};
+
+ChmfoxChrome.load_index_panel = function () {
+    if (! ChmfoxChrome.currentChm.indexTreeView) {
+        var index_iframe = document.getElementById('chmfoxIndex_iframe');
+        var url = ChmfoxChrome.chm_url("#HHK");
+        index_iframe.setAttribute('src', url);
+        index_iframe.addEventListener(
+            "DOMContentLoaded",
+            ChmfoxChrome.on_chmfoxIndex_iframe_load,
+            false);
+    }
+    else {
+        ChmfoxChrome.on_chmfoxIndex_iframe_load();
+    }
+};
+
 ChmfoxChrome.load_bookmark = function(uri) {
     var m = decodeURI(uri).match(/chm:\/\/(.*\.chm)(!(\/.*))?/i);
     if (m) {
@@ -237,41 +268,22 @@ ChmfoxChrome.load_bookmark = function(uri) {
         var chm = Application.storage.get(file_path, null);
         if (ChmfoxChrome.currentChm != chm) {
             ChmfoxChrome.currentChm = chm;
-            if (! ChmfoxChrome.currentChm.contentTreeView) {
-                var topics_iframe = document.getElementById('chmfoxBookmark_iframe');
-                var url = ChmfoxChrome.chm_url('#HHC');
-                topics_iframe.setAttribute('src', url);
-                topics_iframe.addEventListener(
-                    "DOMContentLoaded",
-                    ChmfoxChrome.on_chmfoxBookmark_iframe_load,
-                    false);
-            }
-            else {
-                ChmfoxChrome.on_chmfoxBookmark_iframe_load();
-            }
-            if (! ChmfoxChrome.currentChm.indexTreeView) {
-                var index_iframe = document.getElementById('chmfoxIndex_iframe');
-                var url = ChmfoxChrome.chm_url("#HHK");
-                index_iframe.setAttribute('src', url);
-                index_iframe.addEventListener(
-                    "DOMContentLoaded",
-                    ChmfoxChrome.on_chmfoxIndex_iframe_load,
-                    false);
-            }
-            else {
-                ChmfoxChrome.on_chmfoxIndex_iframe_load();
-            }
         }
-        document.getElementById('content_is_chm').hidden = false;
-    } else {
+        if (document.getElementById('chmfoxContentTab').selected) {
+            ChmfoxChrome.load_content_panel();
+        }
+        else {
+            ChmfoxChrome.load_index_panel();
+        }
+    }
+    else {
         var topicstree = document.getElementById('chmfoxBookmark');
         var indextree = document.getElementById('chmfoxIndex');
         ChmfoxChrome.currentChm = null;
         topicstree.view = null;
         indextree.view = null;
-        document.getElementById('content_is_chm').hidden = true;
     }
-}
+};
 
 ChmfoxChrome.on_browser_document_load = function(event) {
     if (window.parent) {
@@ -281,8 +293,7 @@ ChmfoxChrome.on_browser_document_load = function(event) {
     }
 };
 
-ChmfoxChrome.on_tab_selected = function(event)
-{
+ChmfoxChrome.on_tab_selected = function(event) {
     // var gBrowser = window.parent.gBrowser;
     // var browser = gBrowser.getBrowserAtIndex(gBrowser.mTabContainer.selectedIndex);
     // var url = browser.currentURI;
@@ -315,10 +326,19 @@ ChmfoxChrome.on_sidebar_close = function(e) {
     Chmfox.prefs.setBoolPref(url+".autoOpenSidebar", false);
 };
 
+ChmfoxChrome.on_tabbox_select = function(event) {
+    var doc = window.parent.content.document;
+    var url = doc.location.href;
+    ChmfoxChrome.load_bookmark(url);
+};
+
 ChmfoxChrome.on_sidebar_load = function() {
     window.parent.gBrowser.addEventListener("load", ChmfoxChrome.on_browser_document_load, true);
     window.parent.gBrowser.mPanelContainer.addEventListener("select", ChmfoxChrome.on_tab_selected, false);
     window.parent.gBrowser.mPanelContainer.addEventListener("DOMNodeInserted", ChmfoxChrome.on_tab_creation, false);
+    var tabbox = document.getElementById('chmfoxTabbox');
+    tabbox.addEventListener("select", ChmfoxChrome.on_tabbox_select, false);
+
     var sidebar_closebutton = top.document.querySelector('#sidebar-box toolbarbutton');
     if (sidebar_closebutton) {
         sidebar_closebutton.addEventListener('command', ChmfoxChrome.on_sidebar_close, false);
@@ -327,15 +347,6 @@ ChmfoxChrome.on_sidebar_load = function() {
     var doc = window.parent.content.document;
     var url = doc.location.href;
     ChmfoxChrome.load_bookmark(url);
-
-    // var doc = window.parent.content.document;
-    // var url = doc.location.href;
-    // url = decodeURI(url).split('!')[0];
-    // if (url.substr(0, 7) != 'chm:///') {
-    //     return;
-    // }
-    // Chmfox.prefs.setBoolPref(url+".autoOpenSidebar", true);
-    // Chmfox.log('save open sidebar');
 };
 
 window.addEventListener('load', ChmfoxChrome.on_sidebar_load, false);
