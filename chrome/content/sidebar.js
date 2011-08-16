@@ -262,10 +262,10 @@ ChmfoxChrome.load_index_panel = function () {
 };
 
 ChmfoxChrome.load_bookmark = function(uri) {
-    var m = decodeURI(uri).match(/chm:\/\/(.*\.chm)(!(\/.*))?/i);
+    var m = decodeURI(uri).match(/(chm:\/\/.+\.chm)(!(\/.*))?/i);
     if (m) {
-        var file_path = 'file://' + m[1];
-        var chm = Application.storage.get(file_path, null);
+        var chm_uri = m[1];
+        var chm = Application.storage.get(chm_uri, null);
         if (ChmfoxChrome.currentChm != chm) {
             ChmfoxChrome.currentChm = chm;
         }
@@ -321,7 +321,7 @@ ChmfoxChrome.on_sidebar_close = function(e) {
     if (url.substr(0, 7) != 'chm:///') {
         return;
     }
-    Chmfox.prefs.setBoolPref(url+".autoOpenSidebar", false);
+    Chmfox.prefs.setBoolPref("autoOpenSidebar."+url, false);
 };
 
 ChmfoxChrome.on_tabbox_select = function(event) {
