@@ -2,5 +2,5 @@ import os
 
 Import('env')
 
-contents = Glob('content/*.js') + Glob('content/*.xul') + Glob('skin/*.css')
+contents = Glob('content/*.js') + Glob('content/*.xul') + Glob('skin/*.css') + Glob('locale/*/*.dtd')
 Return('contents')
