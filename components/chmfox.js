@@ -11,7 +11,10 @@ const Chmfox = (function() {
 const Ci = Components.interfaces;
 const Cc = Components.classes;
 const Cr = Components.results;
+
 var Application = Cc["@mozilla.org/fuel/application;1"].getService(Ci.fuelIApplication);
+
+const prefs = Cc["@mozilla.org/preferences-service;1"].getService(Ci.nsIPrefService).getBranch("extensions.chmfox.");
 
 const kScheme = 'chm';
 
@@ -950,7 +953,7 @@ const uriContentListener = {
     }
 };
 
-return {log:log, protocols: [Protocol], uriContentListener: uriContentListener};
+return {log:log, protocols: [Protocol], uriContentListener: uriContentListener, prefs:prefs};
 
 })();
 

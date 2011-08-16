@@ -284,7 +284,6 @@ ChmfoxChrome.on_tab_selected = function(event)
 {
     var gBrowser = window.parent.gBrowser;
     var browser = gBrowser.getBrowserAtIndex(gBrowser.mTabContainer.selectedIndex);
-    // browser is the newly selected tab
     var url = browser.currentURI;
     if (url) {
         ChmfoxChrome.load_bookmark(url.spec);
@@ -295,19 +294,43 @@ ChmfoxChrome.on_tab_creation = function(event)
 {
     var gBrowser = window.parent.gBrowser;
     // listening for new tabs
-    if (event.relatedNode != gBrowser.mPanelContainer)
+    if (event.relatedNode != gBrowser.mPanelContainer) {
         return; //Could be anywhere in the DOM (unless bubbling is caught at the interface?)
-
+    }
     ChmfoxChrome.currentChm = null;
     document.getElementById('chmfoxBookmark').view = null;
     document.getElementById('chmfoxIndex').datasources = "rdf:null";
+};
+
+ChmfoxChrome.on_sidebar_close = function(e) {
+    var doc = window.parent.content.document;
+    var url = doc.location.href;
+    url = decodeURI(url).split('!')[0];
+    if (url.substr(0, 7) != 'chm:///') {
+        return;
+    }
+    Chmfox.prefs.setBoolPref(url+".autoOpenSidebar", false);
 };
 
 ChmfoxChrome.on_sidebar_load = function() {
     window.parent.gBrowser.addEventListener("load", ChmfoxChrome.on_browser_document_load, true);
     window.parent.gBrowser.mPanelContainer.addEventListener("select", ChmfoxChrome.on_tab_selected, false);
     window.parent.gBrowser.mPanelContainer.addEventListener("DOMNodeInserted", ChmfoxChrome.on_tab_creation, false);
+    var sidebar_closebutton = top.document.querySelector('#sidebar-box toolbarbutton');
+    if (sidebar_closebutton) {
+        sidebar_closebutton.addEventListener('command', ChmfoxChrome.on_sidebar_close, false);
+    }
+
     ChmfoxChrome.load_bookmark(window.parent.gURLBar.value);
+
+    // var doc = window.parent.content.document;
+    // var url = doc.location.href;
+    // url = decodeURI(url).split('!')[0];
+    // if (url.substr(0, 7) != 'chm:///') {
+    //     return;
+    // }
+    // Chmfox.prefs.setBoolPref(url+".autoOpenSidebar", true);
+    // Chmfox.log('save open sidebar');
 };
 
-window.addEventListener('load', ChmfoxChrome.on_sidebar_load, true);
+window.addEventListener('load', ChmfoxChrome.on_sidebar_load, false);
