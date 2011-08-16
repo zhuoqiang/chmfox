@@ -294,11 +294,9 @@ ChmfoxChrome.on_browser_document_load = function(event) {
 };
 
 ChmfoxChrome.on_tab_selected = function(event) {
-    // var gBrowser = window.parent.gBrowser;
-    // var browser = gBrowser.getBrowserAtIndex(gBrowser.mTabContainer.selectedIndex);
-    // var url = browser.currentURI;
-    var doc = window.parent.content.document;
-    var url = doc.location.href;
+    var gBrowser = window.parent.gBrowser;
+    var browser = gBrowser.getBrowserAtIndex(gBrowser.mTabContainer.selectedIndex);
+    var url = browser.contentDocument.location.href;
     if (url) {
         ChmfoxChrome.load_bookmark(url);
     }
