@@ -88,6 +88,7 @@ def xpi_function(target, source, env):
 
         rdf = 'install.rdf'
         rdff = file(rdf, 'w')
+        print 'Generate rdf:', rdf
         doc.writexml(rdff)
         rdff.close()
         return File(rdf)

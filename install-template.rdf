@@ -1,4 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE overlay SYSTEM "chrome://chmfox/locale/sidebar.dtd">
 <RDF xmlns="http://www.w3.org/1999/02/22-rdf-syntax-ns#" xmlns:em="http://www.mozilla.org/2004/em-rdf#">
   <Description about="urn:mozilla:install-manifest">
     <em:id>chmfox@zhuoqiang.me</em:id>
@@ -7,7 +8,7 @@
     <em:version />
     <em:creator>ZHUO Qiang</em:creator>
     <em:contributor></em:contributor>
-    <em:description>ChmFox brings the best CHM file reading experience to Firefox. Modified from CHM Reader.</em:description>
+    <em:description>&chmfox.description;</em:description>
     <!-- <em:aboutURL>chrome://chmfox/content/about.xul</em:aboutURL> -->
     <!-- <em:optionsURL>chrome://chmfox/content/options.xul</em:optionsURL> -->
     <em:homepageURL>http://bitbucket.org/zhuoqiang/chmfox</em:homepageURL>
@@ -17,7 +18,7 @@
       <Description>
         <em:id>{ec8030f7-c20a-464f-9b0e-13a3a9e97384}</em:id><!-- Firefox -->
         <em:minVersion>4.0</em:minVersion>
-        <em:maxVersion>8.*</em:maxVersion>
+        <em:maxVersion>8.0a1</em:maxVersion>
       </Description>
     </em:targetApplication>
     <!-- <em:updateURL></em:updateURL> -->

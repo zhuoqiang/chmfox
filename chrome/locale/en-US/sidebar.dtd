@@ -1,3 +1,4 @@
+<!ENTITY chmfox.description "ChmFox brings the best CHM file reading experience to Firefox">
 <!ENTITY chmfoxSidebar.title "ChmFox">
 <!ENTITY openChmfoxSidebar.commandkey "M">
 <!ENTITY openChmfoxSidebar.modifierskey "accel">
