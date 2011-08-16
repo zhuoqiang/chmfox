@@ -24,6 +24,6 @@
                  group="sidebar"
                  sidebarurl="chrome://chmfox/content/sidebar.xul"
                  sidebartitle="&chmfoxSidebar.title;"
-                 oncommand="toggleSidebar('viewChmfoxSidebar');" />
+                 oncommand="ChmfoxChrome.toggleSidebar();" />
   </broadcasterset>
 </overlay>
