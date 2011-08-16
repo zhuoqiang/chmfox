@@ -3,7 +3,7 @@
 <?xml-stylesheet href="chrome://browser/skin/browser.css" type="text/css" ?>
 <!DOCTYPE overlay SYSTEM "chrome://chmfox/locale/sidebar.dtd">
 
-<page id="sbCHMReaderSidebar" title="&chmfoxSidebar.title;"
+<page id="sbChmfoxSidebar" title="&chmfoxSidebar.title;"
       xmlns="http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul">
   <script src="sidebar.js" charset="UTF-8" />
   <!-- <checkbox label="auto open" /> -->
