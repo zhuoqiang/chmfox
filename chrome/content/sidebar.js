@@ -76,6 +76,8 @@ ChmfoxChrome.on_chmfoxBookmark_iframe_load = function(event) {
         var doc = event.originalTarget;
         // var doc = document.getElementById('chmfoxBookmark_iframe').contentDocument;
         ChmfoxChrome.currentChm.contentTreeView = ChmfoxChrome.iframe2tree(doc, tree);
+        var iframe = document.getElementById('chmfoxBookmark_iframe');
+        iframe.setAttribute('src', null);
     }
     tree.view = ChmfoxChrome.currentChm.contentTreeView;
 };
@@ -86,6 +88,8 @@ ChmfoxChrome.on_chmfoxIndex_iframe_load = function(event) {
         // var doc = document.getElementById('chmfoxIndex_iframe').contentDocument;
         var doc = event.originalTarget;
         ChmfoxChrome.currentChm.indexTreeView = ChmfoxChrome.iframe2tree(doc, tree);
+        var iframe = document.getElementById('chmfoxIndex_iframe');
+        iframe.setAttribute('src', null);
     }
     tree.view = ChmfoxChrome.currentChm.indexTreeView;
 };
