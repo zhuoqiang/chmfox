@@ -2,7 +2,7 @@ import os, zipfile
 from platform import system, machine
 from xml.dom import minidom
 
-version = '2.0'
+version = '2.1'
 mode = ARGUMENTS.get('MODE', '')
 
 def get_arch(a):
