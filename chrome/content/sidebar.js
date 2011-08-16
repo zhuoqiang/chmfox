@@ -20,6 +20,9 @@ ChmfoxChrome.HTMLParser = function(aHTMLString) {
 
 
 ChmfoxChrome.chm_url = function(fragment, filePath) {
+    if (fragment.match(/http:\/\//i)) {
+        return fragment;
+    }
     if (!filePath) {
         filePath = ChmfoxChrome.currentChm.path;
     }
