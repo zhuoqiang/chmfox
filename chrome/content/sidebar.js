@@ -233,15 +233,30 @@ ChmfoxChrome.load_bookmark = function(uri) {
         var chm = Application.storage.get(file_path, null);
         if (ChmfoxChrome.currentChm != chm) {
             ChmfoxChrome.currentChm = chm;
-            var topics_iframe = document.getElementById('chmfoxBookmark_iframe');
-            var url = ChmfoxChrome.chm_url('#HHC');
-            topics_iframe.setAttribute('src', url);
-            var index_iframe = document.getElementById('chmfoxIndex_iframe');
-            url = ChmfoxChrome.chm_url("#HHK");
-            index_iframe.setAttribute('src', url);
-
-            topics_iframe.addEventListener("DOMContentLoaded", ChmfoxChrome.on_chmfoxBookmark_iframe_load, true);
-            index_iframe.addEventListener("DOMContentLoaded", ChmfoxChrome.on_chmfoxIndex_iframe_load, true);
+            if (! ChmfoxChrome.currentChm.contentTreeView) {
+                var topics_iframe = document.getElementById('chmfoxBookmark_iframe');
+                var url = ChmfoxChrome.chm_url('#HHC');
+                topics_iframe.setAttribute('src', url);
+                topics_iframe.addEventListener(
+                    "DOMContentLoaded",
+                    ChmfoxChrome.on_chmfoxBookmark_iframe_load,
+                    true);
+            }
+            else {
+                ChmfoxChrome.on_chmfoxBookmark_iframe_load();
+            }
+            if (! ChmfoxChrome.currentChm.indexTreeView) {
+                var index_iframe = document.getElementById('chmfoxIndex_iframe');
+                var url = ChmfoxChrome.chm_url("#HHK");
+                index_iframe.setAttribute('src', url);
+                index_iframe.addEventListener(
+                    "DOMContentLoaded",
+                    ChmfoxChrome.on_chmfoxIndex_iframe_load,
+                    true);
+            }
+            else {
+                ChmfoxChrome.on_chmfoxIndex_iframe_load();
+            }
         }
         document.getElementById('content_is_chm').hidden = false;
     } else {
