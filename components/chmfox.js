@@ -916,7 +916,7 @@ Protocol.prototype = {
 function openUri(uri) {
     const wm = Cc["@mozilla.org/appshell/window-mediator;1"].getService(Ci.nsIWindowMediator);
     var browserEnumerator = wm.getEnumerator("navigator:browser");
-    wm.getMostRecentWindow("navigator:browser").loadURI(uri);
+    wm.getMostRecentWindow("navigator:browser").content.document.location = uri;
 }
 
 const uriContentListener = {
@@ -932,12 +932,8 @@ const uriContentListener = {
                  if (url.fileExtension.toLowerCase() == 'chm') {
                      uri.scheme = kScheme;
                      log("redirect to [" + uri.spec + "]");
-                     const timer = Cc["@mozilla.org/timer;1"]
-                         .createInstance(Ci.nsITimer);
-                     timer.initWithCallback(function() {
-                         openUri(uri.spec);
-                     }, 0, Ci.nsITimer.TYPE_ONE_SHOT);
-                     return true;
+                     openUri(uri.spec);
+                     return false;
                  }
              }
          }
