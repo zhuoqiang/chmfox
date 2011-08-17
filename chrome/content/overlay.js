@@ -56,8 +56,8 @@ ChmfoxChrome.on_new_url = function(event) {
         }
     }
     var logo = gBrowser.contentDocument.title.substr(gBrowser.contentDocument.title.length-8);
-    if (logo != '[ChmFox]') {
-        gBrowser.contentDocument.title = gBrowser.contentDocument.title + ' |[ChmFox]';
+    if (logo != '[CHMFOX]') {
+        gBrowser.contentDocument.title = gBrowser.contentDocument.title + ' ♥ [CHMFOX]';
     }
 
     var autoOpenSidebar = Chmfox.prefs.getBoolPref("autoOpenSidebar");
