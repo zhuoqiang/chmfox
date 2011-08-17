@@ -7,26 +7,14 @@ if ("undefined" == typeof(ChmfoxChrome)) {
 
 ChmfoxChrome.currentChm = null;
 
-ChmfoxChrome.HTMLParser = function(aHTMLString) {
-    var html = document.implementation.createDocument('', "html", null);
-    var body = document.createElement("body");
-    html.documentElement.appendChild(body);
-
-    body.appendChild(Components.classes["@mozilla.org/feed-unescapehtml;1"]
-                     .getService(Components.interfaces.nsIScriptableUnescapeHTML)
-                     .parseFragment(aHTMLString, false, null, body));
-    return body;
-};
-
-
 ChmfoxChrome.chm_url = function(fragment, filePath) {
-    if (fragment.match(/http:\/\//i)) {
+    if (fragment.match(/https?:\/\//i)) {
         return fragment;
     }
     if (!filePath) {
-        filePath = ChmfoxChrome.currentChm.path;
+        filePath = ChmfoxChrome.currentChm.uri;
     }
-    return "chm://" + encodeURI(filePath) + "!/" + fragment;
+    return filePath + "!/" + fragment;
 };
 
 ChmfoxChrome.change_to_url = function(url, chmFilePath) {
@@ -334,7 +322,7 @@ ChmfoxChrome.on_tabbox_select = function(event) {
 };
 
 ChmfoxChrome.on_sidebar_load = function() {
-    window.parent.gBrowser.addEventListener("load", ChmfoxChrome.on_browser_document_load, true);
+    window.parent.gBrowser.addEventListener("load", ChmfoxChrome.on_browser_document_load, false);
     window.parent.gBrowser.mPanelContainer.addEventListener("select", ChmfoxChrome.on_tab_selected, false);
     window.parent.gBrowser.mPanelContainer.addEventListener("DOMNodeInserted", ChmfoxChrome.on_tab_creation, false);
     var tabbox = document.getElementById('chmfoxTabbox');
