@@ -373,9 +373,9 @@ function HtmlizeObject(str) {
     // return r;
 }
 
-var ChmFile = function(path) {
+var ChmFile = function(path, uri) {
     this.path = path;
-    log('open chm file:' + this.path);
+    this.uri = uri;
     this.handle = lib.open(this.path);
 
     this.isValid = function() {
@@ -388,11 +388,8 @@ var ChmFile = function(path) {
     }
 
     this.getSystemInfo = function () {
-        log('getting system information for ' + this.path);
-
         var ui = lib.chmUnitInfo();
         if (lib.CHM_RESOLVE_FAILURE == lib.resolve_object(this.handle, '/#SYSTEM', ui.address())) {
-            log('getSystemInfo error: #SYSTEM does not exists in ' + this.path);
             return ;
         }
 
@@ -402,7 +399,6 @@ var ChmFile = function(path) {
             buffer.addressOfElement(0),
             4, buffer.length);
         if (length == 0) {
-            log('getSystemInfo error: #SYSTEM retrieved 0 bytes in ' + this.path);
             return;
         }
         var index = 0;
@@ -462,7 +458,6 @@ var ChmFile = function(path) {
         // Checks the #WINDOWS file to see if it has any info that was
         // not found in #SYSTEM (topics, index or default page.
         if (lib.CHM_RESOLVE_FAILURE == lib.resolve_object(this.handle, '/#WINDOWS', ui.address())) {
-            log('getSystemInfo error: #WINDOWS does not exists in ' + this.path);
             return;
         }
 
@@ -472,7 +467,6 @@ var ChmFile = function(path) {
             this.handle, ui.address(),
             buffer.addressOfElement(0), 0, buffer.length);
         if (length < buffer.length) {
-            log('getSystemInfo error: /#WINDOWS header retrive error in ' + this.path);
             return;
         }
         var entries = getUInt32(buffer, 0);
@@ -483,12 +477,10 @@ var ChmFile = function(path) {
             buffer.addressOfElement(0), WINDOWS_HEADER_LENGTH, buffer.length);
 
         if (length == 0) {
-            log('getSystemInfo error: /#WINDOWS retrive error in ' + this.path);
             return;
         }
 
         if (lib.resolve_object(this.handle, "/#STRINGS", ui.address()) != lib.CHM_RESOLVE_SUCCESS) {
-            log('getSystemInfo error: /#STRINGS resolve error in ' + this.path);
             return;
         }
 
@@ -552,11 +544,8 @@ var ChmFile = function(path) {
                 this.index = prependSlash(getString(factor_buffer, off_hhk % 4096, ui.length));
             }
 
-            log('System information for ' + this.path);
-            log("home: " + this.home);
             log("lcid: " + this.lcid);
             log("use dbcs: " + this.use_dbcs);
-            log("searchable: " + this.searchable);
         };
 
     };
@@ -567,7 +556,6 @@ var ChmFile = function(path) {
         if (this.html_topics) {
             return this.html_topics;
         }
-        log('getting topics');
         if (! this.isValid()) {
             return;
         }
@@ -588,7 +576,6 @@ var ChmFile = function(path) {
             }
         }
 
-        log("topics: " + this.topics);
         if (lib.CHM_RESOLVE_SUCCESS == lib.resolve_object(
             this.handle, this.topics, ui.address())) {
             var buf = ctypes.unsigned_char.array(Math.floor(ui.length+1))();
@@ -607,7 +594,6 @@ var ChmFile = function(path) {
         if (this.html_index) {
             return this.html_index;
         }
-        log('getting index');
         var ui = lib.chmUnitInfo();
         if (! this.index) {
             if (this.project) {
@@ -624,7 +610,6 @@ var ChmFile = function(path) {
                 return;
             }
         }
-        log("index: " + this.index);
         if (lib.CHM_RESOLVE_SUCCESS == lib.resolve_object(
                 this.handle, this.index, ui.address())) {
             var buf = ctypes.unsigned_char.array(Math.floor(ui.length+1))();
@@ -707,10 +692,10 @@ function getChmFileAndModifyUri(uri) {
     url = ioService.newURI(url, null, null);
     var chm = Application.storage.get(chm_uri, null);
     if (! chm) {
-        chm = new ChmFile(url.QueryInterface(Ci.nsIFileURL).file.path);
+        var local_file = url.QueryInterface(Ci.nsIFileURL).file.path;
+        chm = new ChmFile(local_file, chm_uri);
         if (! chm.isValid()) {
             // @todo should use firefox default handle for file not found
-            log("file not found: " + localfile.path + "\n");
             uri = ioService.newURI("about:blank", null, null);
             return ioService.newChannelFromURI(uri);
         }
