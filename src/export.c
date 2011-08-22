@@ -33,7 +33,11 @@
 extern "C" {
 #endif
 
+#ifdef _WIN32
+    CHMFOX_EXPORT struct chmFile* chmfox_open(wchar_t const* filename)
+#else
     CHMFOX_EXPORT struct chmFile* chmfox_open(char const* filename)
+#endif
     {
         return chm_open(filename);
     }
