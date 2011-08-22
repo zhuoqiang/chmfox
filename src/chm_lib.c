@@ -746,6 +746,8 @@ static Int64 _chm_fetch_bytes(struct chmFile *h,
 #ifdef PPC_BSTR
 /* RWE 6/12/2003 */
 struct chmFile *chm_open(BSTR filename)
+#elif defined(_WIN32)
+struct chmFile *chm_open(const wchar_t *filename)
 #else
 struct chmFile *chm_open(const char *filename)
 #endif
@@ -787,9 +789,9 @@ struct chmFile *chm_open(const char *filename)
         return NULL;
     }
 #else
-    if ((newHandle->fd=CreateFileA(filename,
+    if ((newHandle->fd=CreateFileW(filename,
                                    GENERIC_READ,
-                                   0,
+                                   FILE_SHARE_READ,
                                    NULL,
                                    OPEN_EXISTING,
                                    FILE_ATTRIBUTE_NORMAL,

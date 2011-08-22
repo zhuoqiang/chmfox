@@ -13,6 +13,7 @@ const Cc = Components.classes;
 const Cr = Components.results;
 
 var Application = Cc["@mozilla.org/fuel/application;1"].getService(Ci.fuelIApplication);
+var xulRuntime = Cc["@mozilla.org/xre/app-info;1"].getService(Ci.nsIXULRuntime);
 
 const prefs = Cc["@mozilla.org/preferences-service;1"].getService(Ci.nsIPrefService).getBranch("extensions.chmfox.");
 
@@ -241,10 +242,15 @@ var Lib = function(libPath) {
             ctypes.char.ptr,
             ctypes.char.ptr]).ptr;
 
+    var openCharType = ctypes.char.ptr;
+    if ('WINNT' == xulRuntime.OS) {
+        openCharType = ctypes.jschar.ptr;
+    }
+
     this.open = this._library.declare(
         'chmfox_open', ctypes.default_abi,
         this.chmFilePtr,
-        ctypes.char.ptr);
+        openCharType);
 
     this.close = this._library.declare(
         'chmfox_close', ctypes.default_abi,

@@ -52,6 +52,7 @@ extern "C" {
 #endif
 
 #ifdef WIN32
+#include <wchar.h>
 #ifdef __MINGW32__
 #define __int64 long long
 #endif
@@ -86,6 +87,8 @@ struct chmUnitInfo
 #ifdef PPC_BSTR
 /* RWE 6/12/2003 */
 struct chmFile* chm_open(BSTR filename);
+#elif defined(_WIN32)
+struct chmFile* chm_open(const wchar_t *filename);
 #else
 struct chmFile* chm_open(const char *filename);
 #endif
