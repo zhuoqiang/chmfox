@@ -75,5 +75,40 @@ ChmfoxChrome.on_new_url = function(event) {
     }
 };
 
+
+ChmfoxChrome.on_tab_close = function(event) {
+    var browser = gBrowser.getBrowserForTab(event.target);
+    var url = browser.contentDocument.location.href;
+    var m = decodeURI(url).match(/(chm:\/\/.+\.chm)(!(\/.*))?/i);
+    if (! m) {
+        return;
+    }
+
+    url = m[1];
+    var chm = Application.storage.get(url, null);
+    if (chm) {
+        var thisTabChecked = false;
+        var num = gBrowser.browsers.length;
+        for (var i = 0; i < num; i++) {
+            var b = gBrowser.getBrowserAtIndex(i);
+            var match = decodeURI(b.contentDocument.location.href).match(/(chm:\/\/.+\.chm)(!(\/.*))?/i);
+            if (match && url == match[1]) {
+                if (thisTabChecked) {
+                    Chmfox.log('There still a opened URL');
+                    return;
+                }
+                else {
+                    thisTabChecked = true;
+                }
+            }
+        }
+        Chmfox.log('Closing CHM file');
+        chm.close();
+        Application.storage.set(url, null);
+    }
+};
+
+
 window.parent.gBrowser.addEventListener("load", ChmfoxChrome.on_new_url, true);
 window.parent.gBrowser.mPanelContainer.addEventListener("select", ChmfoxChrome.on_new_url, false);
+gBrowser.tabContainer.addEventListener("TabClose", ChmfoxChrome.on_tab_close, false);

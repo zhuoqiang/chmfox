@@ -2,8 +2,7 @@ import os, zipfile
 from platform import system, machine
 from xml.dom import minidom
 
-version = '2.1'
-mode = ARGUMENTS.get('MODE', '')
+version = '2.2'
 
 def get_arch(a):
     ms = { 'i686' : 'x86', 'i586' : 'x86', 'i486' : 'x86', 'i386' : 'x86',
@@ -14,11 +13,13 @@ arch = get_arch(ARGUMENTS.get('ARCH', machine()))
 
 opts = Variables('custom.py')
 opts.Add('MODE', """Set to ALL, build separate xpi for every platform.
-      Set to ALLINONE, build one big xpi support all platform.""", None)
+      Set to ALLINONE, build one big xpi support all platform.""", 'ALLINONE')
 opts.Add('ARCH', """x86 or x64""", None)
 env = Environment(options = opts)
 Help(opts.GenerateHelpText(env))
     
+mode = ARGUMENTS.get('MODE', 'ALLINONE')
+
 def get_platform_name(abi):
     if abi[0] == 'linux':
         platform_name = 'Linux_%s-%s' % (abi[1], abi[2])
