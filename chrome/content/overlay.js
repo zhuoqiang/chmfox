@@ -48,16 +48,16 @@ ChmfoxChrome.on_new_url = function(event) {
     }
 
     url = m[1];
-    var title = gBrowser.contentDocument.title;
-    if (! gBrowser.contentDocument.title) {
+    if (! browser.contentDocument.title) {
         var chm = Application.storage.get(url, null);
         if (chm) {
-            gBrowser.contentDocument.title = chm.title;
+            browser.contentDocument.title = chm.title;
         }
     }
-    var logo = gBrowser.contentDocument.title.substr(gBrowser.contentDocument.title.length-8);
+
+    var logo = browser.contentDocument.title.substr(browser.contentDocument.title.length-8);
     if (logo != '[CHMFOX]') {
-        gBrowser.contentDocument.title = gBrowser.contentDocument.title + ' ♥ [CHMFOX]';
+        browser.contentDocument.title = browser.contentDocument.title + ' ♥ [CHMFOX]';
     }
 
     var autoOpenSidebar = Chmfox.prefs.getBoolPref("autoOpenSidebar");
