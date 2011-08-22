@@ -94,7 +94,6 @@ ChmfoxChrome.on_tab_close = function(event) {
             var match = decodeURI(b.contentDocument.location.href).match(/(chm:\/\/.+\.chm)(!(\/.*))?/i);
             if (match && url == match[1]) {
                 if (thisTabChecked) {
-                    Chmfox.log('There still a opened URL');
                     return;
                 }
                 else {
@@ -102,12 +101,10 @@ ChmfoxChrome.on_tab_close = function(event) {
                 }
             }
         }
-        Chmfox.log('Closing CHM file');
         chm.close();
         Application.storage.set(url, null);
     }
 };
-
 
 window.parent.gBrowser.addEventListener("load", ChmfoxChrome.on_new_url, true);
 window.parent.gBrowser.mPanelContainer.addEventListener("select", ChmfoxChrome.on_new_url, false);

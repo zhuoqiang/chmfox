@@ -382,7 +382,13 @@ function HtmlizeObject(str) {
 var ChmFile = function(path, uri) {
     this.path = path;
     this.uri = uri;
+    log('open chm file:'+ this.path);
     this.handle = lib.open(this.path);
+
+    this.close = function() {
+        lib.close(this.handle);
+        log('closed chm file:' + this.path);
+    };
 
     this.isValid = function() {
         return !this.handle.isNull();
