@@ -2,7 +2,7 @@ import os, zipfile
 from platform import system, machine
 from xml.dom import minidom
 
-version = '2.2'
+version = '2.7'
 
 def get_arch(a):
     ms = { 'i686' : 'x86', 'i586' : 'x86', 'i486' : 'x86', 'i386' : 'x86',
