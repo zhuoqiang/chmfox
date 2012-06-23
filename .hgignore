@@ -5,3 +5,4 @@
 # lib/.+\.exp$
 # lib/.+\.lib$
 build/
+sample/

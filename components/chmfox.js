@@ -910,52 +910,80 @@ Protocol.prototype = {
 };
 
 
-function openUri(uri) {
-    const wm = Cc["@mozilla.org/appshell/window-mediator;1"].getService(Ci.nsIWindowMediator);
-    var browserEnumerator = wm.getEnumerator("navigator:browser");
-    wm.getMostRecentWindow("navigator:browser").content.document.location = uri;
+function chmXURIContentListener() {
+    this.loadCookie = null;
+    this.parentContentListener = null;
+    this.wrappedJSObject = this;
 }
 
-const uriContentListener = {
-    QueryInterface: XPCOMUtils.generateQI([
-        Ci.nsIURIContentListener,
-        Ci.nsISupportsWeakReference,
-        Ci.nsISupports]),
+chmXURIContentListener.prototype = {
+    classDescription: "chmXURIContentListener",
+    classID: Components.ID("{1c811fec-ec47-45ea-a395-c70fb1fc8f9d}"),
+    contractID: "@zhuoqiang.me/chmXURIContentListener;1",
+    _xpcom_categories: [{ category: "app-startup" }],
+    QueryInterface: XPCOMUtils.generateQI([Components.interfaces.nsISupports,
+                                           Components.interfaces.nsIURIContentListener,
+                                           Components.interfaces.nsIClassInfo,
+                                           Components.interfaces.nsISupportsWeakReference,
+                                           Components.interfaces.nsIObserver]),
 
-     onStartURIOpen: function(uri) {
-         try {
-             if (uri.schemeIs("file")) {
-                 var url = uri.QueryInterface(Ci.nsIURL);
-                 if (url.fileExtension.toLowerCase() == 'chm') {
-                     uri.scheme = kScheme;
-                     log("redirect to [" + uri.spec + "]");
-                     openUri(uri.spec);
-                     return false;
-                 }
-             }
-         }
-         catch(e) {
-             log(e);
-         }
-         return false;
-     },
-
-    isPreferred: function(contentType, desiredContentType) {
-        try {
-            var webNavInfo = Cc["@mozilla.org/webnavigation-info;1"].getService(Ci.nsIWebNavigationInfo);
-            return webNavInfo.isTypeSupported(contentType, null);
+    canHandleContent: function(aContentType, aIsContentPreferred) {
+        if (aContentType == "application/octet-stream") {
+            return true;
         }
-        catch (e) {
-            log(e);
+        
+        return false;
+    },
+
+    doContent: function(aContentType, aIsContentPreferred, aRequest, aContentHandler) {
+        if (aContentType == "application/octet-stream") {
+            if (aRequest.name.substr(0,5).toLowerCase() == 'file:' && aRequest.name.substr(-4).toLowerCase() == '.chm') {
+                let urispec = "chm" + aRequest.name.substr(4);
+                let window = aRequest.loadGroup.notificationCallbacks.
+                    getInterface(Components.interfaces.nsIDOMWindow);
+                let webnav = window.QueryInterface(Components.interfaces.nsIInterfaceRequestor).getInterface(Components.interfaces.nsIWebNavigation);
+                webnav.loadURI(urispec, 0, null, null, null);
+                return true;
+            }
+        }
+
+        throw Components.results.NS_ERROR_NOT_IMPLEMENTED;    // FIXME
+    },
+
+    isPreferred: function(aContentType) {
+        if (aContentType == "application/chm+zip") {
+            return true;
         }
         return false;
+    },
+
+    onStartURIOpen: function(aURI) {
+        return false;
+    },
+
+    // getHelperForLanguage: function() {
+    // },
+
+    // getInterfaces: function() {
+    // },
+
+    observe: function(subject, topic, data) {
+        if (topic == "profile-after-change" || topic == "app-startup") {
+            let uriLoader = Components.classes["@mozilla.org/uriloader;1"].
+                    getService(Components.interfaces.nsIURILoader);
+            uriLoader.registerContentListener(contentListener);
+        }
     }
 };
 
-return {log:log, protocols: [Protocol], uriContentListener: uriContentListener, prefs:prefs};
+var contentListener = new chmXURIContentListener();
+
+var components = [chmXURIContentListener];
+
+return {log:log, components: [Protocol, chmXURIContentListener], prefs:prefs};
 
 })();
 
 };
 
-const NSGetFactory = XPCOMUtils.generateNSGetFactory(Chmfox.protocols);
+const NSGetFactory = XPCOMUtils.generateNSGetFactory(Chmfox.components);
