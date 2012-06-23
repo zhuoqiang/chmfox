@@ -1,12 +1,5 @@
 Components.utils.import("resource://chmfox/chmfox.js");
 
-window.QueryInterface(Ci.nsIInterfaceRequestor)
-      .getInterface(Ci.nsIWebNavigation)
-      .QueryInterface(Ci.nsIDocShell)
-      .QueryInterface(Ci.nsIInterfaceRequestor)
-      .getInterface(Ci.nsIURIContentListener)
-      .parentContentListener = Chmfox.uriContentListener;
-
 if ("undefined" == typeof(ChmfoxChrome)) {
   var ChmfoxChrome = {
   };
@@ -39,6 +32,7 @@ ChmfoxChrome.toggleSidebar = function(event) {
 ChmfoxChrome.on_new_url = function(event) {
     var browser = gBrowser.getBrowserAtIndex(gBrowser.mTabContainer.selectedIndex);
     var url = browser.contentDocument.location.href;
+
     var m = decodeURI(url).match(/(chm:\/\/.+\.chm)(!(\/.*))?/i);
     if (! m) {
         if (ChmfoxChrome.IsSidebarOpen()) {
