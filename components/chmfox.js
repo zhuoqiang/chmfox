@@ -466,6 +466,13 @@ var ChmFile = function(path, uri) {
             index += len;
         }
 
+        this.topics = nativeToUtf8(this.topics, this.lcid);
+        this.index = nativeToUtf8(this.index, this.lcid);
+        this.home = nativeToUtf8(this.home, this.lcid);
+        this.title = nativeToUtf8(this.title, this.lcid);
+        this.project = nativeToUtf8(this.project, this.lcid);
+        this.compiled_by = nativeToUtf8(this.compiled_by, this.lcid);
+
         // Gets information from the #WINDOWS file.
         // Checks the #WINDOWS file to see if it has any info that was
         // not found in #SYSTEM (topics, index or default page.
@@ -960,12 +967,6 @@ chmXURIContentListener.prototype = {
     onStartURIOpen: function(aURI) {
         return false;
     },
-
-    // getHelperForLanguage: function() {
-    // },
-
-    // getInterfaces: function() {
-    // },
 
     observe: function(subject, topic, data) {
         if (topic == "profile-after-change" || topic == "app-startup") {
