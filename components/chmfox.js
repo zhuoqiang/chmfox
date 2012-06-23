@@ -727,6 +727,10 @@ function getChmFileAndModifyUri(uri) {
         urlParts.push(chm.home);
         uri = ioService.newURI(urlParts.join('!'), null, null);
     }
+    else if (urlParts[1] == '/' || urlParts[1] == '') {
+        urlParts[1] = chm.home;
+        uri = ioService.newURI(urlParts.join('!'), null, null);        
+    }
     else {
         pagepath = urlParts[1];
     }
