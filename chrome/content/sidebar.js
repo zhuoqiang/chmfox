@@ -41,7 +41,10 @@ ChmfoxChrome.chm_url = function(fragment, filePath) {
 ChmfoxChrome.change_to_url = function(url, chmFilePath) {
     if (url) {
         var doc = window.parent.content.document;
-        doc.location = ChmfoxChrome.chm_url(url, chmFilePath);
+        var newLocation = ChmfoxChrome.chm_url(url, chmFilePath);
+        if (doc.location != newLocation) {
+            doc.location = newLocation;
+        }
     }
 };
 
@@ -287,12 +290,12 @@ ChmfoxChrome.load_bookmark = function(uri) {
         var chm = Application.storage.get(chm_uri, null);
         if (ChmfoxChrome.currentChm != chm) {
             ChmfoxChrome.currentChm = chm;
-        }
-        if (document.getElementById('chmfoxContentTab').selected) {
-            ChmfoxChrome.load_content_panel();
-        }
-        else {
-            ChmfoxChrome.load_index_panel();
+            if (document.getElementById('chmfoxContentTab').selected) {
+                ChmfoxChrome.load_content_panel();
+            }
+            else {
+                ChmfoxChrome.load_index_panel();
+            }
         }
     }
     else {
@@ -350,7 +353,6 @@ ChmfoxChrome.on_tabbox_select = function(event) {
 };
 
 ChmfoxChrome.on_sidebar_load = function() {
-    window.parent.gBrowser.addEventListener("load", ChmfoxChrome.on_browser_document_load, false);
     window.parent.gBrowser.mPanelContainer.addEventListener("select", ChmfoxChrome.on_tab_selected, false);
     window.parent.gBrowser.mPanelContainer.addEventListener("DOMNodeInserted", ChmfoxChrome.on_tab_creation, false);
     var tabbox = document.getElementById('chmfoxTabbox');
@@ -366,4 +368,35 @@ ChmfoxChrome.on_sidebar_load = function() {
     ChmfoxChrome.load_bookmark(url);
 };
 
+
 window.addEventListener('load', ChmfoxChrome.on_sidebar_load, false);
+
+var myExtension = {
+    init: function() {
+        var mainWindow = window.QueryInterface(Components.interfaces.nsIInterfaceRequestor)
+            .getInterface(Components.interfaces.nsIWebNavigation)
+            .QueryInterface(Components.interfaces.nsIDocShellTreeItem)
+            .rootTreeItem
+            .QueryInterface(Components.interfaces.nsIInterfaceRequestor)
+            .getInterface(Components.interfaces.nsIDOMWindow);
+        
+        var appcontent = mainWindow.document.getElementById("appcontent");   // browser
+        if(appcontent){
+            appcontent.addEventListener("DOMContentLoaded", myExtension.onPageLoad, true);
+        }
+    },
+
+    onPageLoad: function(aEvent) {
+        var doc = aEvent.originalTarget; // doc is document that triggered "onload" event
+        var url = doc.location.href;
+        ChmfoxChrome.load_bookmark(url);
+    },
+
+    onPageUnload: function(aEvent) {
+    }
+};
+
+window.addEventListener("load", function load(event) {
+    window.removeEventListener("load", load, false); //remove listener, no longer needed
+    myExtension.init();  
+},false);
