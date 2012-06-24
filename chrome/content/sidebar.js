@@ -371,7 +371,7 @@ ChmfoxChrome.on_sidebar_load = function() {
 
 window.addEventListener('load', ChmfoxChrome.on_sidebar_load, false);
 
-var myExtension = {
+var sidebarUriDetector = {
     init: function() {
         var mainWindow = window.QueryInterface(Components.interfaces.nsIInterfaceRequestor)
             .getInterface(Components.interfaces.nsIWebNavigation)
@@ -382,7 +382,7 @@ var myExtension = {
         
         var appcontent = mainWindow.document.getElementById("appcontent");   // browser
         if(appcontent){
-            appcontent.addEventListener("DOMContentLoaded", myExtension.onPageLoad, true);
+            appcontent.addEventListener("DOMContentLoaded", sidebarUriDetector.onPageLoad, true);
         }
     },
 
@@ -393,10 +393,11 @@ var myExtension = {
     },
 
     onPageUnload: function(aEvent) {
+        var doc = aEvent.originalTarget; // doc is document that triggered "onload" event
     }
 };
 
 window.addEventListener("load", function load(event) {
     window.removeEventListener("load", load, false); //remove listener, no longer needed
-    myExtension.init();  
+    sidebarUriDetector.init();  
 },false);
