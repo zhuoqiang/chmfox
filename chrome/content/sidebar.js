@@ -8,6 +8,7 @@ if ("undefined" == typeof(ChmfoxChrome)) {
 ChmfoxChrome.currentChm = null;
 
 ChmfoxChrome.chm_url = function(fragment, filePath) {
+    // Chmfox.log('URI:' + fragment);
     if (fragment.match(/https?:\/\//i)) {
         return fragment;
     }
@@ -15,17 +16,26 @@ ChmfoxChrome.chm_url = function(fragment, filePath) {
         filePath = ChmfoxChrome.currentChm.uri;
     }
 
+    // Support external CHM
+    // file.chm
+    if (fragment.substr(-4).toLowerCase() == '.chm') {
+        var paths = filePath.split('/');
+        paths[paths.length-1] = fragment;
+        filePath = paths.join('/');
+        fragment = '';
+    }
     // Support multiple-part CHM file
     // file.chm::/Related_Documentation.html
-    if (fragment.match(/\.chm::\//i)) {
-        parts = fragment.split('::\/');
-        paths = filePath.split('/');
+    else if (fragment.match(/\.chm::\//i)) {
+        var parts = fragment.split('::\/');
+        var paths = filePath.split('/');
         paths[paths.length-1] = parts[0];
         filePath = paths.join('/');
         fragment = parts[1];
     }
 
-    return filePath + "!/" + fragment;
+    var uri = filePath + "!/" + fragment;
+    return uri;
 };
 
 ChmfoxChrome.change_to_url = function(url, chmFilePath) {
@@ -134,18 +144,25 @@ ChmfoxChrome.iframe2tree = function(doc, tree) {
                 if (p.getAttribute('name') == 'Name')
                     return p.getAttribute('value');
             }
-            return 'missing ...';
         } else if (column.id == 'link') {
             var li = list[idx][0];
             var spans = li.getElementsByTagName('span');
             for (var i = 0; i < spans.length; i++) {
                 var p = spans.item(i);
-                if (p.getAttribute('name') == 'Local')
+                if (p.getAttribute('name') == 'Local') {
                     return p.getAttribute('value').replace(/\.\//, '');
+                }
+                // Support multiple CHM
+                // <span name="Merge" value="crackme05.chm::\crackme5.hhc">
+                else if (p.getAttribute('name') == 'Merge') {
+                    var uri = p.getAttribute('value').replace(/\.\//, '');
+                    return uri.split('::')[0];
+                    // return uri.replace('::\\', '::/');
+                }
+
             }
-            return 'missing ...';
         }
-          return "missing ...";
+          return undefined;
       },
       isContainer: function(idx)         { return list[idx][1]; },
       isContainerOpen: function(idx)     { return list[idx][2]; },
