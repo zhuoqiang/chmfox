@@ -14,6 +14,17 @@ ChmfoxChrome.chm_url = function(fragment, filePath) {
     if (!filePath) {
         filePath = ChmfoxChrome.currentChm.uri;
     }
+
+    // Support multiple-part CHM file
+    // file.chm::/Related_Documentation.html
+    if (fragment.match(/\.chm::\//i)) {
+        parts = fragment.split('::\/');
+        paths = filePath.split('/');
+        paths[paths.length-1] = parts[0];
+        filePath = paths.join('/');
+        fragment = parts[1];
+    }
+
     return filePath + "!/" + fragment;
 };
 
