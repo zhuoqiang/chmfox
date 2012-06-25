@@ -103,3 +103,44 @@ ChmfoxChrome.on_tab_close = function(event) {
 window.parent.gBrowser.addEventListener("load", ChmfoxChrome.on_new_url, true);
 window.parent.gBrowser.mPanelContainer.addEventListener("select", ChmfoxChrome.on_new_url, false);
 gBrowser.tabContainer.addEventListener("TabClose", ChmfoxChrome.on_tab_close, false);
+
+ChmfoxChrome.zoomSizes = {};
+
+var zoomHook = {
+    init: function() {
+        var appcontent = document.getElementById("appcontent");   // browser
+        if(appcontent){
+            appcontent.addEventListener("DOMContentLoaded", zoomHook.onPageLoad, true);
+        }
+    },
+
+    onPageLoad: function(aEvent) {
+        var doc = aEvent.originalTarget; // doc is document that triggered "onload" event
+        var url = doc.location.href;
+        if (url.substr(0,7) == 'chm:///') {
+            var key = url.split('!/')[0];
+            var zoom = ChmfoxChrome.zoomSizes[key];
+            var docViewer = gBrowser.selectedBrowser.markupDocumentViewer;
+            if (typeof(zoom) == 'number') {
+                docViewer.fullZoom = zoom;
+            }
+
+            // add event listener for page unload 
+            aEvent.originalTarget.defaultView.addEventListener("pagehide", function(event){ zoomHook.onPageUnload(event, docViewer); }, true);
+        }
+    },
+
+    onPageUnload: function(aEvent, docViewer) {
+        var doc = aEvent.originalTarget; // doc is document that triggered "onload" event
+        var url = doc.location.href;
+        if (url.substr(0,7) == 'chm:///') {
+            var key = url.split('!/')[0];
+            ChmfoxChrome.zoomSizes[key] = docViewer.fullZoom;
+        }
+    }
+};
+
+window.addEventListener("load", function load(event){
+    window.removeEventListener("load", load, false); //remove listener, no longer needed
+    zoomHook.init();  
+},false);
