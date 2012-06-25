@@ -112,7 +112,7 @@ xpi = Builder(action = xpi_function)
 env = Environment(BUILDERS = { 'Xpi' : xpi })
 platform_name = get_platform_name(get_default_abi())
 abis = get_abis()
-objs = ['chrome.manifest', 'icon.png']
+objs = ['chrome.manifest', 'icon.png', 'icon64.png']
 
 for subdir in ['chrome', 'components']:
     objs.extend(SConscript('%s/SConscript' % subdir,
