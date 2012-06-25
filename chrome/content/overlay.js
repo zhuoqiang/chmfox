@@ -118,7 +118,9 @@ var zoomHook = {
         var doc = aEvent.originalTarget; // doc is document that triggered "onload" event
         var url = doc.location.href;
         if (url.substr(0,7) == 'chm:///') {
-            var key = url.split('!/')[0];
+            var parts = url.split('!/');
+            Chmfox.prefs.setCharPref("lastPosition."+parts[0], parts[1]);
+            var key = parts[0];
             var zoom = ChmfoxChrome.zoomSizes[key];
             var docViewer = gBrowser.selectedBrowser.markupDocumentViewer;
             if (typeof(zoom) == 'number') {
@@ -137,6 +139,9 @@ var zoomHook = {
             var key = url.split('!/')[0];
             ChmfoxChrome.zoomSizes[key] = docViewer.fullZoom;
         }
+
+        var parts = url.split('!/');
+        Chmfox.prefs.setCharPref("lastPosition."+parts[0], parts[1]);
     }
 };
 
