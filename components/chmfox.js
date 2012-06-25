@@ -953,7 +953,11 @@ chmXURIContentListener.prototype = {
     doContent: function(aContentType, aIsContentPreferred, aRequest, aContentHandler) {
         if (aContentType == "application/octet-stream") {
             if (aRequest.name.substr(0,5).toLowerCase() == 'file:' && aRequest.name.substr(-4).toLowerCase() == '.chm') {
-                let urispec = "chm" + aRequest.name.substr(4);
+                var urispec = "chm" + aRequest.name.substr(4);
+                var lastPosition = prefs.getCharPref("lastPosition."+urispec, undefined);
+                if (lastPosition) {
+                    urispec = urispec + '!/' + lastPosition;
+                }
                 let window = aRequest.loadGroup.notificationCallbacks.
                     getInterface(Components.interfaces.nsIDOMWindow);
                 let webnav = window.QueryInterface(Components.interfaces.nsIInterfaceRequestor).getInterface(Components.interfaces.nsIWebNavigation);
