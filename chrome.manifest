@@ -4,6 +4,7 @@ resource chmfox components/
 skin chmfox classic/1.0 chrome/skin/
 locale chmfox en-US chrome/locale/en-US/
 locale chmfox zh-CN chrome/locale/zh-CN/
+locale chmfox zh-TW chrome/locale/zh-TW/
 
 overlay chrome://browser/content/browser.xul chrome://chmfox/content/overlay.xul
 
