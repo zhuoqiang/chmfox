@@ -761,6 +761,10 @@ Protocol.prototype = {
   },
 
   newURI: function(spec, charset, baseURI) {
+      // FIXME: why there is 'chm:' uri
+      if (spec == 'chm:') {
+          return undefined;
+      }
     var uri = Cc["@mozilla.org/network/simple-uri;1"].createInstance(Ci.nsIURI);
     if (spec.substring(0, 1) == "#") {
         var basespec = baseURI.spec;
