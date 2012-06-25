@@ -54,8 +54,9 @@ ChmfoxChrome.on_new_url = function(event) {
         browser.contentDocument.title = browser.contentDocument.title + ' ♥ [CHMFOX]';
     }
 
-    var autoOpenSidebar = Chmfox.prefs.getBoolPref("autoOpenSidebar");
+    var autoOpenSidebar = false;
     try {
+        autoOpenSidebar = Chmfox.prefs.getBoolPref("autoOpenSidebar");
         autoOpenSidebar = Chmfox.prefs.getBoolPref("autoOpenSidebar." + url);
     }
     catch (e) {
