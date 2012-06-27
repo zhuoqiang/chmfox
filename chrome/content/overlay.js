@@ -142,7 +142,7 @@ var zoomHook = {
         }
 
         var parts = url.split('!/');
-        Chmfox.prefs.setCharPref("lastPosition."+parts[0], parts[1]);
+        Chmfox.prefs.setCharPref("lastPosition."+decodeURI(parts[0]), parts[1]);
     }
 };
 

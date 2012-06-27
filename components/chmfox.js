@@ -954,6 +954,7 @@ chmXURIContentListener.prototype = {
         if (aContentType == "application/octet-stream") {
             if (aRequest.name.substr(0,5).toLowerCase() == 'file:' && aRequest.name.substr(-4).toLowerCase() == '.chm') {
                 var urispec = "chm" + aRequest.name.substr(4);
+                urispec = decodeURI(urispec);
                 try {
                     var lastPosition = prefs.getCharPref("lastPosition."+urispec);
                     if (lastPosition) {
