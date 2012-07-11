@@ -354,7 +354,6 @@ ChmfoxChrome.on_tabbox_select = function(event) {
 
 ChmfoxChrome.on_sidebar_load = function() {
     window.parent.gBrowser.mPanelContainer.addEventListener("select", ChmfoxChrome.on_tab_selected, false);
-    window.parent.gBrowser.mPanelContainer.addEventListener("DOMNodeInserted", ChmfoxChrome.on_tab_creation, false);
     var tabbox = document.getElementById('chmfoxTabbox');
     tabbox.addEventListener("select", ChmfoxChrome.on_tabbox_select, false);
 
