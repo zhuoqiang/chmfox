@@ -37,9 +37,10 @@ ChmFox is open sourced under MPL 1.1/GPL 2.0/LGPL 2.1
 
 If you like ChmFox and want to help make it better, you could
 
+- [Make a donation](https://addons.mozilla.org/firefox/addon/chmfox)
+- [Comment to encourage](https://addons.mozilla.org/firefox/addon/chmfox/reviews/add)
 - [Report bugs](https://bitbucket.org/zhuoqiang/chmfox/issues)
 - [Contribute to source code](https://bitbucket.org/zhuoqiang/chmfox)
-- [Make a donation](https://addons.mozilla.org/firefox/addon/chmfox)
 
 
 # ChmFox: 查看 CHM 文件的火狐扩展 #
@@ -81,6 +82,7 @@ ChmFox 是开源项目，使用 MPL 1.1/GPL 2.0/LGPL 2.1 版权
 
 如果你喜欢 ChmFox，想帮助它更好的发展，你可以
 
-- [提交问题](https://bitbucket.org/zhuoqiang/chmfox/issues)
-- [贡献代码](https://bitbucket.org/zhuoqiang/chmfox)
 - [捐点小钱](https://addons.mozilla.org/firefox/addon/chmfox)
+- [留言鼓励](https://addons.mozilla.org/firefox/addon/chmfox/reviews/add)
+- [报告问题](https://bitbucket.org/zhuoqiang/chmfox/issues)
+- [贡献代码](https://bitbucket.org/zhuoqiang/chmfox)
