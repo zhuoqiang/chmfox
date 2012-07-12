@@ -1,4 +1,4 @@
-# ChmFox: Firefox Extension for CHM files #
+# ChmFox: Firefox Extension for Viewing CHM files #
 
 ChmFox is a Firefox extension which brings the best CHM file reading experience to all platform. 
 
