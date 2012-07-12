@@ -9,7 +9,7 @@ ChmFox is a Firefox extension which brings the best CHM file reading experience 
 3. Open CHM files through Menu -> File -> Open
 4. You could make firefox the default program for opening CHM file, after doing that, just double click CHM files and enjoy ChmFox
 5. There's a sidebar for the CHM file content/index, you could use hotkey Ctrl+Alt+m (or Command+Option+m under Mac) to turn it on/off
-6. ChmFox remembers and jumps to the last reading position when re-open CHM file, however, you could bookmark as many CHM pages as you like using Firefox's build-in bookmark function
+6. ChmFox remembers and jumps to the last reading position when re-open CHM file and you could always bookmark as many CHM pages as you like using Firefox's build-in bookmark function
 7. Zoom the page by Ctrl + / Ctrl -, just as normal web page. ChmFox remembers the page zoom level per CHM file
 
 ## Build It Yourself ##
