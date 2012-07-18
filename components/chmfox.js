@@ -946,12 +946,15 @@ chmXURIContentListener.prototype = {
         if (aContentType == "application/octet-stream") {
             return true;
         }
-        
-        return false;
+
+        // it is chemical/x-chemdraw on Ubuntu
+        return true;
     },
 
     doContent: function(aContentType, aIsContentPreferred, aRequest, aContentHandler) {
-        if (aContentType == "application/octet-stream") {
+
+        // it is chemical/x-chemdraw on Ubuntu
+        if (true || aContentType == "application/octet-stream") {
             if (aRequest.name.substr(0,5).toLowerCase() == 'file:' && aRequest.name.substr(-4).toLowerCase() == '.chm') {
                 var urispec = "chm" + aRequest.name.substr(4);
                 urispec = decodeURI(urispec);
@@ -971,11 +974,12 @@ chmXURIContentListener.prototype = {
             }
         }
 
+        // return false;
         throw Components.results.NS_ERROR_NOT_IMPLEMENTED;    // FIXME
     },
 
     isPreferred: function(aContentType) {
-        if (aContentType == "application/chm+zip") {
+        if (aContentType == "application/octet-stream") {
             return true;
         }
         return false;
