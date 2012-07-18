@@ -120,6 +120,10 @@ var zoomHook = {
         var url = doc.location.href;
         if (url.substr(0,7) == 'chm:///') {
             var parts = url.split('!/');
+            if (! parts[1]) {
+                return;
+            }
+            Chmfox.log(parts + ' ' + parts[0] + ' ' + parts[1]);
             Chmfox.prefs.setCharPref("lastPosition."+parts[0], parts[1]);
             var key = parts[0];
             var zoom = ChmfoxChrome.zoomSizes[key];
