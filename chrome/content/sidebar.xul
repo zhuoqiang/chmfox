@@ -14,7 +14,7 @@
     </tabs>
     <tabpanels flex="1">
       <tabpanel id="topicspanel" flex="1">
-        <iframe id="chmfoxBookmark_iframe" hidden="true" />
+        <iframe id="chmfoxBookmark_iframe" hidden="true" type="content" />
         <tree id="chmfoxBookmark" flex="1"
               hidecolumnpicker="true"
               seltype="single"
@@ -27,7 +27,7 @@
         </tree>
       </tabpanel>
       <tabpanel id="indexpanel" flex="1">
-        <iframe id="chmfoxIndex_iframe" hidden="true" />
+        <iframe id="chmfoxIndex_iframe" hidden="true" type="content" />
         <vbox flex="1">
           <hbox>
             <textbox id="find_index" rows="1" flex="1" onkeypress="ChmfoxChrome.on_find_index_keypress(event)"
