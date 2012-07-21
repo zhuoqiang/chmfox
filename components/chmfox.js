@@ -797,71 +797,81 @@ Protocol.prototype = {
 
   newChannel: function(aURI) {
     var chm = getChmFileAndModifyUri(aURI);
+    if (chm.file) {
+        if (! chm.page) {
+            return redirect(chm.uri.spec, aURI);
+        }
 
-    if (! chm.page) {
-        return redirect(chm.uri.spec, aURI);
-    }
+        if (chm.page == "/#HHC") {
+            return this.newRawTopicsChannel(aURI, chm.file);
+        }
 
-    if (chm.page == "/#HHC") {
-        return this.newRawTopicsChannel(aURI, chm.file);
-    }
+        if (chm.page == "/#HHK") {
+            return this.newRawIndexChannel(aURI, chm.file);
+        }
 
-    if (chm.page == "/#HHK") {
-        return this.newRawIndexChannel(aURI, chm.file);
-    }
-
-    var pos = chm.page.indexOf("#");
-    if (pos > 0) {
-        chm.page = chm.page.substring(0, pos);
+        var pos = chm.page.indexOf("#");
+        if (pos > 0) {
+            chm.page = chm.page.substring(0, pos);
+        }
     }
 
     // Create the channel
     var mime = "text/html";
-    pos = chm.page.lastIndexOf(".");
-    if (pos > 0) {
-        var ext = chm.page.substring(pos + 1);
-        switch (ext.toLowerCase()) {
-        case "gif":
-            mime = "image/gif";
-            break;
-        case "jpg":
-        case "jpeg":
-        case "jpe":
-            mime = "image/jpeg";
-            break;
-        case "png":
-            mime = "image/png";
-            break;
-        case "css":
-            mime = "text/css";
-            break;
-        case "mht":
-            mime = "message/rfc822";
-        case "txt":
-            mime = "text/plain";
-            break;
-        case "xml":
-            mime = "text/xml";
-            break;
-        case "xhtml":
-            mime = "text/xhtml";
-            break;
-        case 'html':
-        case 'htm':
-            mime = 'text/html';
-            break;
-        case 'bmp':
-            mime = 'image/bitmap';
-            break;
-        default:
-            mime = "application/octet-stream";
+    if (chm.page) {
+        var pos = chm.page.lastIndexOf(".");
+        if (pos > 0) {
+            var ext = chm.page.substring(pos + 1);
+            switch (ext.toLowerCase()) {
+            case "gif":
+                mime = "image/gif";
+                break;
+            case "jpg":
+            case "jpeg":
+            case "jpe":
+                mime = "image/jpeg";
+                break;
+            case "png":
+                mime = "image/png";
+                break;
+            case "css":
+                mime = "text/css";
+                break;
+            case "mht":
+                mime = "message/rfc822";
+            case "txt":
+                mime = "text/plain";
+                break;
+            case "xml":
+                mime = "text/xml";
+                break;
+            case "xhtml":
+                mime = "text/xhtml";
+                break;
+            case 'html':
+            case 'htm':
+                mime = 'text/html';
+                break;
+            case 'bmp':
+                mime = 'image/bitmap';
+                break;
+            default:
+                mime = "application/octet-stream";
+            }
         }
     }
 
-    var content = chm.file.getContent(chm.page);
-    if (! content) {
-        content = chm.file.path + '! ' + chm.path + '  Not Found!';
+    var content = undefined;
+    if (chm.file) {
+        content = chm.file.getContent(chm.page);
+        if (! content) {
+            content = chm.file.path + '! ' + chm.path + '  Not Found!';
+        }
     }
+    else {
+        content = "CHM file " + decodeURI(aURI.spec).substr(6) + " open failed!\n";
+    }
+      
     var is = Cc["@mozilla.org/io/string-input-stream;1"].createInstance(Ci.nsIStringInputStream);
     is.setData(content, content.length);
     var isc = Cc["@mozilla.org/network/input-stream-channel;1"].createInstance(Ci.nsIInputStreamChannel);
