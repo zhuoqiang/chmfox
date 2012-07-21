@@ -697,7 +697,7 @@ function redirect(to, orig) {
     bc.contentType = "text/html";
     bc.contentLength = html.length;
     bc.originalURI = orig;
-    bc.owner = this;
+    // bc.owner = this;
     return bc;
 }
 
@@ -874,7 +874,7 @@ Protocol.prototype = {
     // bc.contentCharset = 'utf-8';
     bc.contentLength = content.length;
     bc.originalURI = aURI;
-    bc.owner = this;
+    // bc.owner = this;
 
     return bc;
   },
@@ -896,7 +896,7 @@ Protocol.prototype = {
     bc.contentType = "text/html";
     bc.contentLength = content.length;
     bc.originalURI = aURI;
-    bc.owner = this;
+    // bc.owner = this;
 
     return bc;
   },
@@ -918,7 +918,7 @@ Protocol.prototype = {
     bc.contentType = "text/html";
     bc.contentLength = content.length;
     bc.originalURI = aURI;
-    bc.owner = this;
+    // bc.owner = this;
 
     return bc;
   }
