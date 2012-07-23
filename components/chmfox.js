@@ -872,7 +872,9 @@ Protocol.prototype = {
         }
     }
     else {
-        content = "CHM file " + decodeURI(aURI.spec).substr(6) + " open failed!\n";
+        var filePath = decodeURI(aURI.spec).substr(6);
+        filePath = filePath.split('!')[0];
+        content = "CHM file [" + filePath + "] open failed!";
     }
       
     var is = Cc["@mozilla.org/io/string-input-stream;1"].createInstance(Ci.nsIStringInputStream);
