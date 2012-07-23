@@ -42,10 +42,13 @@ function utf8Encode(string) {
 };
 
 function log(message) {
-  var console = Cc["@mozilla.org/consoleservice;1"].getService(Ci.nsIConsoleService);
-  var msg = "[chmfox] " + message + "\n";
-  console.logStringMessage(msg);
-  dump(msg);
+    if (false) // Disable log for release
+    {
+        var console = Cc["@mozilla.org/consoleservice;1"].getService(Ci.nsIConsoleService);
+        var msg = "[chmfox] " + message + "\n";
+        console.logStringMessage(msg);
+        dump(msg);
+    }
 }
 
 function getCharsetFromLcid(lcid) {
