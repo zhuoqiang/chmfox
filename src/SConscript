@@ -59,9 +59,9 @@ libchmfox = env.SharedLibrary(
     'libchmfox',
     ['chm_lib.c', 'lzx.c', 'export.c', 'extra.c'])
 
-install = env.Install('#lib/%s' % platform_name, libchmfox[0])
+# install = env.Install('#lib/%s' % platform_name, libchmfox[0])
 
-env.Alias('binary', install)
+# env.Alias('binary', install)
 
 xpts = []
 Return('xpts')
