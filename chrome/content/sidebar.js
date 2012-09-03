@@ -141,7 +141,13 @@ ChmfoxChrome.iframe2tree = function(doc, tree) {
       getCellText: function(idx, column) {
         if (column.id == 'name') {
             var li = list[idx][0];
-            var spans = li.getElementsByTagName('span');
+            var spans = []
+            try {
+                var spans = li.getElementsByTagName('span');
+            }
+            catch (e) {
+            }
+
             for (var i = 0; i < spans.length; i++) {
                 var p = spans.item(i);
                 if (p.getAttribute('name') == 'Name')
@@ -212,7 +218,12 @@ ChmfoxChrome.iframe2tree = function(doc, tree) {
 
           var toinsert = [];
           var j = 0;
-          var children = item[0].getElementsByTagName('LI');
+          var children = [];
+          try {
+              children = item[0].getElementsByTagName('LI');
+          }
+          catch (e) {
+          }
           for (var i = 0; i < children.length; i++) {
             var li = children.item(i);
             var isdirect = true;
@@ -249,6 +260,7 @@ ChmfoxChrome.iframe2tree = function(doc, tree) {
       getCellProperties: function(idx, column, prop) {},
       getColumnProperties: function(column, element, prop) {}
     };
+
     return view;
 };
 
