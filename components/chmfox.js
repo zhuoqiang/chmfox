@@ -833,6 +833,9 @@ Protocol.prototype = {
         if (pos > 0) {
             var ext = chm.page.substring(pos + 1);
             switch (ext.toLowerCase()) {
+            case "svg":
+                mime = "image/svg+xml";
+                break;
             case "gif":
                 mime = "image/gif";
                 break;
