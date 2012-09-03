@@ -109,6 +109,10 @@ ChmfoxChrome.on_chmfoxIndex_iframe_load = function(event) {
     tree.view = ChmfoxChrome.currentChm.indexTreeView;
 };
 
+function isContainer(node) {
+    return node.getElementsByTagName('li').length !=0 ;
+}
+
 ChmfoxChrome.iframe2tree = function(doc, tree) {
     var body = doc.getElementsByTagName('body')[0];
     var children = body.getElementsByTagName('li');
@@ -127,8 +131,7 @@ ChmfoxChrome.iframe2tree = function(doc, tree) {
         }
 
         if (isdirect) {
-            var isc = li.childNodes.length > 2;
-            list[j++] = [ li, isc, false, 0 , -1];
+            list[j++] = [ li, isContainer(li), false, 0 , -1];
         }
     }
 
@@ -139,38 +142,35 @@ ChmfoxChrome.iframe2tree = function(doc, tree) {
       get rowCount()                     { return list.length; },
       setTree: function(treeBox)         { this.treeBox = treeBox; },
       getCellText: function(idx, column) {
-        if (column.id == 'name') {
-            var li = list[idx][0];
-            var spans = []
-            try {
-                var spans = li.getElementsByTagName('span');
-            }
-            catch (e) {
-            }
+          var li = list[idx][0];
+          var spans = []
+          try {
+              var spans = li.getElementsByTagName('span');
+          }
+          catch (e) {
+          }
 
-            for (var i = 0; i < spans.length; i++) {
-                var p = spans.item(i);
-                if (p.getAttribute('name') == 'Name')
-                    return p.getAttribute('value');
-            }
-        } else if (column.id == 'link') {
-            var li = list[idx][0];
-            var spans = li.getElementsByTagName('span');
-            for (var i = 0; i < spans.length; i++) {
-                var p = spans.item(i);
-                if (p.getAttribute('name') == 'Local') {
-                    return p.getAttribute('value').replace(/\.\//, '');
-                }
-                // Support multiple CHM
-                // <span name="Merge" value="crackme05.chm::\crackme5.hhc">
-                else if (p.getAttribute('name') == 'Merge') {
-                    var uri = p.getAttribute('value').replace(/\.\//, '');
-                    return uri.split('::')[0];
-                    // return uri.replace('::\\', '::/');
-                }
-
-            }
-        }
+          if (column.id == 'name') {
+              for (var i = 0; i < spans.length; i++) {
+                  var p = spans.item(i);
+                  if (p.getAttribute('name') == 'Name')
+                      return p.getAttribute('value');
+              }
+          } else if (column.id == 'link') {
+              for (var i = 0; i < spans.length; i++) {
+                  var p = spans.item(i);
+                  if (p.getAttribute('name') == 'Local') {
+                      return p.getAttribute('value').replace(/\.\//, '');
+                  }
+                  // Support multiple CHM
+                  // <span name="Merge" value="crackme05.chm::\crackme5.hhc">
+                  else if (p.getAttribute('name') == 'Merge') {
+                      var uri = p.getAttribute('value').replace(/\.\//, '');
+                      return uri.split('::')[0];
+                      // return uri.replace('::\\', '::/');
+                  }
+              }
+          }
           return undefined;
       },
       isContainer: function(idx)         { return list[idx][1]; },
@@ -236,8 +236,7 @@ ChmfoxChrome.iframe2tree = function(doc, tree) {
                 p = p.parentNode;
             }
             if (isdirect) {
-                var isc = li.childNodes.length > 2;
-                toinsert[j++] = [ li, isc, false, item[3] + 1, idx ];
+                toinsert[j++] = [ li, isContainer(li), false, item[3] + 1, idx ];
             }
           }
 
