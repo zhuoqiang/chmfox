@@ -416,6 +416,13 @@ var ChmFile = function(path, uri) {
         if (length == 0) {
             return;
         }
+
+        this.index = '';
+        this.topics = '';
+        this.home = '';
+        this.lcid = null;
+        this.title = '';
+
         var index = 0;
         while (index < length) {
             var type = buffer[index] + (buffer[index+1] * 256);
