@@ -42,7 +42,7 @@ function utf8Encode(string) {
 };
 
 function log(message) {
-    if (false) // Disable log for release
+    if (true) // Disable log for release
     {
         var console = Cc["@mozilla.org/consoleservice;1"].getService(Ci.nsIConsoleService);
         var msg = "[chmfox] " + message + "\n";
@@ -775,6 +775,17 @@ Protocol.prototype = {
       if (spec == 'chm:') {
           return undefined;
       }
+
+      // Remote websites are not allowed to load or link to local files
+      log('baseURI:' + baseURI);
+      if (baseURI) {
+          var baseUriProtocol = baseURI.spec.substr(0, baseURI.spec.indexOf(':')).toLowerCase(); 
+          log("uri prefix:" + baseUriProtocol);
+          if (baseUriProtocol != 'chm' && baseUriProtocol != 'chrome') {
+              return undefined;
+          }
+      }
+
     var uri = Cc["@mozilla.org/network/simple-uri;1"].createInstance(Ci.nsIURI);
     if (spec.substring(0, 1) == "#") {
         var basespec = baseURI.spec;
@@ -968,11 +979,10 @@ chmXURIContentListener.prototype = {
                                            Components.interfaces.nsIObserver]),
 
     canHandleContent: function(aContentType, aIsContentPreferred) {
-        if (aContentType == "application/octet-stream") {
-            return true;
-        }
-
         // it is chemical/x-chemdraw on Ubuntu
+        // if (aContentType == "application/octet-stream") {
+        //     return true;
+        // }
         return true;
     },
 
