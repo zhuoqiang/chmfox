@@ -107,11 +107,11 @@ gBrowser.tabContainer.addEventListener("TabClose", ChmfoxChrome.on_tab_close, fa
 
 ChmfoxChrome.zoomSizes = {};
 
-var zoomHook = {
+ChmfoxChrome.zoomHook = {
     init: function() {
         var appcontent = document.getElementById("appcontent");   // browser
         if(appcontent){
-            appcontent.addEventListener("DOMContentLoaded", zoomHook.onPageLoad, true);
+            appcontent.addEventListener("DOMContentLoaded", ChmfoxChrome.zoomHook.onPageLoad, true);
         }
     },
 
@@ -133,7 +133,7 @@ var zoomHook = {
             }
 
             // add event listener for page unload 
-            aEvent.originalTarget.defaultView.addEventListener("pagehide", function(event){ zoomHook.onPageUnload(event, docViewer); }, true);
+            aEvent.originalTarget.defaultView.addEventListener("pagehide", function(event){ ChmfoxChrome.zoomHook.onPageUnload(event, docViewer); }, true);
         }
     },
 
@@ -152,5 +152,5 @@ var zoomHook = {
 
 window.addEventListener("load", function load(event){
     window.removeEventListener("load", load, false); //remove listener, no longer needed
-    zoomHook.init();  
+    ChmfoxChrome.zoomHook.init();  
 },false);
