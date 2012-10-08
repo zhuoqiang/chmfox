@@ -764,7 +764,10 @@ Protocol.prototype = {
 
   defaultPort: -1,
   protocolFlags: Ci.nsIProtocolHandler.URI_NORELATIVE |
-                 Ci.nsIProtocolHandler.URI_NOAUTH,
+        Ci.nsIProtocolHandler.URI_URI_INHERITS_SECURITY_CONTEXT |
+        Ci.nsIProtocolHandler.URI_DANGEROUS_TO_LOAD |
+        Ci.nsIProtocolHandler.URI_IS_LOCAL_FILE | 
+        Ci.nsIProtocolHandler.URI_NOAUTH,
 
   allowPort: function(port, scheme) {
     return false;
