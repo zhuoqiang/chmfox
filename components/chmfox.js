@@ -42,7 +42,7 @@ function utf8Encode(string) {
 };
 
 function log(message) {
-    if (true) // Disable log for release
+    if (false) // Disable log for release
     {
         var console = Cc["@mozilla.org/consoleservice;1"].getService(Ci.nsIConsoleService);
         var msg = "[chmfox] " + message + "\n";
