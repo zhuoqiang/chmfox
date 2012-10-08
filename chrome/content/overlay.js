@@ -49,10 +49,10 @@ ChmfoxChrome.on_new_url = function(event) {
         }
     }
 
-    var logo = browser.contentDocument.title.substr(browser.contentDocument.title.length-8);
-    if (logo != '[CHMFOX]') {
-        browser.contentDocument.title = browser.contentDocument.title + ' ♥ [CHMFOX]';
-    }
+    // var logo = browser.contentDocument.title.substr(browser.contentDocument.title.length-8);
+    // if (logo != '[CHMFOX]') {
+    //     browser.contentDocument.title = browser.contentDocument.title + ' ♥ [CHMFOX]';
+    // }
 
     var autoOpenSidebar = false;
     try {
