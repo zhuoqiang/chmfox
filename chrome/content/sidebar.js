@@ -8,7 +8,6 @@ if ("undefined" == typeof(ChmfoxChrome)) {
 ChmfoxChrome.currentChm = null;
 
 ChmfoxChrome.chm_url = function(fragment, filePath) {
-    // Chmfox.log('URI:' + fragment);
     if (fragment.match(/https?:\/\//i)) {
         return fragment;
     }
@@ -109,31 +108,74 @@ ChmfoxChrome.on_chmfoxIndex_iframe_load = function(event) {
     tree.view = ChmfoxChrome.currentChm.indexTreeView;
 };
 
-function isContainer(node) {
-    return node.getElementsByTagName('li').length !=0 ;
-}
-
 ChmfoxChrome.iframe2tree = function(doc, tree) {
-    var body = doc.getElementsByTagName('body')[0];
-    var children = body.getElementsByTagName('li');
-    var j = 0;
-    var list = [];
-    for (var i = 0; i < children.length; ++i) {
-        var li = children[i];
-        var isdirect = true;
-        var p = li.parentNode;
-        while (p != body) {
-            if (p.tagName == 'LI')  {
-                isdirect = false;
+
+    function getCell(li) {
+        var spans = [];
+        try {
+            spans = li.getElementsByTagName('span');
+        }
+        catch (e) {
+        }
+
+        var name = null;
+        for (var i = 0; i < spans.length; i++) {
+            var p = spans.item(i);
+            if (p.getAttribute('name') == 'Name') {
+                name = p.getAttribute('value');
                 break;
             }
-            p = p.parentNode;
+        }
+        
+        var link = null;
+        for (var i = 0; i < spans.length; i++) {
+            var p = spans.item(i);
+            if (p.getAttribute('name') == 'Local') {
+                link =  p.getAttribute('value').replace(/\.\//, '');
+                break
+            }
+            // Support multiple CHM
+            // <span name="Merge" value="crackme05.chm::\crackme5.hhc">
+            else if (p.getAttribute('name') == 'Merge') {
+                var uri = p.getAttribute('value').replace(/\.\//, '');
+                link = uri.split('::')[0]; // uri.replace('::\\', '::/');
+                break;
+            }
+        }
+        return {'name':name, 'link':link};
+    };
+
+    function getList(node, level) {
+        var children = [];
+        try {
+            children = node.getElementsByTagName('li');
+        }
+        catch (e) {
         }
 
-        if (isdirect) {
-            list[j++] = [ li, isContainer(li), false, 0 , -1];
+        var list = [];
+        for (var i = 0; i < children.length; ++i) {
+            var li = children[i];
+            var isdirect = true;
+            var p = li.parentNode;
+            while (p != node) {
+                if (p.tagName.toLowerCase() == 'li')  {
+                    isdirect = false;
+                    break;
+                }
+                p = p.parentNode;
+            }
+
+            if (isdirect) {
+                // name+link, children, open, level, parentId
+                list.push([getCell(li), getList(li, level+1), false, level, -1]);
+            }
         }
+        return list;
     }
+
+    var body = doc.getElementsByTagName('body')[0];
+    var list = getList(body, 0);
 
     var view = {
       treeBox: null,
@@ -142,38 +184,9 @@ ChmfoxChrome.iframe2tree = function(doc, tree) {
       get rowCount()                     { return list.length; },
       setTree: function(treeBox)         { this.treeBox = treeBox; },
       getCellText: function(idx, column) {
-          var li = list[idx][0];
-          var spans = []
-          try {
-              var spans = li.getElementsByTagName('span');
-          }
-          catch (e) {
-          }
-
-          if (column.id == 'name') {
-              for (var i = 0; i < spans.length; i++) {
-                  var p = spans.item(i);
-                  if (p.getAttribute('name') == 'Name')
-                      return p.getAttribute('value');
-              }
-          } else if (column.id == 'link') {
-              for (var i = 0; i < spans.length; i++) {
-                  var p = spans.item(i);
-                  if (p.getAttribute('name') == 'Local') {
-                      return p.getAttribute('value').replace(/\.\//, '');
-                  }
-                  // Support multiple CHM
-                  // <span name="Merge" value="crackme05.chm::\crackme5.hhc">
-                  else if (p.getAttribute('name') == 'Merge') {
-                      var uri = p.getAttribute('value').replace(/\.\//, '');
-                      return uri.split('::')[0];
-                      // return uri.replace('::\\', '::/');
-                  }
-              }
-          }
-          return undefined;
+          return list[idx][0][column.id];
       },
-      isContainer: function(idx)         { return list[idx][1]; },
+      isContainer: function(idx)         { return list[idx][1].length != 0; },
       isContainerOpen: function(idx)     { return list[idx][2]; },
       isContainerEmpty: function(idx)    { return false; },
       isSeparator: function(idx)         { return false; },
@@ -195,56 +208,40 @@ ChmfoxChrome.iframe2tree = function(doc, tree) {
         }
         return false;
       },
+
       toggleOpenState: function(idx) {
-        var item = list[idx];
-        if (!item[1]) return;
+          if (! this.isContainer(idx)) {
+              return;
+          }
+        
+          var item = list[idx];
 
-        if (item[2]) {
-          item[2] = false;
+          if (this.isContainerOpen(idx)) {
+              item[2] = false;
 
-          var thisLevel = this.getLevel(idx);
-          var deletecount = 0;
-          for (var t = idx + 1; t < list.length; t++) {
-            if (this.getLevel(t) > thisLevel) deletecount++;
-            else break;
+              var thisLevel = this.getLevel(idx);
+              var deletecount = 0;
+              for (var t = idx + 1; t < list.length; t++) {
+                  if (this.getLevel(t) > thisLevel) {
+                      ++ deletecount;
+                  }
+                  else {
+                      break;
+                  }
+              }
+              if (deletecount != 0) {
+                  list.splice(idx + 1, deletecount);
+                  this.treeBox.rowCountChanged(idx + 1, -deletecount);
+              }
           }
-          if (deletecount) {
-            list.splice(idx + 1, deletecount);
-            this.treeBox.rowCountChanged(idx + 1, -deletecount);
+          else {
+              item[2] = true;
+              var toinsert = item[1];
+              for (var i = 0; i < toinsert.length; i++) {
+                  list.splice(idx + i + 1, 0, toinsert[i]);
+              }
+              this.treeBox.rowCountChanged(idx + 1, toinsert.length);
           }
-        }
-        else {
-          item[2] = true;
-
-          var toinsert = [];
-          var j = 0;
-          var children = [];
-          try {
-              children = item[0].getElementsByTagName('LI');
-          }
-          catch (e) {
-          }
-          for (var i = 0; i < children.length; i++) {
-            var li = children.item(i);
-            var isdirect = true;
-            var p = li.parentNode;
-            while (p != item[0]) {
-                if (p.tagName == 'LI') {
-                    isdirect = false;
-                    break;
-                }
-                p = p.parentNode;
-            }
-            if (isdirect) {
-                toinsert[j++] = [ li, isContainer(li), false, item[3] + 1, idx ];
-            }
-          }
-
-          for (var i = 0; i < toinsert.length; i++) {
-            list.splice(idx + i + 1, 0, toinsert[i]);
-          }
-          this.treeBox.rowCountChanged(idx + 1, toinsert.length);
-        }
       },
 
       getImageSrc: function(idx, column) {},

@@ -764,7 +764,6 @@ Protocol.prototype = {
 
   defaultPort: -1,
   protocolFlags: Ci.nsIProtocolHandler.URI_NORELATIVE |
-        Ci.nsIProtocolHandler.URI_URI_INHERITS_SECURITY_CONTEXT |
         Ci.nsIProtocolHandler.URI_DANGEROUS_TO_LOAD |
         Ci.nsIProtocolHandler.URI_IS_LOCAL_FILE | 
         Ci.nsIProtocolHandler.URI_NOAUTH,
@@ -780,10 +779,8 @@ Protocol.prototype = {
       }
 
       // Remote websites are not allowed to load or link to local files
-      log('baseURI:' + baseURI);
       if (baseURI) {
           var baseUriProtocol = baseURI.spec.substr(0, baseURI.spec.indexOf(':')).toLowerCase(); 
-          log("uri prefix:" + baseUriProtocol);
           if (baseUriProtocol != 'chm' && baseUriProtocol != 'chrome') {
               return undefined;
           }
@@ -945,6 +942,7 @@ Protocol.prototype = {
     if (! content) {
         content = '';
     }
+
     var sis = Cc["@mozilla.org/io/string-input-stream;1"].createInstance(Ci.nsIStringInputStream);
     sis.setData(content, content.length);
 
