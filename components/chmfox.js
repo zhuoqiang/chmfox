@@ -6,7 +6,7 @@ var EXPORTED_SYMBOLS = [ "Chmfox"];
 
 if ("undefined" == typeof(Chmfox)) {
 
-const Chmfox = (function() {
+var Chmfox = (function() {
 
 const Ci = Components.interfaces;
 const Cc = Components.classes;
