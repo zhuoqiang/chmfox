@@ -43,6 +43,17 @@ If you like ChmFox and want to help make it better, you could
 - [Contribute to source code](https://bitbucket.org/zhuoqiang/chmfox)
 
 
+## Roadmap
+
+### 3.0
+
+* Pure javascript extension without and C/C++ code
+* Restartless
+* Web UI for search/index
+
+
+
+
 # ChmFox: 查看 CHM 文件的火狐扩展 #
 
 ChmFox 是一款火狐浏览器扩展。它给所有平台带来最好的 CHM 文件阅读体验。使用这款扩展，你就可以在 Window, Mac，以及 Linux 上直接使用火狐浏览器阅读 CHM 文件
@@ -89,3 +100,4 @@ ChmFox 是开源项目，使用 MPL 1.1/GPL 2.0/LGPL 2.1 版权
 - [贡献代码](https://bitbucket.org/zhuoqiang/chmfox)
 
 更多介绍请看[作者博客](http://zhuoqiang.me/tag/chmfox)
+
