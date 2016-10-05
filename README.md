@@ -28,6 +28,30 @@ If your platform is not supported, you could always build it yourself
 4. Run the command "scons xpi" under the source tree, if everything is OK, you could find the final xpi file under ./build directory
 5. [Drop author an email](mailto:zhuo.qiang@gmail.com>) to help add that platform to the offical build so that others could benifit as well
 
+## Setup Development Environment
+
+In addition to setup general Firefox extension development environment, 
+
+you could also [point your Firefox extensions directory to your extension](https://blog.mozilla.org/addons/2009/01/28/how-to-develop-a-firefox-extension/)
+
+1.  First find the profiles directory. On Mac all profiles are under
+
+        ~/Library/Application Support/Firefox/Profiles/
+
+2.  Then choose a specifix profile. You could see all profile name and their location in 
+
+        ~/Library/Application Support/Firefox/Profiles/profiles.ini
+    
+3.  Next add a text file `chmfox@zhuoqiang.me` inside the extension directory of the profile you are choosing, for example: 
+
+        ~/Library/Application Support/Firefox/Profiles/2al7gpp8.dev-edition-default/extensions/chmfox@zhuoqiang.me
+    
+4.  Add single line in that file, which will point firefox to the local chmfox source directory (with / at the end)
+
+        ~/source/chmfox/
+
+5.  restart firefox and you have installed the local chmfox. All changes in source code will be effective without build
+
 ## License ##
 
 ChmFox is open sourced under MPL 1.1/GPL 2.0/LGPL 2.1
