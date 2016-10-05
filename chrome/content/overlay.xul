@@ -1,0 +1,29 @@
+<?xml version="1.0"?>
+<?xml-stylesheet href="chrome://chmfox/skin/overlay.css" type="text/css"?>
+<!DOCTYPE overlay SYSTEM "chrome://chmfox/locale/sidebar.dtd">
+
+<overlay id="chmfoxOverlay" xmlns="http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul">
+  <script type="application/x-javascript" src="chrome://browser/content/utilityOverlay.js" />
+  <script type="application/x-javascript" src="overlay.js" />
+
+  <menupopup id="viewSidebarMenu">
+    <menuitem key="key_openChmfoxSidebar" observes="viewChmfoxSidebar" />
+  </menupopup>
+  
+  <keyset id="mainKeyset">
+    <key id="key_openChmfoxSidebar" command="viewChmfoxSidebar"
+         key="&openChmfoxSidebar.commandkey;" 
+         modifiers="&openChmfoxSidebar.modifierskey;" />
+  </keyset>
+  
+  <broadcasterset id="mainBroadcasterSet"> 
+    <broadcaster id="viewChmfoxSidebar" 
+                 label="&chmfoxSidebar.title;"
+                 autoCheck="false"
+                 type="checkbox"
+                 group="sidebar"
+                 sidebarurl="chrome://chmfox/content/sidebar.xul"
+                 sidebartitle="&chmfoxSidebar.title;"
+                 oncommand="ChmfoxChrome.toggleSidebar();" />
+  </broadcasterset>
+</overlay>

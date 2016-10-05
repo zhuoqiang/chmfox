@@ -1,0 +1,52 @@
+<?xml version="1.0"?>
+<?xml-stylesheet href="chrome://global/skin/" type="text/css" ?>
+<?xml-stylesheet href="chrome://browser/skin/browser.css" type="text/css" ?>
+<!DOCTYPE overlay SYSTEM "chrome://chmfox/locale/sidebar.dtd">
+
+<page id="sbChmfoxSidebar" title="&chmfoxSidebar.title;"
+      xmlns="http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul">
+  <script src="sidebar.js" charset="UTF-8" />
+  <!-- <checkbox label="auto open" /> -->
+  <tabbox id="chmfoxTabbox" flex="1">
+    <tabs>
+      <tab id="chmfoxContentTab" label="&chmfoxSidebar.contents;" selected="true" accesskey="C"/>
+      <tab id="chmfoxIndexTab" label="&chmfoxSidebar.index;" accesskey="N"/>
+    </tabs>
+    <tabpanels flex="1">
+      <tabpanel id="topicspanel" flex="1">
+        <iframe id="chmfoxBookmark_iframe" hidden="true" type="content" />
+        <tree id="chmfoxBookmark" flex="1"
+              hidecolumnpicker="true"
+              seltype="single"
+              onselect="ChmfoxChrome.on_bookmark_select()">
+          <treecols>
+            <treecol id="name" primary="true" flex="1" hideheader="true"/>
+            <treecol id="link" hidden="true"/>
+          </treecols>
+          <treechildren />
+        </tree>
+      </tabpanel>
+      <tabpanel id="indexpanel" flex="1">
+        <iframe id="chmfoxIndex_iframe" hidden="true" type="content" />
+        <vbox flex="1">
+          <hbox>
+            <textbox id="find_index" rows="1" flex="1" onkeypress="ChmfoxChrome.on_find_index_keypress(event)"
+                     onfocus="ChmfoxChrome.on_find_index_focus(event)" />
+            <button id="find_index_btn" label="&chmfoxSidebar.find;"
+                    oncommand="ChmfoxChrome.on_find_index(event)" />
+          </hbox>
+          <tree id="chmfoxIndex" flex="1"
+                hidecolumnpicker="true"
+                seltype="single"
+                onselect="ChmfoxChrome.on_index_select()">
+            <treecols>
+              <treecol id="name" primary="true" flex="1" hideheader="true" />
+              <treecol id="link" hidden="true" />
+            </treecols>
+            <treechildren />
+          </tree>
+        </vbox>
+      </tabpanel>
+    </tabpanels>
+  </tabbox>
+</page>

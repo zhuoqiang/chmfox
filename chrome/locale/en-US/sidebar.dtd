@@ -1,0 +1,7 @@
+<!ENTITY chmfox.description "ChmFox brings the best CHM file reading experience to Firefox">
+<!ENTITY chmfoxSidebar.title "ChmFox">
+<!ENTITY openChmfoxSidebar.commandkey "M">
+<!ENTITY openChmfoxSidebar.modifierskey "alt shift">
+<!ENTITY chmfoxSidebar.contents "Contents">
+<!ENTITY chmfoxSidebar.index "Index">
+<!ENTITY chmfoxSidebar.find "Find">

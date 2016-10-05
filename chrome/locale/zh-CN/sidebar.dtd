@@ -1,0 +1,8 @@
+<!ENTITY chmfox.description "ChmFox 带给火狐最好的 CHM 阅读体验">
+<!ENTITY chmfoxSidebar.title "ChmFox">
+<!ENTITY openChmfoxSidebar.commandkey "M">
+<!ENTITY openChmfoxSidebar.modifierskey "alt shift">
+<!ENTITY chmfoxSidebar.contents "目录">
+<!ENTITY chmfoxSidebar.index "索引">
+<!ENTITY chmfoxSidebar.find "查找">
+

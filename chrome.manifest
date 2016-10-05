@@ -1,0 +1,25 @@
+content chmfox chrome/content/
+resource chmfox components/
+
+skin chmfox classic/1.0 chrome/skin/
+locale chmfox en-US chrome/locale/en-US/
+locale chmfox zh-CN chrome/locale/zh-CN/
+locale chmfox zh-TW chrome/locale/zh-TW/
+
+overlay chrome://browser/content/browser.xul chrome://chmfox/content/overlay.xul
+
+component {c152fc51-a5bf-4cc7-99f1-66ca8459d806} components/chmfox.js
+contract @mozilla.org/network/protocol;1?name=chm {c152fc51-a5bf-4cc7-99f1-66ca8459d806}
+
+component {1c811fec-ec47-45ea-a395-c70fb1fc8f9d} components/chmfox.js
+contract @zhuoqiang.me/chmXURIContentListener;1 {1c811fec-ec47-45ea-a395-c70fb1fc8f9d}
+category profile-after-change chmXURIContentListener @zhuoqiang.me/chmXURIContentListener;1
+
+resource chmfox-lib lib/WINNT_x86-msvc/libchmfox.dll ABI=WINNT_x86-msvc
+resource chmfox-lib lib/WINNT_x86_64-msvc/libchmfox.dll ABI=WINNT_x86_64-msvc
+
+resource chmfox-lib lib/Linux_x86-gcc3/libchmfox.so ABI=Linux_x86-gcc3
+resource chmfox-lib lib/Linux_x86_64-gcc3/libchmfox.so ABI=Linux_x86_64-gcc3
+
+resource chmfox-lib lib/Darwin_x86-gcc3/libchmfox.dylib ABI=Darwin_x86-gcc3
+resource chmfox-lib lib/Darwin_x86_64-gcc3/libchmfox.dylib ABI=Darwin_x86_64-gcc3

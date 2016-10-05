@@ -1,0 +1,8 @@
+\.DS_Store
+\.dblite$
+\.orig$
+^install\.rdf$
+# lib/.+\.exp$
+# lib/.+\.lib$
+build/
+sample/

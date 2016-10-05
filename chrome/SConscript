@@ -1,0 +1,6 @@
+import os
+
+Import('env')
+
+contents = Glob('content/*.js') + Glob('content/*.xul') + Glob('skin/*.css') + Glob('locale/*/*.dtd') + Glob('../defaults/preferences/prefs.js')
+Return('contents')
